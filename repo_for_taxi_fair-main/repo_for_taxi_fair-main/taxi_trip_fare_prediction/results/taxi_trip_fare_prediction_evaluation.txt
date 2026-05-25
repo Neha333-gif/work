@@ -1,0 +1,22 @@
+Taxi Trip Fare Prediction Model Evaluation Report
+=================================================
+
+Dataset shape: (209673, 8)
+Best model: Linear Regression
+
+Best model metrics:
+  MAE : 12.7636
+  MSE : 454.1947
+  RMSE: 21.3118
+  R2  : 0.9547
+
+Detailed model comparison:
+
+Linear Regression: MAE=12.7636, MSE=454.1947, RMSE=21.3118, R2=0.9547
+
+Decision Tree: MAE=12.4442, MSE=583.3158, RMSE=24.1519, R2=0.9418
+
+Random Forest: MAE=12.2685, MSE=461.2891, RMSE=21.4776, R2=0.9540
+
+Feature columns:
+trip_duration, distance_traveled, num_of_passengers, fare, surge_applied

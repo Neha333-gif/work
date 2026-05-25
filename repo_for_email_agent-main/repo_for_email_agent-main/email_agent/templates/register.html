@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - AI Email Agent</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-header">
+            <h1>Create Account</h1>
+            <p class="subtitle">Join our AI-powered assistant</p>
+        </div>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <div class="flash-messages">
+              {% for message in messages %}
+                <div class="flash-message">{{ message }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <form action="{{ url_for('register') }}" method="POST" class="glass-card">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" class="form-control" placeholder="Choose a username" required autocomplete="username">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" class="form-control" placeholder="Create a password" required autocomplete="new-password">
+            </div>
+            <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 1rem;">
+                <i class="fas fa-user-plus"></i> Register
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            Already have an account? <a href="{{ url_for('login') }}">Login</a>
+        </div>
+    </div>
+</body>
+</html>

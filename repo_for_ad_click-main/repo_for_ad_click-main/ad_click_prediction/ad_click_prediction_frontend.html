@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AD ENGAGE | AI Ad Click Predictor</title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #090c15;
+      --bg-card: rgba(16, 24, 48, 0.6);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+
+      --color-primary: #3b82f6;
+      --color-primary-glow: rgba(59, 130, 246, 0.3);
+      --color-success: #10b981;
+      --color-success-glow: rgba(16, 185, 129, 0.3);
+      --color-warning: #f59e0b;
+      --color-warning-glow: rgba(245, 158, 11, 0.3);
+      --color-danger: #ef4444;
+      --color-danger-glow: rgba(239, 68, 68, 0.3);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background-color: var(--bg-dark);
+      background-image:
+        radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.04) 0%, transparent 60%);
+      background-attachment: fixed;
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+      overflow-x: hidden;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1100px;
+      z-index: 10;
+    }
+
+    /* Glow Header */
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+      position: relative;
+    }
+
+    .header h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 42px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #ffffff 30%, #3b82f6 70%, #10b981 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 12px;
+      text-shadow: 0 0 40px rgba(59, 130, 246, 0.15);
+    }
+
+    .header p {
+      font-size: 16px;
+      color: var(--text-muted);
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+
+    /* Glassmorphic Card */
+    .card {
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      padding: 40px;
+      margin-bottom: 30px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+    }
+
+    /* API connection banner */
+    .api-banner {
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      border-radius: 12px;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 30px;
+      font-size: 14px;
+      flex-wrap: wrap;
+    }
+
+    .api-input-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .api-banner input {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: var(--text-main);
+      font-family: inherit;
+      width: 250px;
+      transition: all 0.3s;
+    }
+
+    .api-banner input:focus {
+      border-color: var(--color-primary);
+      outline: none;
+      box-shadow: 0 0 0 2px var(--color-primary-glow);
+    }
+
+    .api-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      background-color: #e2e8f0;
+      border-radius: 50%;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+      transition: all 0.3s;
+    }
+
+    .status-dot.connected {
+      background-color: var(--color-success);
+      box-shadow: 0 0 10px var(--color-success-glow);
+    }
+
+    .status-dot.disconnected {
+      background-color: var(--color-danger);
+      box-shadow: 0 0 10px var(--color-danger-glow);
+    }
+
+    /* Navigation Tabs */
+    .tab-container {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 35px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 2px;
+    }
+
+    .tab-btn {
+      padding: 12px 24px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-radius: 12px 12px 0 0;
+      position: relative;
+      transition: all 0.3s;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .tab-btn.active {
+      color: var(--color-primary);
+    }
+
+    .tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -3px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--color-primary);
+      border-radius: 3px;
+      box-shadow: 0 0 12px var(--color-primary);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.4s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Form Fields Grid */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    @media (min-width: 600px) {
+      .form-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .field label {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    select {
+      padding: 16px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 15px;
+      outline: none;
+      transition: all 0.3s;
+      width: 100%;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--color-primary);
+      background: rgba(0, 0, 0, 0.4);
+      box-shadow: 0 0 0 3px var(--color-primary-glow);
+    }
+
+    .btn {
+      padding: 16px 30px;
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 20px rgba(59, 130, 246, 0.25);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
+    }
+
+    .btn:active {
+      transform: none;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Results Layout */
+    .results-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 30px;
+      margin-top: 40px;
+      display: none;
+    }
+
+    .results-grid.show {
+      display: grid;
+    }
+
+    @media (min-width: 800px) {
+      .results-grid {
+        grid-template-columns: 350px 1fr;
+      }
+    }
+
+    /* Circular Prediction Dial */
+    .dial-card {
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .svg-gauge {
+      width: 200px;
+      height: 200px;
+      transform: rotate(-90deg);
+    }
+
+    .gauge-bg {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.05);
+      stroke-width: 14px;
+    }
+
+    .gauge-fill {
+      fill: none;
+      stroke-width: 14px;
+      stroke-linecap: round;
+      stroke-dasharray: 565.48; /* 2 * pi * 90 */
+      stroke-dashoffset: 565.48;
+      transition: stroke-dashoffset 1.5s ease-out, stroke 1.5s ease-out;
+    }
+
+    .dial-value {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 42px;
+      font-weight: 700;
+      margin-top: -125px;
+      margin-bottom: 75px;
+      z-index: 2;
+    }
+
+    .verdict-badge {
+      display: inline-block;
+      padding: 8px 18px;
+      border-radius: 30px;
+      font-weight: 700;
+      font-size: 15px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-top: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+    }
+
+    .verdict-badge.clicks-0 {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid var(--color-danger);
+      color: #fca5a5;
+    }
+    .verdict-badge.clicks-low {
+      background: rgba(245, 158, 11, 0.2);
+      border: 1px solid var(--color-warning);
+      color: #fde047;
+    }
+    .verdict-badge.clicks-high {
+      background: rgba(16, 185, 129, 0.2);
+      border: 1px solid var(--color-success);
+      color: #a7f3d0;
+    }
+
+    /* Insights Box */
+    .insights-card {
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .insights-card h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-left: 3px solid var(--color-primary);
+      padding-left: 10px;
+    }
+
+    .insights-card p {
+      font-size: 15px;
+      line-height: 1.6;
+      color: #cbd5e1;
+      margin-bottom: 20px;
+    }
+
+    .insights-list {
+      list-style: none;
+    }
+
+    .insights-list li {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      padding-left: 24px;
+      position: relative;
+      line-height: 1.5;
+    }
+
+    .insights-list li::before {
+      content: '✦';
+      position: absolute;
+      left: 0;
+      color: var(--color-primary);
+    }
+
+    /* Class Probability Bars */
+    .prob-header {
+      font-size: 14px;
+      font-weight: 600;
+      margin-top: 15px;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+
+    .prob-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 13px;
+    }
+
+    .prob-bar-container {
+      width: 100%;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+
+    .prob-bar-fill {
+      height: 100%;
+      background-color: var(--color-primary);
+      border-radius: 4px;
+      transition: width 1s ease-out;
+    }
+
+    /* Errors */
+    .error-box {
+      background: rgba(239, 68, 68, 0.1);
+      border-left: 4px solid var(--color-danger);
+      color: #fca5a5;
+      padding: 16px;
+      border-radius: 8px;
+      margin-top: 20px;
+      display: none;
+      font-size: 14px;
+    }
+
+    .loading-spinner {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 20px;
+      color: var(--color-primary);
+      font-weight: 600;
+    }
+
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid rgba(59, 130, 246, 0.2);
+      border-top-color: var(--color-primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Diagnostics title */
+    .batch-title {
+      font-size: 18px;
+      font-weight: 600;
+      border-left: 3px solid var(--color-success);
+      padding-left: 10px;
+    }
+
+    /* Diagnostics Tab */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+
+    .stat-card {
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .stat-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 32px;
+      font-weight: 700;
+      color: white;
+    }
+
+    /* Visualizations grid */
+    .viz-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+      margin-top: 30px;
+    }
+
+    @media (min-width: 768px) {
+      .viz-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .plot-card {
+      background: rgba(0, 0, 0, 0.15);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .plot-card h4 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      align-self: flex-start;
+      color: var(--text-main);
+      border-left: 3px solid var(--color-primary);
+      padding-left: 8px;
+    }
+
+    .plot-img-container {
+      width: 100%;
+      height: 250px;
+      border-radius: 10px;
+      overflow: hidden;
+      background: rgba(0, 0, 0, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: zoom-in;
+      position: relative;
+    }
+
+    .plot-img-container::after {
+      content: '🔍 Click to Zoom';
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      color: white;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .plot-img-container:hover::after {
+      opacity: 1;
+    }
+
+    .plot-img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      transition: transform 0.3s;
+    }
+
+    .plot-img-container:hover .plot-img {
+      transform: scale(1.03);
+    }
+
+    /* Modal for zoom */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(9, 12, 21, 0.9);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-content {
+      max-width: 90%;
+      max-height: 85%;
+      object-fit: contain;
+      border-radius: 12px;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
+      border: 1px solid var(--border-color);
+      animation: zoomIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes zoomIn {
+      from { transform: scale(0.95); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 30px;
+      right: 30px;
+      color: var(--text-main);
+      font-size: 32px;
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+
+    .modal-close:hover {
+      color: var(--color-primary);
+    }
+
+    /* Retrain Controls */
+    .retrain-section {
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      margin-top: 40px;
+      padding-top: 30px;
+    }
+
+    .retrain-console {
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px 20px;
+      font-family: monospace;
+      font-size: 13px;
+      color: #38bdf8;
+      max-height: 150px;
+      overflow-y: auto;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    
+    <!-- Header -->
+    <header class="header">
+      <h1>AD ENGAGE</h1>
+      <p>Premium Machine Learning Ad Click Prediction engine. Analyze engagement levels, predict clicks based on CTR and Impressions, and extract optimization insights.</p>
+    </header>
+
+    <!-- API connection banner -->
+    <div class="api-banner">
+      <div class="api-input-group">
+        <label for="apiUrl">API Gateway:</label>
+        <input type="text" id="apiUrl" value="http://127.0.0.1:8000" placeholder="e.g. http://localhost:8000" onchange="checkConnection()">
+      </div>
+      <div class="api-status">
+        Server: <span class="status-dot" id="statusDot"></span> <span id="statusText">Checking...</span>
+      </div>
+    </div>
+
+    <!-- Main Navigation Card -->
+    <div class="card">
+      <div class="tab-container">
+        <button class="tab-btn active" onclick="switchTab('singlePredict')">🎯 Single Ad Scanner</button>
+        <button class="tab-btn" id="diagTabBtn" onclick="switchTab('diagnostics')">📊 Diagnostics Dashboard</button>
+      </div>
+
+      <!-- TAB 1: Single Prediction -->
+      <div id="singlePredict" class="tab-content active">
+        <form id="predictionForm" onsubmit="predictSingle(event)">
+          <div class="form-grid">
+            
+            <div class="field">
+              <label for="bannerId">Banner ID</label>
+              <select id="bannerId" required>
+                <option value="">-- Select Banner ID --</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="eventDate">Interaction Date</label>
+              <input type="date" id="eventDate" required>
+            </div>
+
+            <div class="field">
+              <label for="impressions">Impressions</label>
+              <input type="number" id="impressions" min="1" max="1000000" placeholder="e.g. 5" value="3" required>
+            </div>
+
+            <div class="field">
+              <label for="ctr">Click-Through Rate (CTR)</label>
+              <input type="number" id="ctr" min="0.0" max="1.0" step="0.0001" placeholder="e.g. 0.12" value="0.0" required>
+            </div>
+
+          </div>
+
+          <button type="submit" class="btn" id="predictBtn">
+            <span>Analyze Ad Interaction</span>
+          </button>
+        </form>
+
+        <div class="loading-spinner" id="spinner">
+          <div class="spinner"></div>
+          <span>Processing prediction variables...</span>
+        </div>
+
+        <div class="error-box" id="errorBox"></div>
+
+        <!-- Single Prediction Results -->
+        <div class="results-grid" id="resultsGrid">
+          
+          <!-- Gauge Card -->
+          <div class="dial-card">
+            <svg class="svg-gauge">
+              <circle class="gauge-bg" cx="100" cy="100" r="90"></circle>
+              <circle class="gauge-fill" id="gaugeFill" cx="100" cy="100" r="90" stroke="#3b82f6"></circle>
+            </svg>
+            <div class="dial-value" id="dialVal">0</div>
+            <p style="font-size: 13px; font-weight: 600; text-transform: uppercase; color: var(--text-muted);">Predicted Clicks</p>
+            <div class="verdict-badge clicks-0" id="verdictBadge">No Clicks</div>
+          </div>
+
+          <!-- Description and insights -->
+          <div class="insights-card">
+            <h3 id="insightsTitle">Engagement Verdict</h3>
+            <p id="verdictDesc">No clicks predicted for this banner interaction.</p>
+            
+            <h3 style="border-left-color: var(--color-success)">Optimization Recommendations</h3>
+            <ul class="insights-list" id="insightsList">
+              <li>Review the copy or creatives of this banner.</li>
+              <li>A/B test different formats.</li>
+            </ul>
+
+            <div class="prob-header">Target Distribution Probabilities</div>
+            <div id="probBarsContainer">
+              <!-- Dynamically populated probability bars -->
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- TAB 3: Diagnostics & Retraining -->
+      <div id="diagnostics" class="tab-content">
+        
+        <!-- Metrics -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Model Type</div>
+            <div class="stat-value" style="font-size: 20px; line-height: 48px;">Random Forest</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Classification Accuracy</div>
+            <div class="stat-value" id="statAccuracy" style="color: var(--color-success);">99.6%</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Precision score</div>
+            <div class="stat-value" id="statPrecision">99.6%</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Recall score</div>
+            <div class="stat-value" id="statRecall">99.6%</div>
+          </div>
+        </div>
+
+        <!-- Plots -->
+        <h3 class="batch-title" style="border-left-color: var(--color-primary); margin-bottom: 20px;">Model Diagnostics & Insights Plots</h3>
+        
+        <div class="viz-grid">
+          
+          <div class="plot-card">
+            <h4>Confusion Matrix</h4>
+            <div class="plot-img-container" onclick="zoomImage('confusion_matrix.png')">
+              <img id="plotConfusionMatrix" class="plot-img" alt="Confusion Matrix plot">
+            </div>
+          </div>
+
+          <div class="plot-card">
+            <h4>Feature Importance</h4>
+            <div class="plot-img-container" onclick="zoomImage('feature_importance.png')">
+              <img id="plotFeatureImportance" class="plot-img" alt="Feature Importance plot">
+            </div>
+          </div>
+
+          <div class="plot-card">
+            <h4>Correlation Heatmap</h4>
+            <div class="plot-img-container" onclick="zoomImage('correlation_heatmap.png')">
+              <img id="plotCorrelationHeatmap" class="plot-img" alt="Correlation Heatmap plot">
+            </div>
+          </div>
+
+          <div class="plot-card">
+            <h4>Clicks Distribution</h4>
+            <div class="plot-img-container" onclick="zoomImage('class_distribution.png')">
+              <img id="plotClassDistribution" class="plot-img" alt="Class Distribution plot">
+            </div>
+          </div>
+
+          <div class="plot-card" style="grid-column: 1 / -1;">
+            <h4>Receiver Operating Characteristic (ROC) Curve</h4>
+            <div class="plot-img-container" onclick="zoomImage('roc_curve.png')">
+              <img id="plotRocCurve" class="plot-img" alt="ROC Curve plot">
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Live Retraining -->
+        <div class="retrain-section">
+          <h3 class="batch-title" style="border-left-color: var(--color-warning);">Retraining & Model Control Center</h3>
+          <p style="font-size: 14px; color: var(--text-muted); margin-top: 10px; line-height: 1.5;">
+            Initiate a background model training pipeline. The server will run the Python script (<code>ad_click_predictions.py</code>), process the dataset, generate updated encoders/scalers, rebuild plots, and reload variables automatically without downtime.
+          </p>
+          
+          <button class="btn" onclick="triggerRetraining()" id="retrainBtn" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); box-shadow: 0 4px 20px rgba(245, 158, 11, 0.25); margin-top: 20px;">
+            <span>🔄 Retrain Model in Background</span>
+          </button>
+          
+          <div class="retrain-console" id="retrainConsole" style="display: none;">
+            &gt; Retraining system idle...
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Modal for zoomed images -->
+  <div class="modal" id="imageModal" onclick="closeModal()">
+    <span class="modal-close">&times;</span>
+    <img class="modal-content" id="modalImg">
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    let savedApiUrl = localStorage.getItem('ad_click_api_url') || 'http://127.0.0.1:8000';
+    document.getElementById('apiUrl').value = savedApiUrl;
+
+    let preprocessors = null;
+
+    // Check connection on startup
+    window.addEventListener('load', () => {
+      checkConnection();
+      initFeatures();
+      loadDiagnosticsData();
+    });
+
+    // Helper: API URL formatting
+    function getApiUrl() {
+      let url = document.getElementById('apiUrl').value.trim();
+      if (url.endsWith('/')) {
+        url = url.slice(0, -1);
+      }
+      return url;
+    }
+
+    // Ping /health
+    async function checkConnection() {
+      const dot = document.getElementById('statusDot');
+      const text = document.getElementById('statusText');
+      const url = getApiUrl();
+
+      dot.className = 'status-dot';
+      text.innerText = 'Checking...';
+
+      localStorage.setItem('ad_click_api_url', url);
+
+      try {
+        const response = await fetch(`${url}/health`, { mode: 'cors' });
+        if (response.ok) {
+          const data = await response.json();
+          if (data.status === 'ok') {
+            dot.className = 'status-dot connected';
+            text.innerText = 'Online';
+            // Reload metadata if we just connected
+            if (!preprocessors) {
+              initFeatures();
+              loadDiagnosticsData();
+            }
+          } else {
+            dot.className = 'status-dot disconnected';
+            text.innerText = 'Degraded';
+          }
+        } else {
+          dot.className = 'status-dot disconnected';
+          text.innerText = 'Offline';
+        }
+      } catch (err) {
+        dot.className = 'status-dot disconnected';
+        text.innerText = 'Disconnected';
+      }
+    }
+
+    // Get features dropdown and validation
+    async function initFeatures() {
+      const url = getApiUrl();
+      const bannerSelect = document.getElementById('bannerId');
+      const dateInput = document.getElementById('eventDate');
+
+      try {
+        const res = await fetch(`${url}/features`);
+        if (!res.ok) return;
+
+        preprocessors = await res.json();
+        
+        // Populate banners dropdown
+        bannerSelect.innerHTML = '<option value="">-- Select Banner ID --</option>';
+        preprocessors.unique_banners.forEach(b => {
+          const opt = document.createElement('option');
+          opt.value = b;
+          opt.innerText = b;
+          bannerSelect.appendChild(opt);
+        });
+
+        // Date range constraint settings
+        if (preprocessors.date_range && preprocessors.date_range.min) {
+          dateInput.min = preprocessors.date_range.min;
+          dateInput.max = preprocessors.date_range.max;
+          dateInput.value = preprocessors.date_range.min;
+        }
+
+      } catch (err) {
+        console.error("Failed to load preprocessors info: ", err);
+      }
+    }
+
+    // Tab Switcher
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+
+      document.getElementById(tabId).classList.add('active');
+      
+      // Find corresponding button
+      const btns = Array.from(document.querySelectorAll('.tab-btn'));
+      const activeBtn = btns.find(b => b.innerText.toLowerCase().includes(tabId.replace('Predict', '').toLowerCase()) || (tabId === 'diagnostics' && b.id === 'diagTabBtn'));
+      if (activeBtn) activeBtn.classList.add('active');
+
+      if (tabId === 'diagnostics') {
+        loadDiagnosticsData();
+      }
+    }
+
+    // Predict Single Ad Click
+    async function predictSingle(e) {
+      e.preventDefault();
+      
+      const spinner = document.getElementById('spinner');
+      const errorBox = document.getElementById('errorBox');
+      const resultsGrid = document.getElementById('resultsGrid');
+      const predictBtn = document.getElementById('predictBtn');
+      const url = getApiUrl();
+
+      errorBox.style.display = 'none';
+      resultsGrid.classList.remove('show');
+      predictBtn.disabled = true;
+      spinner.style.display = 'flex';
+
+      const payload = {
+        event_date: document.getElementById('eventDate').value,
+        banner_id: document.getElementById('bannerId').value,
+        impressions: parseInt(document.getElementById('impressions').value),
+        ctr: parseFloat(document.getElementById('ctr').value)
+      };
+
+      try {
+        const response = await fetch(`${url}/predict`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+          const detail = await response.json();
+          throw new Error(detail.detail || 'Prediction request failed.');
+        }
+
+        const data = await response.json();
+        
+        // Render outputs
+        document.getElementById('dialVal').innerText = data.prediction;
+        
+        // Update verdict badge
+        const badge = document.getElementById('verdictBadge');
+        badge.innerText = data.prediction === 0 ? 'No Clicks' : `${data.prediction} ${data.prediction === 1 ? 'Click' : 'Clicks'}`;
+        badge.className = 'verdict-badge';
+        if (data.prediction === 0) {
+          badge.classList.add('clicks-0');
+        } else if (data.prediction <= 2) {
+          badge.classList.add('clicks-low');
+        } else {
+          badge.classList.add('clicks-high');
+        }
+
+        document.getElementById('verdictDesc').innerText = data.description;
+        
+        // Populate recommendations list
+        const list = document.getElementById('insightsList');
+        list.innerHTML = '';
+        data.insights.forEach(ins => {
+          const li = document.createElement('li');
+          li.innerText = ins;
+          list.appendChild(li);
+        });
+
+        // Set SVG Gauge fill based on prediction confidence
+        const circumference = 565.48;
+        const fillOffset = circumference - (data.confidence * circumference);
+        const fill = document.getElementById('gaugeFill');
+        fill.style.strokeDashoffset = fillOffset;
+        
+        // Set gauge color based on clicks prediction
+        if (data.prediction === 0) {
+          fill.style.stroke = '#ef4444'; // Red
+        } else if (data.prediction <= 2) {
+          fill.style.stroke = '#f59e0b'; // Amber
+        } else {
+          fill.style.stroke = '#10b981'; // Emerald
+        }
+
+        // Pop probabilities bars
+        const barsContainer = document.getElementById('probBarsContainer');
+        barsContainer.innerHTML = '';
+        data.top_probabilities.forEach(p => {
+          const row = document.createElement('div');
+          row.style.marginBottom = '12px';
+          
+          const label = document.createElement('div');
+          label.className = 'prob-row';
+          label.innerHTML = `<span><strong>${p.clicks}</strong> ${p.clicks === 1 ? 'click' : 'clicks'} prediction</span> <span>${(p.probability * 100).toFixed(1)}%</span>`;
+          
+          const barBg = document.createElement('div');
+          barBg.className = 'prob-bar-container';
+          
+          const barFill = document.createElement('div');
+          barFill.className = 'prob-bar-fill';
+          
+          // Color coding classes
+          if (p.clicks === 0) {
+            barFill.style.background = 'linear-gradient(90deg, #ef4444, #f87171)';
+          } else if (p.clicks <= 2) {
+            barFill.style.background = 'linear-gradient(90deg, #f59e0b, #fbbf24)';
+          } else {
+            barFill.style.background = 'linear-gradient(90deg, #10b981, #34d399)';
+          }
+
+          barBg.appendChild(barFill);
+          row.appendChild(label);
+          row.appendChild(barBg);
+          barsContainer.appendChild(row);
+
+          // Force trigger animation
+          setTimeout(() => {
+            barFill.style.width = `${p.probability * 100}%`;
+          }, 50);
+        });
+
+        resultsGrid.classList.add('show');
+
+      } catch (err) {
+        errorBox.innerText = err.message;
+        errorBox.style.display = 'block';
+      } finally {
+        spinner.style.display = 'none';
+        predictBtn.disabled = false;
+      }
+    }
+
+    // Load diagnostics and plots
+    async function loadDiagnosticsData() {
+      const url = getApiUrl();
+      try {
+        const res = await fetch(`${url}/results/metrics`);
+        if (!res.ok) return;
+
+        const data = await res.json();
+        
+        // Set images src adding cache buster to prevent cached image load
+        const cacheBuster = `?t=${new Date().getTime()}`;
+        document.getElementById('plotConfusionMatrix').src = `${url}${data.plots.confusion_matrix}${cacheBuster}`;
+        document.getElementById('plotFeatureImportance').src = `${url}${data.plots.feature_importance}${cacheBuster}`;
+        document.getElementById('plotCorrelationHeatmap').src = `${url}${data.plots.correlation_heatmap}${cacheBuster}`;
+        document.getElementById('plotClassDistribution').src = `${url}${data.plots.class_distribution}${cacheBuster}`;
+        document.getElementById('plotRocCurve').src = `${url}${data.plots.roc_curve}${cacheBuster}`;
+
+        // Parse accuracy results report to get numeric values
+        const report = data.text_report;
+        const lines = report.split('\n');
+        
+        let acc = "99.66%";
+        let prec = "99.66%";
+        let rec = "99.66%";
+        
+        lines.forEach(line => {
+          if (line.startsWith('Accuracy')) {
+            acc = line.split(':')[1].trim();
+          } else if (line.startsWith('Precision')) {
+            prec = (parseFloat(line.split(':')[1].trim()) * 100).toFixed(1) + "%";
+          } else if (line.startsWith('Recall')) {
+            rec = (parseFloat(line.split(':')[1].trim()) * 100).toFixed(1) + "%";
+          }
+        });
+
+        document.getElementById('statAccuracy').innerText = acc;
+        document.getElementById('statPrecision').innerText = prec;
+        document.getElementById('statRecall').innerText = rec;
+
+      } catch (err) {
+        console.error("Failed to load metrics and plots: ", err);
+      }
+    }
+
+    // Zoom plots
+    function zoomImage(filename) {
+      const url = getApiUrl();
+      const modal = document.getElementById('imageModal');
+      const modalImg = document.getElementById('modalImg');
+      modal.style.display = "flex";
+      modalImg.src = `${url}/results/image/${filename}?t=${new Date().getTime()}`;
+    }
+
+    function closeModal() {
+      document.getElementById('imageModal').style.display = "none";
+    }
+
+    // Trigger Retraining
+    let retrainPollInterval = null;
+    async function triggerRetraining() {
+      const url = getApiUrl();
+      const btn = document.getElementById('retrainBtn');
+      const consoleBox = document.getElementById('retrainConsole');
+
+      btn.disabled = true;
+      consoleBox.style.display = 'block';
+      consoleBox.innerText = '> Triggering background training process on server...\n';
+
+      try {
+        const res = await fetch(`${url}/retrain`, { method: 'POST' });
+        if (!res.ok) throw new Error("Could not start background training process.");
+
+        const data = await res.json();
+        consoleBox.innerText += `> Server status: ${data.status}\n`;
+        consoleBox.innerText += `> Message: ${data.message}\n`;
+        consoleBox.innerText += `> Polling training logs. Please stand by...\n`;
+        
+        let dotCount = 0;
+        retrainPollInterval = setInterval(() => {
+          dotCount++;
+          consoleBox.innerText += `.`;
+          if (dotCount % 30 === 0) {
+            consoleBox.innerText += `\n`;
+          }
+          consoleBox.scrollTop = consoleBox.scrollHeight;
+        }, 1000);
+
+        // Wait 25 seconds for model retraining to finish, then reload
+        setTimeout(async () => {
+          clearInterval(retrainPollInterval);
+          consoleBox.innerText += `\n> Polling complete. Checking server status...\n`;
+          try {
+            const hRes = await fetch(`${url}/health`);
+            if (hRes.ok) {
+              consoleBox.innerText += `> Server is healthy. Reloading model parameters & plots...\n`;
+              await initFeatures();
+              await loadDiagnosticsData();
+              consoleBox.innerText += `> SUCCESS: Model assets and plots refreshed!\n`;
+            } else {
+              consoleBox.innerText += `> WARNING: Server returned error status.\n`;
+            }
+          } catch (e) {
+            consoleBox.innerText += `> ERROR: Could not verify server health.\n`;
+          }
+          btn.disabled = false;
+          consoleBox.scrollTop = consoleBox.scrollHeight;
+        }, 25000);
+
+      } catch (err) {
+        consoleBox.innerText += `> ERROR: ${err.message}\n`;
+        btn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>

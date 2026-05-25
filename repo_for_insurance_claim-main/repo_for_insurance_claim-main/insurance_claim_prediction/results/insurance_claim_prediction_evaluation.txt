@@ -1,0 +1,32 @@
+Insurance Claim Prediction Model Evaluation Report
+=================================================
+
+Pipeline: Random Forest Classification for insurance claim prediction
+
+Dataset shape: (1338, 8)
+Target distribution:
+insuranceclaim
+1    783
+0    555
+
+Random Forest Performance:
+  Accuracy : 0.9291
+  Precision: 0.9423
+  Recall   : 0.9363
+  F1 Score : 0.9393
+  ROC AUC  : 0.9891
+
+Classification Report:
+              precision    recall  f1-score   support
+
+    No Claim       0.91      0.92      0.91       111
+       Claim       0.94      0.94      0.94       157
+
+    accuracy                           0.93       268
+   macro avg       0.93      0.93      0.93       268
+weighted avg       0.93      0.93      0.93       268
+
+
+Comparison Models:
+  Logistic Regression ROC AUC: 0.9046
+  Decision Tree      ROC AUC: 0.9841

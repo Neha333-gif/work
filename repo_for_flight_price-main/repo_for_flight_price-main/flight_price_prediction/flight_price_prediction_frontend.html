@@ -1,0 +1,1592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AeroPredict - Premium Flight Price Predictor</title>
+  
+  <!-- Premium Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --primary: #5c62f7;
+      --primary-glow: rgba(92, 98, 247, 0.4);
+      --secondary: #00d2ff;
+      --secondary-glow: rgba(0, 210, 255, 0.3);
+      --accent: #ff007a;
+      --dark-bg: #0b0f19;
+      --card-bg: rgba(20, 26, 46, 0.6);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+      --glow-box: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      --glass-filter: blur(16px);
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--dark-bg);
+      background-image: 
+        radial-gradient(at 10% 10%, rgba(92, 98, 247, 0.15) 0px, transparent 50%),
+        radial-gradient(at 90% 90%, rgba(0, 210, 255, 0.12) 0px, transparent 50%),
+        radial-gradient(at 50% 10%, rgba(255, 0, 122, 0.05) 0px, transparent 40%);
+      background-attachment: fixed;
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    /* Core Container Layout */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    /* Header Styling */
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+      position: relative;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .brand-logo {
+      font-size: 2.2rem;
+      background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 2px 8px var(--primary-glow));
+    }
+
+    .brand-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(to right, #ffffff, #d8dee9);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* Tabs Component */
+    .tabs {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 30px;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 6px;
+      border-radius: 50px;
+      max-width: fit-content;
+      margin-left: auto;
+      margin-right: auto;
+      border: 1px solid var(--card-border);
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 10px 24px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border-radius: 50px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: var(--transition);
+    }
+
+    .tab-btn:hover {
+      color: #fff;
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, var(--primary) 0%, #4c51bf 100%);
+      color: #fff;
+      box-shadow: 0 4px 15px var(--primary-glow);
+    }
+
+    /* Active Tab Panels */
+    .tab-panel {
+      display: none;
+      animation: fadeIn 0.4s ease-out forwards;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    /* Cards Layout */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 30px;
+      align-items: start;
+    }
+
+    @media (max-width: 968px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: var(--glass-filter);
+      -webkit-backdrop-filter: var(--glass-filter);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: var(--glow-box);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(to right, var(--secondary), var(--primary), var(--accent));
+      opacity: 0.8;
+    }
+
+    .card-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #fff;
+    }
+
+    .card-title i {
+      color: var(--secondary);
+    }
+
+    /* Styled Input Fields */
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 576px) {
+      .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+      }
+    }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .input-wrapper i {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+      transition: var(--transition);
+    }
+
+    select, input[type="number"], input[type="text"] {
+      width: 100%;
+      padding: 12px 15px 12px 42px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      color: #fff;
+      font-size: 0.95rem;
+      font-family: inherit;
+      outline: none;
+      transition: var(--transition);
+      appearance: none; /* custom selects */
+    }
+
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239ca3af'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 15px center;
+      background-size: 18px;
+      padding-right: 40px;
+    }
+
+    select:focus, input:focus {
+      border-color: var(--primary);
+      background: rgba(255, 255, 255, 0.07);
+      box-shadow: 0 0 0 4px rgba(92, 98, 247, 0.15);
+    }
+
+    select:focus + i, input:focus + i {
+      color: var(--secondary);
+    }
+
+    /* Toggle Switches for Class */
+    .class-selector {
+      display: flex;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 4px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      margin-bottom: 20px;
+    }
+
+    .class-option {
+      flex: 1;
+      text-align: center;
+    }
+
+    .class-option input[type="radio"] {
+      display: none;
+    }
+
+    .class-option label {
+      display: block;
+      padding: 10px;
+      margin: 0;
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-transform: none;
+      color: var(--text-muted);
+      transition: var(--transition);
+    }
+
+    .class-option input[type="radio"]:checked + label {
+      background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
+      color: #fff;
+      box-shadow: 0 4px 10px var(--primary-glow);
+    }
+
+    /* Sliders and Range Inputs */
+    .slider-container {
+      margin-bottom: 25px;
+    }
+
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .slider-value {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      color: var(--secondary);
+      background: rgba(0, 210, 255, 0.1);
+      padding: 2px 10px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.1);
+      outline: none;
+      transition: background 450ms ease-in;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--secondary);
+      cursor: pointer;
+      box-shadow: 0 0 10px var(--secondary-glow);
+      transition: var(--transition);
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+
+    /* Warning/Validation messages */
+    .alert {
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
+      padding: 12px 16px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+      display: none;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Button styles */
+    .btn {
+      width: 100%;
+      background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 15px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 20px var(--primary-glow);
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn:hover {
+      box-shadow: 0 6px 25px var(--primary-glow);
+      transform: translateY(-2px);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: none;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: none;
+    }
+
+    /* Premium Ticket Result Card */
+    .ticket-outer {
+      perspective: 1000px;
+      margin-bottom: 30px;
+    }
+
+    .ticket {
+      background: linear-gradient(135deg, #1c233d 0%, #111628 100%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 15px 45px rgba(0, 0, 0, 0.4);
+      animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    .ticket::after {
+      content: '';
+      position: absolute;
+      right: 33%;
+      top: -10px;
+      bottom: -10px;
+      border-left: 2px dashed rgba(255, 255, 255, 0.15);
+      z-index: 10;
+    }
+
+    /* Ticket notch details */
+    .ticket::before {
+      content: '';
+      position: absolute;
+      right: calc(33% - 10px);
+      top: -10px;
+      width: 20px;
+      height: 20px;
+      background: var(--dark-bg);
+      border-radius: 50%;
+      z-index: 15;
+    }
+
+    .ticket-bottom-notch {
+      position: absolute;
+      right: calc(33% - 10px);
+      bottom: -10px;
+      width: 20px;
+      height: 20px;
+      background: var(--dark-bg);
+      border-radius: 50%;
+      z-index: 15;
+    }
+
+    .ticket-main {
+      padding: 24px;
+      width: 67%;
+      float: left;
+    }
+
+    .ticket-side {
+      padding: 24px;
+      width: 33%;
+      float: right;
+      height: 100%;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.01);
+    }
+
+    .ticket-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      align-items: center;
+    }
+
+    .ticket-airline {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--secondary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ticket-class {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 3px 12px;
+      border-radius: 50px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .ticket-route {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .route-node {
+      text-align: center;
+    }
+
+    .route-code {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .route-city {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .route-divider {
+      flex: 1;
+      position: relative;
+      margin: 0 15px;
+      border-top: 2px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .route-divider i {
+      position: absolute;
+      color: var(--secondary);
+      font-size: 1rem;
+      background: #192036;
+      padding: 0 8px;
+    }
+
+    .ticket-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .ticket-detail-item strong {
+      display: block;
+      color: #fff;
+      font-size: 0.9rem;
+      margin-top: 2px;
+    }
+
+    .price-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .price-value {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2rem;
+      font-weight: 800;
+      color: #fff;
+      text-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+    }
+
+    .price-inr {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--secondary);
+    }
+
+    .ticket-barcode {
+      width: 80%;
+      height: 40px;
+      margin-top: 15px;
+      opacity: 0.4;
+      background: repeating-linear-gradient(90deg, #fff, #fff 2px, transparent 2px, transparent 6px);
+    }
+
+    .clearfix::after {
+      content: "";
+      clear: both;
+      display: table;
+    }
+
+    /* Diagnostics Dashboard Grid */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    @media (max-width: 768px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .metric-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+      position: relative;
+    }
+
+    .metric-icon {
+      font-size: 1.5rem;
+      color: var(--secondary);
+      margin-bottom: 10px;
+    }
+
+    .metric-val {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+
+    .metric-lbl {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* Plots Visualization Styles */
+    .plots-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 25px;
+    }
+
+    @media (max-width: 768px) {
+      .plots-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .plot-item {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 16px;
+      padding: 15px;
+      transition: var(--transition);
+      cursor: zoom-in;
+      overflow: hidden;
+    }
+
+    .plot-item:hover {
+      background: rgba(255, 255, 255, 0.04);
+      transform: scale(1.02);
+      border-color: rgba(92, 98, 247, 0.25);
+    }
+
+    .plot-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      color: #fff;
+    }
+
+    .plot-title span {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .plot-title i {
+      color: var(--secondary);
+    }
+
+    .plot-img {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+      background: #0f1322;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      transition: var(--transition);
+    }
+
+    /* Modal for Plot Zoom */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(11, 15, 25, 0.95);
+      z-index: 1000;
+      backdrop-filter: blur(10px);
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .modal-content {
+      max-width: 90%;
+      max-height: 85%;
+      border-radius: 15px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 25px;
+      right: 25px;
+      color: #fff;
+      font-size: 2rem;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.05);
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: var(--transition);
+    }
+
+    .modal-close:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+      transform: rotate(90deg);
+    }
+
+    /* Bulk upload dropzone */
+    .dropzone {
+      border: 2px dashed rgba(255, 255, 255, 0.15);
+      border-radius: 16px;
+      padding: 40px 20px;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.02);
+      cursor: pointer;
+      transition: var(--transition);
+      margin-bottom: 25px;
+    }
+
+    .dropzone:hover, .dropzone.dragover {
+      border-color: var(--secondary);
+      background: rgba(0, 210, 255, 0.04);
+    }
+
+    .dropzone-icon {
+      font-size: 3rem;
+      color: var(--text-muted);
+      margin-bottom: 15px;
+      transition: var(--transition);
+    }
+
+    .dropzone:hover .dropzone-icon {
+      color: var(--secondary);
+      transform: translateY(-5px);
+    }
+
+    .dropzone h3 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.15rem;
+      margin-bottom: 8px;
+    }
+
+    .dropzone p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* Loader animations */
+    .loader-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      color: var(--text-muted);
+    }
+
+    .airplane-loader {
+      font-size: 3rem;
+      color: var(--secondary);
+      animation: fly 1.5s infinite ease-in-out;
+      margin-bottom: 15px;
+    }
+
+    @keyframes fly {
+      0% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-15px) rotate(-5deg); }
+      100% { transform: translateY(0) rotate(0deg); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+    }
+
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 15px;
+      opacity: 0.5;
+    }
+
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      margin-top: 20px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.85rem;
+    }
+
+    th {
+      background: rgba(255, 255, 255, 0.03);
+      color: #fff;
+      padding: 12px 15px;
+      font-weight: 600;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    td {
+      padding: 12px 15px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.01);
+    }
+
+    .badge-price {
+      background: rgba(0, 210, 255, 0.1);
+      color: var(--secondary);
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+
+    /* Retrain details styling */
+    .retrain-section {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    @media (max-width: 576px) {
+      .retrain-section {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  
+  <div class="container">
+    
+    <!-- Top Header Brand -->
+    <header>
+      <div class="brand">
+        <i class="fa-solid fa-plane-departure brand-logo"></i>
+        <h1 class="brand-title">AeroPredict</h1>
+      </div>
+      <p>State-of-the-Art Flight Ticket Price Intelligence. Experience micro-second price estimations backed by premium machine learning models.</p>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('estimator')">
+        <i class="fa-solid fa-calculator"></i> Price Estimator
+      </button>
+      <button class="tab-btn" onclick="switchTab('analytics'); loadMetricsDashboard();">
+        <i class="fa-solid fa-chart-line"></i> Analytics & Insights
+      </button>
+      <button class="tab-btn" onclick="switchTab('bulk')">
+        <i class="fa-solid fa-file-csv"></i> Bulk Estimation
+      </button>
+    </div>
+
+    <!-- TAB 1: SINGLE ESTIMATOR -->
+    <div id="panel-estimator" class="tab-panel active">
+      <div class="main-grid">
+        
+        <!-- Left Column: Attributes form -->
+        <div class="card">
+          <div class="card-title">
+            <i class="fa-solid fa-sliders"></i> Customize Flight Attributes
+          </div>
+          
+          <div id="validation-alert" class="alert">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span id="validation-alert-msg"></span>
+          </div>
+
+          <div>
+            <!-- Row 1: Airline & Class -->
+            <div class="form-group">
+              <label>Service Cabin Class</label>
+              <div class="class-selector">
+                <div class="class-option">
+                  <input type="radio" name="class" id="class-economy" value="Economy" checked>
+                  <label for="class-economy">Economy Cabin</label>
+                </div>
+                <div class="class-option">
+                  <input type="radio" name="class" id="class-business" value="Business">
+                  <label for="class-business">Business Cabin</label>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Carrier / Airline</label>
+                <div class="input-wrapper">
+                  <i class="fa-solid fa-plane"></i>
+                  <select id="airline">
+                    <option value="Indigo">Indigo</option>
+                    <option value="Air_India">Air India</option>
+                    <option value="Vistara">Vistara</option>
+                    <option value="SpiceJet">SpiceJet</option>
+                    <option value="AirAsia">AirAsia</option>
+                    <option value="GO_FIRST">GO FIRST</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Flight Code</label>
+                <div class="input-wrapper">
+                  <i class="fa-solid fa-hashtag"></i>
+                  <input type="text" id="flight" value="UK-995" placeholder="e.g. UK-995">
+                </div>
+              </div>
+            </div>
+
+            <!-- Row 2: Source & Destination -->
+            <div class="form-row">
+              <div class="form-group">
+                <label>Departure City (Source)</label>
+                <div class="input-wrapper">
+                  <i class="fa-solid fa-plane-departure"></i>
+                  <select id="source_city" onchange="validateCities()">
+                    <option value="Delhi" selected>Delhi</option>
+                    <option value="Mumbai">Mumbai</option>
+                    <option value="Bangalore">Bangalore</option>
+                    <option value="Kolkata">Kolkata</option>
+                    <option value="Hyderabad">Hyderabad</option>
+                    <option value="Chennai">Chennai</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Arrival City (Destination)</label>
+                <div class="input-wrapper">
+                  <i class="fa-solid fa-plane-arrival"></i>
+                  <select id="destination_city" onchange="validateCities()">
+                    <option value="Delhi">Delhi</option>
+                    <option value="Mumbai" selected>Mumbai</option>
+                    <option value="Bangalore">Bangalore</option>
+                    <option value="Kolkata">Kolkata</option>
+                    <option value="Hyderabad">Hyderabad</option>
+                    <option value="Chennai">Chennai</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Row 3: Timings -->
+            <div class="form-row">
+              <div class="form-group">
+                <label>Departure Timing Slot</label>
+                <div class="input-wrapper">
+                  <i class="fa-regular fa-clock"></i>
+                  <select id="departure_time">
+                    <option value="Morning">Morning</option>
+                    <option value="Early_Morning">Early Morning</option>
+                    <option value="Afternoon">Afternoon</option>
+                    <option value="Evening">Evening</option>
+                    <option value="Night">Night</option>
+                    <option value="Late_Night">Late Night</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Arrival Timing Slot</label>
+                <div class="input-wrapper">
+                  <i class="fa-regular fa-clock"></i>
+                  <select id="arrival_time">
+                    <option value="Night">Night</option>
+                    <option value="Morning">Morning</option>
+                    <option value="Early_Morning">Early Morning</option>
+                    <option value="Afternoon">Afternoon</option>
+                    <option value="Evening">Evening</option>
+                    <option value="Late_Night">Late Night</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Row 4: Stops -->
+            <div class="form-group">
+              <label>Layovers / Stops</label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-arrows-split-up-and-left"></i>
+                <select id="stops">
+                  <option value="zero">Non-Stop (Direct)</option>
+                  <option value="one" selected>1 Stop</option>
+                  <option value="two_or_more">2 or More Stops</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Row 5: Numeric Sliders -->
+            <div class="slider-container">
+              <div class="slider-header">
+                <label>Flight Duration (Hours)</label>
+                <span class="slider-value" id="val-duration">2.25 hrs</span>
+              </div>
+              <input type="range" id="duration" min="0.5" max="50" step="0.25" value="2.25" oninput="updateSliderVal('duration', 'hrs')">
+            </div>
+
+            <div class="slider-container">
+              <div class="slider-header">
+                <label>Days Left Until Departure</label>
+                <span class="slider-value" id="val-days_left">20 days</span>
+              </div>
+              <input type="range" id="days_left" min="1" max="49" step="1" value="20" oninput="updateSliderVal('days_left', 'days')">
+            </div>
+
+            <!-- Submit Button -->
+            <button class="btn" id="predict-btn" onclick="predictTicketPrice()">
+              <i class="fa-solid fa-paper-plane"></i> Predict Flight Price
+            </button>
+
+          </div>
+        </div>
+
+        <!-- Right Column: Visual Ticket Output -->
+        <div>
+          <div class="card-title" style="margin-left:10px">
+            <i class="fa-solid fa-ticket"></i> Prediction Board
+          </div>
+
+          <div id="ticket-area">
+            <div class="empty-state">
+              <i class="fa-solid fa-plane-arrival"></i>
+              <h3>Ready to Calculate</h3>
+              <p>Configure attributes on the left and click **Predict Flight Price** to generate your tickets.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TAB 2: ANALYTICS & DIAGNOSTICS -->
+    <div id="panel-analytics" class="tab-panel">
+      <!-- Summary stats -->
+      <div class="dashboard-grid">
+        <div class="metric-card">
+          <i class="fa-solid fa-crown metric-icon"></i>
+          <div class="metric-val" id="meta-model-type">Random Forest</div>
+          <div class="metric-lbl">Best Algorithm Selected</div>
+        </div>
+        <div class="metric-card">
+          <i class="fa-solid fa-chart-pie metric-icon"></i>
+          <div class="metric-val" id="meta-r2">0.9542</div>
+          <div class="metric-lbl">Accuracy Metric (R² Score)</div>
+        </div>
+        <div class="metric-card">
+          <i class="fa-solid fa-wand-magic-sparkles metric-icon"></i>
+          <div class="metric-val" id="meta-mae">₹ 2,342</div>
+          <div class="metric-lbl">Mean Absolute Error (MAE)</div>
+        </div>
+      </div>
+
+      <!-- Visualized Plots -->
+      <div class="card" style="margin-bottom:30px">
+        <div class="card-title">
+          <i class="fa-solid fa-image"></i> Machine Learning Pipeline Visualizations
+        </div>
+        <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 0.95rem">
+          The following diagnostic charts demonstrate correlation heatmaps, feature importances, price distributions, and actual vs predicted ticket prices. Hover and click on any visualization to inspect it closely.
+        </p>
+
+        <div class="plots-grid">
+          <div class="plot-item" onclick="zoomPlot('/results/image/price_distribution.png', 'Ticket Price Distribution')">
+            <div class="plot-title">
+              <span><i class="fa-solid fa-chart-area"></i> Price Distribution</span>
+              <i class="fa-solid fa-expand"></i>
+            </div>
+            <img class="plot-img" src="" id="plot-price_distribution" alt="Price Distribution" onerror="handleImageError(this)">
+          </div>
+
+          <div class="plot-item" onclick="zoomPlot('/results/image/actual_vs_predicted.png', 'Actual vs. Predicted Price Scatter Plot')">
+            <div class="plot-title">
+              <span><i class="fa-solid fa-chart-line"></i> Actual vs. Predicted</span>
+              <i class="fa-solid fa-expand"></i>
+            </div>
+            <img class="plot-img" src="" id="plot-actual_vs_predicted" alt="Actual vs Predicted" onerror="handleImageError(this)">
+          </div>
+
+          <div class="plot-item" onclick="zoomPlot('/results/image/residuals.png', 'Model Residuals (Prediction Error) Histogram')">
+            <div class="plot-title">
+              <span><i class="fa-solid fa-circle-exclamation"></i> Residuals Distribution</span>
+              <i class="fa-solid fa-expand"></i>
+            </div>
+            <img class="plot-img" src="" id="plot-residuals" alt="Residuals" onerror="handleImageError(this)">
+          </div>
+
+          <div class="plot-item" onclick="zoomPlot('/results/image/feature_importance.png', 'Model Feature Importance Plot')">
+            <div class="plot-title">
+              <span><i class="fa-solid fa-list-check"></i> Top Feature Importances</span>
+              <i class="fa-solid fa-expand"></i>
+            </div>
+            <img class="plot-img" src="" id="plot-feature_importance" alt="Feature Importance" onerror="handleImageError(this)">
+          </div>
+
+          <div class="plot-item" onclick="zoomPlot('/results/image/correlation_heatmap.png', 'Numerical Feature Correlation Heatmap')">
+            <div class="plot-title">
+              <span><i class="fa-solid fa-table-cells"></i> Correlation Heatmap</span>
+              <i class="fa-solid fa-expand"></i>
+            </div>
+            <img class="plot-img" src="" id="plot-correlation_heatmap" alt="Correlation Heatmap" onerror="handleImageError(this)">
+          </div>
+
+          <div class="plot-item" onclick="zoomPlot('/results/image/model_comparison.png', 'Linear Regression vs Decision Tree vs Random Forest')">
+            <div class="plot-title">
+              <span><i class="fa-solid fa-diagram-project"></i> Model Comparison</span>
+              <i class="fa-solid fa-expand"></i>
+            </div>
+            <img class="plot-img" src="" id="plot-model_comparison" alt="Model Comparison" onerror="handleImageError(this)">
+          </div>
+        </div>
+        
+        <div class="retrain-section">
+          <div>
+            <h4 style="font-family:'Outfit',sans-serif; margin-bottom:4px">Trigger Model Pipeline Retraining</h4>
+            <p style="font-size:0.85rem; color:var(--text-muted)">Need to hot-reload and retrain the model in the background? Trigger it safely.</p>
+          </div>
+          <button class="btn btn-secondary" style="width:auto; padding:10px 20px" id="retrain-btn" onclick="triggerRetraining()">
+            <i class="fa-solid fa-sync"></i> Retrain Model Pipeline
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: BULK ESTIMATION -->
+    <div id="panel-bulk" class="tab-panel">
+      <div class="card">
+        <div class="card-title">
+          <i class="fa-solid fa-file-csv"></i> Batch Flight Price CSV Estimator
+        </div>
+        <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 0.95rem">
+          Process thousands of flight estimation requests at once. Upload a CSV file containing columns corresponding to flight details, and instantly download the file back with the predicted prices appended.
+        </p>
+
+        <!-- CSV Format details -->
+        <div style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.05)">
+          <h5 style="margin-bottom: 8px; font-family:'Outfit',sans-serif; color: #fff"><i class="fa-solid fa-circle-info" style="color: var(--secondary)"></i> Required CSV Format Columns</h5>
+          <code style="font-size:0.8rem; color: var(--secondary)">airline,flight,source_city,departure_time,stops,arrival_time,destination_city,class,duration,days_left</code>
+          <p style="font-size:0.8rem; color: var(--text-muted); margin-top: 6px">Note: The file must be a standard CSV with column headers. Missing values will be imputed automatically by the pipeline.</p>
+        </div>
+
+        <div class="dropzone" id="csv-dropzone" onclick="document.getElementById('csv-file').click()">
+          <input type="file" id="csv-file" style="display:none" accept=".csv" onchange="handleCSVSelect(event)">
+          <i class="fa-solid fa-file-arrow-up dropzone-icon" id="dz-icon"></i>
+          <h3 id="dz-title">Drag & drop your CSV file here</h3>
+          <p id="dz-desc">or click to browse from your computer</p>
+        </div>
+
+        <div id="bulk-result-area" style="display:none">
+          <div class="card-title" style="font-size: 1.1rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top:20px">
+            <i class="fa-solid fa-circle-check" style="color: var(--secondary)"></i> Batch Processing Complete!
+          </div>
+          <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom: 15px">We have calculated flight prices for your dataset. Download the output file below or preview the first few rows.</p>
+          
+          <button class="btn" style="width: auto; padding: 10px 24px" onclick="downloadBulkCSV()">
+            <i class="fa-solid fa-download"></i> Download Predicted CSV Report
+          </button>
+
+          <div class="table-container">
+            <table id="bulk-preview-table">
+              <!-- filled dynamically -->
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Zoomable Plot Modal -->
+  <div class="modal" id="plot-modal" onclick="closeModal()">
+    <span class="modal-close" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></span>
+    <img class="modal-content" id="modal-img" src="" alt="Expanded Diagnostic Plot" onclick="event.stopPropagation()">
+  </div>
+
+  <!-- Script Logic -->
+  <script>
+    const API = window.location.origin;
+    let bulkCSVData = null;
+    let bulkCSVFilename = "flight_predictions.csv";
+
+    // 1. Tab Swapper
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
+      
+      const targetBtn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.innerText.toLowerCase().includes(tabId.slice(0, 3)));
+      if (targetBtn) targetBtn.classList.add('active');
+      
+      const targetPanel = document.getElementById('panel-' + tabId);
+      if (targetPanel) targetPanel.classList.add('active');
+    }
+
+    // 2. Form Helpers
+    function updateSliderVal(sliderId, unit) {
+      const val = document.getElementById(sliderId).value;
+      document.getElementById('val-' + sliderId).innerText = val + ' ' + unit;
+      validateCities();
+    }
+
+    function validateCities() {
+      const src = document.getElementById('source_city').value;
+      const dst = document.getElementById('destination_city').value;
+      const alertBox = document.getElementById('validation-alert');
+      const predictBtn = document.getElementById('predict-btn');
+
+      if (src === dst) {
+        document.getElementById('validation-alert-msg').innerText = "Departure (Source) and Arrival (Destination) cities cannot be the same.";
+        alertBox.style.display = 'flex';
+        predictBtn.disabled = true;
+        predictBtn.style.opacity = 0.5;
+        predictBtn.style.cursor = 'not-allowed';
+        return false;
+      } else {
+        alertBox.style.display = 'none';
+        predictBtn.disabled = false;
+        predictBtn.style.opacity = 1;
+        predictBtn.style.cursor = 'pointer';
+        return true;
+      }
+    }
+
+    // 3. Price Prediction Endpoint Call
+    async function predictTicketPrice() {
+      if (!validateCities()) return;
+
+      const ticketArea = document.getElementById('ticket-area');
+      
+      // Render Premium Flying Loader
+      ticketArea.innerHTML = `
+        <div class="loader-container">
+          <i class="fa-solid fa-plane airplane-loader"></i>
+          <h3>Plotting Vector Flight Coordinates...</h3>
+          <p>Calculating lightweight regression estimates on high-dimensional category trees.</p>
+        </div>
+      `;
+
+      // Build features object according to trained format
+      const isBusiness = document.getElementById('class-business').checked;
+      const features = {
+        airline: document.getElementById('airline').value,
+        flight: document.getElementById('flight').value,
+        source_city: document.getElementById('source_city').value,
+        departure_time: document.getElementById('departure_time').value,
+        stops: document.getElementById('stops').value,
+        arrival_time: document.getElementById('arrival_time').value,
+        destination_city: document.getElementById('destination_city').value,
+        class: isBusiness ? "Business" : "Economy",
+        duration: parseFloat(document.getElementById('duration').value),
+        days_left: parseInt(document.getElementById('days_left').value)
+      };
+
+      try {
+        const response = await fetch(API + '/predict', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ features })
+        });
+
+        if (!response.ok) {
+          const err = await response.json();
+          throw new Error(err.detail || 'Prediction request failed.');
+        }
+
+        const data = await response.json();
+        const price = Math.round(data.predicted_price);
+        
+        // Render Gorgeous Boarding Pass Ticket
+        ticketArea.innerHTML = `
+          <div class="ticket-outer">
+            <div class="ticket clearfix">
+              <div class="ticket-main">
+                <div class="ticket-header">
+                  <span class="ticket-airline"><i class="fa-solid fa-plane-up"></i> ${features.airline}</span>
+                  <span class="ticket-class">${features.class}</span>
+                </div>
+                
+                <div class="ticket-route">
+                  <div class="route-node">
+                    <div class="route-code">${getCityCode(features.source_city)}</div>
+                    <div class="route-city">${features.source_city}</div>
+                  </div>
+                  <div class="route-divider">
+                    <i class="fa-solid fa-plane"></i>
+                  </div>
+                  <div class="route-node">
+                    <div class="route-code">${getCityCode(features.destination_city)}</div>
+                    <div class="route-city">${features.destination_city}</div>
+                  </div>
+                </div>
+
+                <div class="ticket-details">
+                  <div class="ticket-detail-item">FLIGHT CODE<strong>${features.flight}</strong></div>
+                  <div class="ticket-detail-item">DURATION<strong>${features.duration} hrs</strong></div>
+                  <div class="ticket-detail-item">DEP. TIME<strong>${features.departure_time}</strong></div>
+                  <div class="ticket-detail-item">DAYS LEFT<strong>${features.days_left} Days</strong></div>
+                </div>
+              </div>
+              <div class="ticket-side">
+                <div class="price-label">Estimated Fare</div>
+                <div class="price-value"><span class="price-inr">₹</span>${price.toLocaleString('en-IN')}</div>
+                <div class="ticket-barcode"></div>
+                <div style="font-size:0.65rem; color:var(--text-muted); margin-top:8px">BOARDING PASS</div>
+              </div>
+              <div class="ticket-bottom-notch"></div>
+            </div>
+          </div>
+        `;
+
+      } catch (err) {
+        ticketArea.innerHTML = `
+          <div class="empty-state" style="color: #fca5a5">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <h3>Estimation Failed</h3>
+            <p>Error details: ${err.message}</p>
+            <button class="btn btn-secondary" style="width:auto; margin-top:15px" onclick="predictTicketPrice()">Retry prediction</button>
+          </div>
+        `;
+      }
+    }
+
+    function getCityCode(city) {
+      const codes = {
+        'Delhi': 'DEL',
+        'Mumbai': 'BOM',
+        'Bangalore': 'BLR',
+        'Kolkata': 'CCU',
+        'Hyderabad': 'HYD',
+        'Chennai': 'MAA'
+      };
+      return codes[city] || city.substring(0, 3).toUpperCase();
+    }
+
+    // 4. Load Metrics and Charts Dashboard
+    async function loadMetricsDashboard() {
+      // Set plots source paths
+      document.getElementById('plot-price_distribution').src = API + '/results/image/price_distribution.png?' + new Date().getTime();
+      document.getElementById('plot-actual_vs_predicted').src = API + '/results/image/actual_vs_predicted.png?' + new Date().getTime();
+      document.getElementById('plot-residuals').src = API + '/results/image/residuals.png?' + new Date().getTime();
+      document.getElementById('plot-feature_importance').src = API + '/results/image/feature_importance.png?' + new Date().getTime();
+      document.getElementById('plot-correlation_heatmap').src = API + '/results/image/correlation_heatmap.png?' + new Date().getTime();
+      document.getElementById('plot-model_comparison').src = API + '/results/image/model_comparison.png?' + new Date().getTime();
+
+      try {
+        const response = await fetch(API + '/results/metrics');
+        if (!response.ok) throw new Error('No metrics loaded.');
+        
+        const data = await response.json();
+        const s = data.structured || {};
+
+        document.getElementById('meta-model-type').innerText = s.model_type || 'Random Forest';
+        document.getElementById('meta-r2').innerText = Number(s.r2).toFixed(4);
+        document.getElementById('meta-mae').innerText = '₹ ' + Math.round(s.mae).toLocaleString('en-IN');
+      } catch (e) {
+        console.warn('Dashboard summary not fully loaded:', e);
+      }
+    }
+
+    function handleImageError(img) {
+      // Hide plots dynamically if they are missing
+      img.parentNode.style.display = 'none';
+    }
+
+    // 5. Expand Diagnostics Visualizations in Modal
+    function zoomPlot(path, title) {
+      const modal = document.getElementById('plot-modal');
+      const modalImg = document.getElementById('modal-img');
+      modalImg.src = API + path + '?' + new Date().getTime();
+      modal.style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('plot-modal').style.display = 'none';
+    }
+
+    // 6. CSV Bulk Prediction Actions
+    function handleCSVSelect(event) {
+      const file = event.target.files[0];
+      if (file) uploadCSVFile(file);
+    }
+
+    // Support drag and drop on dropzone
+    const dropzone = document.getElementById('csv-dropzone');
+    dropzone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropzone.classList.add('dragover');
+    });
+
+    dropzone.addEventListener('dragleave', () => {
+      dropzone.classList.remove('dragover');
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      if (file && file.name.endsWith('.csv')) {
+        uploadCSVFile(file);
+      } else {
+        alert("Please drop a valid .csv file.");
+      }
+    });
+
+    async function uploadCSVFile(file) {
+      document.getElementById('dz-title').innerText = "Uploading & Processing...";
+      document.getElementById('dz-desc').innerText = file.name;
+      document.getElementById('dz-icon').className = "fa-solid fa-spinner fa-spin dropzone-icon";
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        const response = await fetch(API + '/predict/upload', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!response.ok) {
+          const err = await response.json();
+          throw new Error(err.detail || 'CSV upload estimation failed.');
+        }
+
+        const blob = await response.blob();
+        bulkCSVData = blob;
+        bulkCSVFilename = "predicted_" + file.name;
+
+        // Read text to show preview
+        const text = await blob.text();
+        showBulkPreview(text);
+
+        // Reset dropzone
+        document.getElementById('dz-title').innerText = "Process Another CSV";
+        document.getElementById('dz-desc').innerText = file.name + " processed successfully.";
+        document.getElementById('dz-icon').className = "fa-solid fa-file-arrow-up dropzone-icon";
+
+        document.getElementById('bulk-result-area').style.display = 'block';
+
+      } catch (err) {
+        document.getElementById('dz-title').innerText = "Upload Failed";
+        document.getElementById('dz-desc').innerText = err.message;
+        document.getElementById('dz-icon').className = "fa-solid fa-triangle-exclamation dropzone-icon";
+        document.getElementById('bulk-result-area').style.display = 'none';
+      }
+    }
+
+    function showBulkPreview(csvText) {
+      const rows = csvText.split('\n').filter(r => r.trim() !== '');
+      const table = document.getElementById('bulk-preview-table');
+      table.innerHTML = '';
+
+      if (rows.length === 0) return;
+
+      // Extract headers
+      const headers = rows[0].split(',');
+      let headerHTML = '<tr>';
+      headers.forEach(h => {
+        headerHTML += `<th>${h.replace(/"/g, '')}</th>`;
+      });
+      headerHTML += '</tr>';
+      table.innerHTML += headerHTML;
+
+      // Extract first 5 data rows
+      const previewRows = rows.slice(1, 6);
+      previewRows.forEach(row => {
+        const cols = row.split(',');
+        let rowHTML = '<tr>';
+        cols.forEach((col, idx) => {
+          const cleaned = col.replace(/"/g, '');
+          if (idx === cols.length - 1) { // Predicted price column
+            rowHTML += `<td><span class="badge-price">₹${Math.round(cleaned).toLocaleString('en-IN')}</span></td>`;
+          } else {
+            rowHTML += `<td>${cleaned}</td>`;
+          }
+        });
+        rowHTML += '</tr>';
+        table.innerHTML += rowHTML;
+      });
+    }
+
+    function downloadBulkCSV() {
+      if (!bulkCSVData) return;
+      const url = window.URL.createObjectURL(bulkCSVData);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = bulkCSVFilename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+    }
+
+    // 7. Retraining trigger
+    async function triggerRetraining() {
+      const btn = document.getElementById('retrain-btn');
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Initiating retraining...`;
+
+      try {
+        const response = await fetch(API + '/retrain', { method: 'POST' });
+        if (!response.ok) throw new Error('Could not trigger background retraining.');
+        
+        btn.className = "btn btn-secondary";
+        btn.innerHTML = `<i class="fa-solid fa-circle-check" style="color:var(--secondary)"></i> Retraining Started`;
+        alert("Model pipeline retraining has been triggered successfully in the background. It will reload the models once completed.");
+        
+        setTimeout(() => {
+          btn.disabled = false;
+          btn.innerHTML = `<i class="fa-solid fa-sync"></i> Retrain Model Pipeline`;
+        }, 5000);
+      } catch (err) {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-sync"></i> Retrain Model Pipeline`;
+        alert("Error initiating retraining: " + err.message);
+      }
+    }
+
+    // Load initial analytics if landing
+    setTimeout(() => {
+      validateCities();
+      loadMetricsDashboard();
+    }, 1000);
+  </script>
+</body>
+</html>
