@@ -1,0 +1,126 @@
+import pandas as pd 
+import mlflow 
+import mlflow.sklearn 
+from sklearn.model_selection import train_test_split 
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.compose import ColumnTransformer 
+from sklearn.pipeline import Pipeline
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, roc_auc_score 
+
+
+# load data 
+df = pd.read_csv(r'C:\Users\peepl\Downloads\tele_churn_prediction_api\WA_Fn-UseC_-Telco-Customer-Churn.csv')
+df['TotalCharges'] = pd.to_numeric(df['TotalCharges'], errors = 'coerce')
+df.dropna(inplace = True) # drop values if they are not filled
+df.drop('customerID', axis = 1, inplace = True) #drop the customerID column since its of no use 
+
+
+
+# target encoding 
+
+df['Churn'] = df['Churn'].map({'No':0, 'Yes':1})
+
+# now drop churn column from x and add to y 
+
+x = df.drop('Churn', axis = 1)
+y = df['Churn']
+
+categorical_cols = x.select_dtypes(include = 'object').columns.tolist() 
+# select the columns with object value convert to list 
+numerical_cols = x.select_dtypes(include = 'number').columns.tolist()
+
+
+preprocessor = ColumnTransformer ([
+    ('num', StandardScaler(), numerical_cols),
+    ('cat', OneHotEncoder(), categorical_cols)
+])
+
+model = LogisticRegression(max_iter = 1000, random_state = 42)
+
+pipeline = Pipeline([
+    ('preprocessor', preprocessor),
+    ('classifier', model)
+])
+
+
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.2, random_state = 42, stratify = y)
+
+
+
+with mlflow.start_run(run_name = "Logistic_Regssion"):
+    pipeline.fit(x_train, y_train)
+    y_pred = pipeline.predict(x_test)
+    y_prob = pipeline.predict_proba(x_test)[:,1]
+
+
+    accuracy = accuracy_score(y_test, y_pred)
+    
+    mlflow.log_metric("accuracy", accuracy)
+
+    mlflow.sklearn.log_model(pipeline, 'model')
+    
+    print("✅ MLflow run logged successfully")
+
+
+
+### API 
+
+from flask import Flask, request, jsonify 
+import mlflow.sklearn 
+#to load and use logged sklearn models.
+import pandas as pd # data manipulation
+import numpy as np # numerical operations
+
+app = Flask(__name__)
+# creates a flask application instance called app
+# app is used to define routes and run web server 
+# flask is to define endpoints like /api/prediction 
+model = mlflow.sklearn.load_model("runs:/2a04c72975a94612b666596f8b2438b1/model")
+
+
+@app.route('/api/prediction', methods = ['POST'])
+def predict():
+    data = request.json 
+    df = pd.DataFrame([data])
+    prob = model.predict_proba(df)[0][1]
+    pred = "yes" if prob > 0.5 else "No"
+    return jsonify({
+        "churn probablity" : round(prob, 4),
+        "churn" : pred
+    })
+
+@app.route('/api/bulkprediction', methods = ["POST"])
+def bulk_predict():
+    data = request.json['data']
+    df = pd.DataFrame(data)
+    prob = model.predict_proba(df)[:, 1]
+    pred = ["yes" if p> 0.5 else "No" for p in prob]
+    return jsonify ({
+        "churn_probablities" : [round(p,4) for p in prob.tolist()],
+        "churn_predictions" : pred
+
+    })
+
+
+# 'POST' means client must send data to request body 
+# predict is the unction which runs when someone hits this endpoint 
+# data sends the json payload sent be client
+# df converts it into a dataframe
+# prob returns probablities for both classes yes and no 
+# then it returns a json response back to client 
+
+# bulk predict is endpoint for multiple customers 
+# converts list of records to dataframe
+# ping is health check endpoint 
+# useful to confirm that api is running 
+
+# ensures script runs only if executed directly not imported
+
+@app.route('/ping', methods = ["GET"])
+def ping():
+    return "logistic Regression API is alive!", 200
+
+
+if __name__ == '__main__':
+    app.run(port = 5001, debug = True)

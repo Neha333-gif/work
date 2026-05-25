@@ -1,0 +1,1978 @@
+
+## 🔹 Section 1: Numbers (int, float, complex)
+## 1.Check the data type of a given number.
+
+def data_type(num):
+    return type(num)
+
+num = 123
+data_type(num)
+
+## 2.Convert an integer to float and float to integer.
+
+def count(num):
+    if(type(num)==int):
+        print(f"{float(num)}")
+    else:
+        print(f"{int(num)}")
+
+num = 123.5
+count(num)
+
+### 3. Add, subtract, multiply, divide two integers.
+
+def operate(num1, num2):
+    type1 = type(num1)
+    type2 = type(num2)
+    if(type1 and type2 == int):
+        print(f"{num1+num2},{num1-num2},{num1*num2},{num1/num2}")
+num1 = 10
+num2 = 100
+operate(num1, num2)
+
+## 4. Round a floating value to 2 decimal places.
+
+num = 2.345
+print(f"{num:.2f}")
+
+## 5. Get absolute value of a number using abs().
+
+num = 2 + 3j
+print(f"{abs(num)}")
+
+## 6. Raise a number to a power using pow().
+
+num = 3
+power = 2
+print(f"{pow(num, power)}")
+
+
+## 7.Convert a number to binary using bin().
+
+num = 3
+print(f"{bin(num)}")
+
+
+## 8.Convert a number to octal using oct().
+
+num = 8
+print(f"{oct(num)}")
+
+
+## 9. Convert a number to hexadecimal using hex().
+
+num = 16 
+print(f"{hex(num)}")
+
+
+## 10. Check if a number is even without using %.
+
+def num_even(num):
+    if(num&1 == 0):  ## even numbers have even number of 1's or 0's in them so they end at 0 when done bitwise operation
+        print(f"{num} is even")
+    else:
+        print(f"{num} is not even")
+
+result = num_even(8)
+result 
+
+## 11. Generate a random integer (using standard functions).
+
+import numpy as np
+np.random.randint(1,10)
+
+
+## 12.Extract the real part of a complex number.
+
+num = 2 + 3j
+num.real 
+
+## 13. Extract the imaginary part of a complex number.
+
+num = 2 + 3j
+num.imag
+
+
+## 14.Find magnitude of a complex number.
+
+num = 4 + 3j
+abs(num)
+
+## 15. Convert a number to complex type.
+
+num = 3 + 4j
+complex(num)
+
+
+## 16.Use divmod() to return quotient and remainder.
+
+num1 = 5
+num2 = 2
+divmod(num1, num2)
+
+
+## 17. Check if a number is positive, negative or zero.
+
+def ent_er(num):
+    if(num > 0):
+        print(f"{num} is positive")
+    elif (num < 0):
+        print(f"{num} is negative")
+    else:
+        print(f"{num} is zero")
+
+result = ent_er(-9)
+result
+
+
+
+
+## 18. Find max and min of three numbers using built-in functions.
+
+list_a = [1, 2, 4]
+print(f"max is : {max(list_a)} and min is: {min(list_a)}")
+
+
+## 19. Format a number with commas.
+
+num = 9876
+num_s = str(num)
+for i in range(len(num_s)):
+    print(f"{num_s[i]}:, ")
+
+
+## 20. Convert string "123.45" into float.
+
+num = "123.45" 
+float(num)
+
+
+## 🔹 Section 2: Strings (str) – Indexing, Slicing & Inbuilt Methods
+
+# sample string for testing 
+
+text = "hello python programming"
+
+21. Access the first and last character of a string using indexing.
+
+text = "hello python programming"
+print(text[-1])
+print(text[0])
+
+22. Reverse a string using slicing.
+
+text = "hello python programming"
+text[::-1] 
+
+23. Extract substring from index 2 to 6.
+
+text = "hello python programming"
+text[2:7:1]
+
+
+24. Extract every second character from a string.
+
+text = "hello python programming"
+text[::2]
+
+
+25. Check string length without using `len()` (using loop).
+
+text = "hello python programming"
+length = 0
+for i in text:
+    length = length + 1
+print(length)
+
+26. Convert entire string to uppercase.
+
+text = "hello python programming"
+text.upper()
+
+27. Convert entire string to lowercase.
+
+text = "hello python programming"
+text.lower()
+
+28. Capitalize the first character.
+
+text = "hello python programming"
+text.strip().capitalize() 
+
+
+29. Count how many times a character appears.
+
+text = 'banana'
+print(text.count('a'))
+
+30. Replace a word inside a string.
+
+text = 'i love java'
+print(text.replace("java", "python"))
+
+31. Split a string by spaces.
+
+text = 'i love python'
+print(text.split(" "))
+
+32. Join a list of words into a string.
+
+words = ['i', 'love', 'python']
+print(' '.join(words))
+
+33. Check if a string is numeric.
+
+text = "123"
+print(f" the string is numeric is : {text.isnumeric()}") 
+
+34. Check if a string is alphanumeric.
+
+text = "hello123"
+print(f" the string is alphanumeric: {text.isalnum()}")
+
+
+35. Remove spaces from left using `lstrip()`.
+
+text = "  python"
+print(f"the string is : {text.lstrip()}")
+
+36. Remove spaces from right using `rstrip()`.
+
+text = "python    "
+print(f" the string is : {text.rstrip()}")
+
+37. Remove spaces from both sides using `strip()`.
+
+text = "   python   "
+print(f"the string is : {text.strip()}")
+
+38. Check if string starts with a given prefix.
+
+text = "python"
+print(text.startswith("py"))
+
+39. Check if string ends with a given suffix.
+
+text = "python"
+print(text.endswith("on"))
+
+40. Find the index of a substring.
+
+text = "hello world"
+print(f"the string world is in index : {text.find("world")}")
+
+41. Convert `"Python Programming"` into a list of characters.
+
+text = "Python Programming"
+print(list(text))
+
+
+42. Swap case of characters.
+ 
+text = "HeLlO WorLD"
+text.swapcase()
+
+# or 
+
+text = "pyThOn"
+app = []
+for i in text:
+    if i == i.upper() :
+        app.append(i)
+    else:
+        app.append(i.lower())
+print("".join(app))
+
+43. Remove all occurrences of `"a"` using replace.
+
+text = "apple"
+text.replace("a","")
+
+44. Format a string using `f-strings`.
+
+text = "python"
+print(f"I love {text}")
+
+45. Check if a substring exists using `in`.
+
+text = "redapple"
+sub = "red" in text 
+sub
+
+46. Count vowels in a string.
+
+string_a = "apple"
+count = 0
+vow = ['a','e','i','o','u']
+for j in string_a:
+    if j in vow:
+        count = count + 1
+print( count )
+
+# or 
+
+string_a = "apple"
+vow = ['a','e','i','o','u']
+max = sum ( 1 for c in string_a if c in vow )
+max
+
+47. Remove duplicate characters.
+
+text = "Python Programming"
+set(text)
+
+# or 
+
+text = "python Programming"
+dup = []
+for i in text :
+    if i not in dup: 
+        dup.append(i)
+print(dup)
+
+48. Find the most repeated character.
+
+
+text = "Python Programming"
+most_common = max(text,  key = text.count)
+print(most_common)
+
+
+49. Convert string to title case.
+
+text = "python Programming"
+text.title()
+
+50. Convert `"Hello123"` → `"123Hello"` using slicing.
+
+text = "Hello123"
+dig = ""
+char = ""
+for i in text:
+    if i.isdigit():
+        dig+=i
+    else :
+        char+=i
+print(dig + char)
+
+#or 
+
+text = "Hello123"
+dig = text[-3::]
+char = text[:-3:]
+print(dig+char)
+
+# or 
+
+text = "Hello123"
+dig = text[-3::]
+char = text[:-3:]
+print ("".join([dig, char]))
+
+---
+
+## 🔹 Section 3: Lists – Indexing, Slicing & Inbuilt Functions
+
+51. Access 2nd, last, and middle elements of a list.
+
+lst = [10, 20, 30, 40, 50]
+print(lst[-1])
+print(lst[1])
+print(lst[len(lst)//2])
+
+52. Append an item to a list.
+
+lst = [10, 20, 30, 40, 50]
+lst.append(100)
+lst
+
+53. Insert an item at index 2.
+
+lst = [10, 20, 30, 40, 50]
+lst.insert(2,"item")
+lst
+
+54. Remove an item by value.
+
+lst = [10, 20, 30, 40, 50]
+lst.remove(20)
+lst
+
+55. Remove item at index using `pop()`.
+
+lst = [10, 20, 30, 40, 50]
+print(lst.pop(2))
+print(lst)
+
+
+56. Reverse a list using slicing.
+
+lst = [10, 20, 30, 40, 50]
+lst[::-1]
+
+
+57. Reverse a list using `reverse()` method.
+
+lst = [10, 20, 30, 40, 50]
+lst.reverse()
+lst
+
+58. Sort a list ascending and descending.
+
+lst = [10, 60, 60, 40, 20]
+lst.sort()
+print(lst)
+lst.sort(reverse = True)
+print(lst)
+
+
+59. Count occurrences of an element.
+
+lst = [10, 60, 60, 40, 20]
+print(lst.count(60))
+
+60. Find index of an element.
+
+lst = [10, 60, 60, 40, 20]
+lst.index(60)
+
+61. Extend one list with another list.
+
+lst = [10, 60, 60, 40, 20]
+lst_1 = [10, 90, 100]
+lst.extend(lst_1)
+lst
+
+62. Copy a list using `copy()`.
+
+lst = [10, 60, 60, 40, 20]
+new_lst = []
+new_lst = lst.copy()
+new_lst
+
+63. Find sum of numeric list items.
+
+lst = [10, 60, 60, 40, 20]
+sum(lst)
+
+64. Find largest and smallest numbers in a list.
+
+lst = [10, 60, 60, 40, 20]
+print(min(lst))
+print(max(lst))
+
+
+65. Remove duplicate items from a list.
+
+dup = [1, 2, 2, 3, 4, 4, 5]
+unique = []
+for i in dup:
+    if i not in unique:
+        unique.append(i)
+print(unique)
+
+
+66. Slice: Extract items from index 2 to 7.
+
+text = "python Programming"
+text[2:8:1]
+
+67. Extract every third element from a list using slicing.
+
+text = "python Programming"
+text[::3]
+
+68. Convert list to tuple.
+
+dup = [1, 2, 2, 3, 4, 4, 5]
+tuple(dup)
+
+
+69. Check if an item exists in a list using `in`.
+
+dup = [1, 2, 2, 3, 4, 4, 5]
+print(2 in dup)
+
+70. Create a nested list and access inner elements.
+
+nested_lst =  [[10,20], [20,30]]
+nested_lst[-1][-1]
+
+---
+
+## 🔹 Section 4: Tuples – Indexing, Slicing & Inbuilt Functions
+
+71. Create a tuple with mixed data types.
+
+tuple_a = (1, 3.3, "item")
+tuple_a
+
+72. Access elements using indexing.
+
+tuple_a = (1, 3.3, "item")
+print(tuple_a[0])
+
+73. Slice a tuple (indexes 2 to 5).
+
+tuple_a = (1, 3.3, "item", "a", 9, 0)
+print(tuple_a[2:5:])
+
+74. Check if an element exists in a tuple.
+
+tuple_a = (1, 3.3, "item", "a", 9, 0)
+print(3.3 in tuple_a)
+
+75. Convert a tuple to list.
+
+tuple_a = (1, 3.3, "item", "a", 9, 0)
+print(list(tuple_a))
+
+76. Convert a list to tuple.
+
+nested_lst =  [[10,20], [20,30]]
+print(tuple(nested_lst))
+
+77. Count occurrences of an element in a tuple.
+
+tuple_a = (1, 3.3, "item", "a", 9, 9, 9, 0)
+tuple_a.count(9)
+
+78. Find index of an element.
+
+tuple_a = (1, 3.3, "item", "a", 9, 9, 9, 0)
+tuple_a.index(3.3)
+
+79. Unpack a tuple into multiple variables.
+
+a, b, c  = (10, 20, 30)
+print(a, b, c)
+
+80. Create a nested tuple and access inner elements.
+
+nested_tuple = ((2,5), (6,8))
+nested_tuple[-1][0]
+
+---
+
+## 🔹 Section 5: Sets – Inbuilt Functions & Operations
+
+81. Create a set and add elements using `.add()`.
+
+s1 = {1, 2, 3}
+s2 = {3, 4, 5}
+s1.add(99)
+s1
+
+82. Remove an element using `.remove()`.
+
+s1 = {1, 2, 3}
+s2 = {3, 4, 5}
+s1.remove(2) # throws an error if element doesnot exist
+s1
+
+83. Remove an element using `.discard()` without error.
+
+
+s1 = {1, 2, 3}
+s2 = {3, 4, 5}
+s1.discard(2) # no error if not existing 
+s1
+
+84. Find union of two sets.
+
+s1 = {1, 2, 3}
+s2 = {3, 4, 5}
+print(s1 | s2) # combines both sets and remove duplicates
+
+85. Find intersection of two sets.
+
+s1 = {1, 2, 3}
+s2 = {3, 4, 5}
+print(s1 & s2)
+
+86. Find set difference.
+
+s1 = {1, 2, 3}
+s2 = {3, 4, 5}
+print(f"s1 - s2: removes any elements from s1 if its preset in s2 : {s1 - s2}")
+
+87. Find symmetric difference.
+
+s1 = {1, 2, 3}
+s2 = {3, 4, 5}
+print(s1 ^ s2) # remove common elements through symmetric diffrence
+
+88. Check if one set is subset of another.
+
+s1 = {1, 2, 3}
+s2 = {1, 2}
+print(s2.issubset(s1)) # checks if s2 is subset of s1
+
+89. Check if two sets are disjoint.
+
+s1 = {1, 2, 7}
+s2 = {3, 4, 5}
+print(s1.isdisjoint(s2))
+
+90. Convert a set to list.
+
+s1 = {1, 2, 3}
+list(s1)
+
+91. Convert a list with duplicates to a set to remove duplicates.
+
+dup_list = [1, 1, 2, 2, 3]
+list(set(dup_list))
+
+92. Pop a random element from a set.
+
+
+s1 = {1, 2, 7}
+s1.pop() # pops first element unless list which pops last element
+
+---
+
+## 🔹 Section 6: Dictionary – Keys, Values, Inbuilt Methods
+
+93. Create a dictionary with 5 key-value pairs.
+
+student = {
+    "name" : "neha",
+    "age" : 18,
+    "class" : 12,
+    "marks" : 90,
+    "city" : "udupi"
+}
+
+
+94. Access value by key.
+
+student["name"]
+
+95. Change the value of a key.
+
+
+student["name"] = "nori"
+student["name"]
+
+96. Add a new key-value pair.
+
+student["grade"] = "A+"
+
+97. Remove a key using `pop()`.
+
+student.pop("city")  
+
+98. Remove the last inserted item using `popitem()`.
+
+student.popitem()
+
+99. Get all keys as a list.
+
+print(list(student.keys()))
+
+100. Get all values as a list.
+
+print(list(student.values()))
+
+101. Check if a key exists.
+
+print("name" in student)
+
+102. Merge two dictionaries.
+
+d1 = {"a" : 1, "b" : 2}
+d2 = {"c" : 3, "d" : 4}
+d1.update(d2)
+
+103. Iterate through keys of a dictionary.
+
+
+for key in student: 
+    print(key)
+
+104. Iterate through values of a dictionary.
+
+for val in student.values():
+    print(val)
+
+105. Iterate through key-value pairs.
+
+for k, v in student.items():
+    print(k, "->", v)
+
+106. Convert dictionary keys to a tuple.
+
+print(tuple(student.keys()))
+
+107. Convert dictionary values to a set.
+
+print(set(student.values()))
+
+108. Find the key with maximum value (numeric dictionary).
+
+marks = {"A": 95, "B": 88, "C": 92}
+topper = max(marks, key = marks.get)
+topper
+
+109. Create a nested dictionary and access inner data.
+
+school = {
+    "class10": {"students": 30, "teacher": "Mr.Singh"},
+    "class12": {"students": 25, "teacher": "Ms.Rani"}
+}
+print(school["class10"])
+
+
+110. Reverse key-value pairs (swap keys & values).
+
+d = {"a":1, "b":2, "c":3}
+swapped = {v: k for k,v in d.items()}
+swapped
+
+---
+
+## 🔹 Section 7: Boolean, None, Range, Bytes & Misc
+
+111. Check the type of a boolean variable.
+
+x = True 
+type(x)
+
+112. Convert 0 and 1 to boolean.
+
+print(bool(0))
+print(bool(1))
+
+113. Use `bool()` function on different values.
+
+print(bool(""), bool("hi"))
+print(bool(0), bool(100))
+
+114. Check if a variable is None.
+
+data = None 
+data is None
+
+115. Compare two numbers using boolean operators.
+
+print(10 > 5)
+print(5==5 and 10!=5)
+
+
+116. Create a range object from 1 to 20.
+
+r = range(1,21)
+for i in r:
+    print(i)
+
+117. Convert a range object into a list.
+
+list(range(1,21))
+
+118. Access items of a range using indexing.
+
+r = range(1,21)
+print(r[0])
+
+119. Slice a range.
+
+r = range(1,21)
+print (list(r[5:13]))
+
+120. Create a bytes object and print each byte.
+
+b = bytes([65, 66, 67])
+print(b)
+for byte in b:
+    print(byte)
+
+121. Convert string to bytes.
+
+# string to byte 
+
+text = "Hello"
+b2 = text.encode()
+b2
+
+
+122. Modify a bytearray element.
+
+ba = bytearray(b"hello")
+ba[0] = 67
+ba
+
+123. Convert bytearray back to bytes.
+
+ba = bytearray(b"hello")
+bytes(ba)
+
+124. Check length of any data type using `len()`.
+
+text = "python"
+num = [10, 20]
+print(len(text))
+print(len(num))
+
+125. Use `type()` on various objects.
+
+print(type(6))
+print(type("apple"))
+print(type([2,5]))
+print(type(6.6))
+print(type({3, 7}))
+print(type('a'))
+print(type((2, 4)))
+
+
+126. Use `id()` to print memory address of variables.
+
+a = 10
+b = "hello"
+
+print(id(a), id(b))
+
+127. Check mutability of list vs tuple.
+
+lst = [1, 2, 3]
+tuple = (2, 4, 5)
+tuple[0] = 10 # doenot work cuz tuples are immutable
+lst[0] = 6
+print(lst)
+print(tuple)
+
+128. Convert data types using `int()`, `float()`, `str()`, `list()`.
+
+print(int("123"))
+print(str(122))
+print(float("123"))
+print(list((1,2,3)))
+
+129. Evaluate expression from string using `eval()`.
+
+x = eval("10 * 20 + 20")
+x
+
+130. Find all available methods of `str` using `dir()`.
+
+print(dir(str))
+
+
+# 🌀 100 Loop Programming Questions (For Loop + While Loop)
+
+## ✅ 50 FOR LOOP QUESTIONS
+
+### 🔹 Basic Level (1–20)
+1. Print numbers from 1 to 100.
+
+for i in range(1,100):
+    print(i)
+
+2. Print even numbers from 1 to 50.
+
+for i in range(1,51):
+    if i%2 == 0 :
+        print(i)
+
+
+3. Print odd numbers from 1 to 50.
+
+for i in range (1, 51):
+    if i%2!=0 :
+        print(i)
+
+4. Print the multiplication table of 5.
+
+for i in range(1, 11):
+    print(5*i)
+
+
+5. Print all numbers divisible by 7 between 1 and 200.
+
+for i in range(1,201):
+    if i%7==0 :
+        print(i)
+
+
+6. Print the squares of numbers from 1 to 20.
+
+for i in range(1, 21):
+    print(i*i)
+
+7. Print characters of a string one by one.
+
+text = "python"
+for i in text:
+    print(i)
+
+8. Count how many vowels are in a given string.
+
+text = "python"
+vow = "aeiou"
+count = 0
+for i in text:
+    if i in vow:
+        count = count + 1
+print(count)
+
+
+9. Count how many digits are in a string.
+
+text = "123string"
+for i in text:
+    if i.isdigit():
+        print(i)
+
+10. Print the sum of numbers from 1 to 100.
+
+sum = 0
+for i in range (1,101):
+    sum = sum + i
+print(sum)
+
+
+11. Print factorial of a number using a for loop.
+
+fact = 1
+for i in range (1,10):
+    fact = fact * i
+print(fact)
+
+12. Print elements of a list.
+
+list = [ 1, 2, 3, 4]
+for i in list : 
+    print(i)
+
+13. Print the sum of all items in a list.
+
+list = [ 1, 2, 3, 4]
+sum = 0
+for i in list :
+    sum = sum + i
+print(sum)
+
+14. Find the largest number in a list.
+
+largest = list[0]
+for num in list:
+    if num > largest:
+        largest = num 
+print(f"the largest number is : {largest}")
+
+15. Find the smallest number in a list.
+
+smallest = list[0]
+for num in list:
+    if num < smallest:
+        smallest = num 
+print(f"the smallest number is : {smallest}")
+
+16. Print only positive numbers from a list.
+
+list = [0, -1, -4, 3, 5]
+for i in list:
+    if i >=0 :
+        print(i)
+
+17. Print the reverse of a list.
+
+list = [0, -1, -4, 3, 5]
+list[::-1]
+
+18. Print the reverse of a string.
+
+text = "apple"
+text[::-1]
+
+
+19. Count how many words in a sentence.
+
+sentence = "python is awesome"
+word = sentence.split()
+len(word)
+
+20. Print first 10 Fibonacci numbers.
+
+a, b = 0, 1
+print("first 10 fibonacci")
+for i in range(10):
+    print(a)
+    a, b = b, a+b
+print("\n")
+
+
+### 🔹 Intermediate Level (21–40)
+
+21. Print prime numbers between 1 and 100.
+
+
+def find_prime(n):
+    primes = []
+    for num in range(2,n):
+        is_prime = True
+        for i in range(2, (n//2)+1):
+            if num%i == 0:
+                is_prime = False
+                break 
+        if is_prime:
+            primes.append(num)
+    return primes
+            
+print(find_prime(100))    
+    
+22. Count how many prime numbers are between 1 and 100.
+
+def find_primes(n):
+    primes = []
+    count = 0
+    for num in range(2,n):
+        is_prime = True 
+        for i in range(2,(n//2)+1):
+            if num % i == 0:
+                is_prime = False 
+                break 
+        if is_prime: 
+                primes.append(num)
+                count = count + 1
+    return primes, count
+result = find_primes(100)
+print(result[0])
+print(result[1])
+
+
+23. Print all Armstrong numbers between 1 and 1000.
+
+
+24. Print the sum of digits of a number.
+
+num = 2345
+sum_digit = 0
+for digit in num:
+    sum_digit = sum_digit + digit 
+print(sum_digit)
+
+24. Print the sum of digits of a number.
+
+num = 1234
+sum_dig = 0
+for i in str(num):
+    sum_dig = sum_dig + int(i)
+print(sum_dig)
+
+
+25. Count how many even/odd numbers in a list.
+
+lst = [12, 45, 23, 67, 88, 90, 44]
+even = odd = 0
+for i in lst:
+    if i%2 == 0:
+        even += 1
+    else:
+        odd += 1
+print(f"even number is : {even}")
+print(f"odd number is : {odd}")
+
+
+26. Remove duplicates from a list using a loop.
+
+lst = [12, 45, 23, 67, 67, 67, 44]
+unique = []
+
+for i in lst:
+    if i not in unique:
+        unique.append(i)
+unique
+
+27. Print frequency of each character in a string.
+
+
+text = "apple"
+dict = {}
+
+for i in text:
+    if i in dict:
+        dict[i] += 1
+    else:
+        dict[i] = 1
+
+print(dict)
+
+
+28. Print numbers from 100 to 1 (reverse loop).
+
+for i in range(100,0,-1):
+    print(i)
+
+
+29. Print the cube of all numbers from 1 to 15.
+
+for i in range(1,16):
+    print(i**3)
+
+
+30. Print a star pattern: * **
+
+for i in range(1,10):
+    print('*'*i, end = " ")
+
+
+31. Print a pyramid pattern.
+
+n = 8
+for i in range(0,n):
+    print(" "*(n-i) +"*"*(2*i + 1)) 
+
+
+32. Print a list in sorted order (without using sort()).
+
+a = [1, 4, 5, 2, 3, 7, 8]
+for i in range(len(a)):
+    for j in range(i+1, len(lst)):
+        if a[i] > a[j]:
+            a[i], a[j] = a[j], a[i]
+print(a)
+
+
+33. Print numbers divisible by both 3 and 5 between 1 and 100.
+
+for i in range(0,101):
+    if i%3 == 0 and i%5 == 0:
+        print(i)
+
+34. Print the product of all numbers in a list.
+
+product = 1
+a = [1, 4, 5, 2, 3, 7, 8]
+for i in range(len(a)):
+    product = product * a[i]
+print(product)
+
+
+35. Print the second largest number in a list.
+
+a = [1, 4, 5, 2, 3, 7, 8]
+for i in range(len(a)):
+    for j in range(len(a)):
+        if a[j] > a[i]:
+            a[j], a[i] = a[i], a[j]
+print(a)
+print(a[len(a)-2])
+
+
+36. Print the common elements of two lists.
+
+a = [1, 4, 5, 2, 3, 7, 8]
+b = [0, 2, 5, 2, 10, 11, 12]
+unique = []
+
+for i in a:
+    if i not in b:
+        unique.append(i)
+for j in b:
+    if j not in a:
+        unique.append(j)
+print(unique)
+
+
+37. Convert lowercase letters of string to uppercase without using .upper().
+
+text = "Apple"
+for i in text:
+    if ord(i) > 90:
+        print("".join(chr(ord(i)-32)))
+    else:
+        print(i)
+
+
+38. Count uppercase and lowercase letters.
+
+up = 0 
+low = 0 
+text = "AppLeZZZZz"
+for i in text:
+    if ord(i) > 90:
+        low += 1
+    else:
+        up += 1
+print(f"lowercase count is : {low}")
+print(f"uppercase count is : {up}")
+
+
+39. Reverse digits of a number.
+
+num = 1234 
+print(str(num)[::-1])
+
+# or 
+
+num = 1234 
+dig = 0
+rev_num = 0
+for i in range(len(str(num))):
+    dig = num%10
+    rev_num = rev_num * 10 + dig
+    num//=10
+rev_num
+
+
+40. Print the sum of squares of first N numbers.
+
+
+n = 10
+sum_sq = 0
+for i in range(n+1):
+    sum_sq = sum_sq + (i**2)
+sum_sq
+
+
+🔹 Advanced Level (41–50)
+                   
+
+41. Implement bubble sort using for loops.
+
+a = [1, 4, 5, 2, 3, 7, 8]
+for i in range(len(a)):
+    for j in range(i+1,len(a)):
+        if a[j] < a[i]:
+            a[i], a[j] = a[j], a[i]
+print(a)
+    
+42. Implement selection sort using for loops.
+
+a = [1, 4, 5, 2, 3, 7, 8]
+
+for i in range(len(a)):
+    key = i
+    for j in range((i-1)):
+        if a[j] > a[key]:
+            a[j], a[key] = a[key], a[j]
+            key = j
+print(a)    
+
+
+43. Print frequency of each word in a paragraph.
+
+paragraph = "blue fish lives in blue sea and blue ocean"
+
+word = paragraph.split()
+un = {}
+
+for i in word:
+    if i in un:
+        un[i] = un[i] + 1
+    else:
+        un[i] = 1
+print(un)
+    
+
+44. Find missing numbers in a list of 1 to 100.
+
+present = [1, 3, 5, 7, 8, 9]
+missing = []
+
+for i in range(0,101):
+    if i not in present:
+        missing.append(i)
+print(missing)
+
+
+45. Generate Pascal’s Triangle for N rows.
+
+46. Print a diamond pattern using stars.
+
+num = 5
+for i in range(0,num):
+    print(" "*(num-i) + "*"*(2*i+1))
+for i in range(num, -1, -1):
+    print(" "*(num-i) + "*"*(2*i+1))
+
+47. Check if a number is a perfect number.
+
+perfect_num = []
+for i in range(1,101):
+    for j in range(1,101):
+        if i*i == j:
+            perfect_num.append(j)
+print(perfect_num)
+
+48. Generate a list of factorials from 1 to 10.
+
+fact = 1
+for i in range(1,11):
+    fact = fact * i
+    print(fact)
+
+
+49. Print all substrings of a string.
+
+text = "string"
+for i in range(len(text)):
+    print(text[i:j])
+
+
+50. Generate a multiplication table matrix (1 to 10).// answer all using for loop
+
+for i in range(1,11):
+    for j in range (1,11):
+        print(i*j)
+    print()
+   
+### while loop
+### 🔹 Basic Level (1–20)
+1. Print numbers from 1 to 50 using while.
+
+i = 1
+while i <= 50:
+    print(i)
+    i = i + 1
+
+2. Print even numbers from 1 to 100.
+
+i = 1
+while i <= 100:
+    if i%2 == 0:
+        print(i)
+    i = i + 1
+
+3. Print odd numbers from 1 to 100.
+
+i = 1
+while i <= 100:
+    if i%2 != 0:
+        print(i)
+    i = i + 1
+
+4. Calculate factorial of a number using while.
+
+fact = 1
+i = 1
+while i <= 10:
+    fact = fact * i
+    i = i + 1
+print(fact)
+
+5. Print the countdown from 10 to 1.
+
+i = 10
+while i <= 10 and i >= 0:
+    print(i)
+    i = i - 1
+
+6. Repeat input until the user enters "stop".
+
+while True:
+    word = input("enter anything")
+    if word.lower() == "stop":
+        break 
+    print(f"you entered :{word}")
+    
+7. Accept numbers until user enters 0, then print sum.
+
+total = 0
+while True:
+    num = int(input("enter a number"))
+    if num == 0:
+        break
+    total = total + num
+print(f"sum is {total}")
+
+
+8. Print digits of a number one by one.
+
+num = int(input("enter a number"))
+temp = num 
+while temp > 0:
+    print(temp%10)
+    temp//=10
+
+
+9. Reverse a number using while.
+
+num = int(input("enter a number"))
+reversed_num = 0
+while num > 0:
+    digit = num%10
+    reversed_num = reversed_num * 10 + digit
+    num//=10
+print(reversed_num)
+
+
+10. Count digits in a number.
+
+temp = int(input("enter anything"))
+count = 0
+
+while temp > 0:
+    count = count + 1
+    temp//= 10
+print(count)
+
+
+11. Find sum of digits of a number.
+
+
+num = int(input("enter a number"))
+sum = 0
+while num > 0:
+    digit = num%10
+    sum = sum + digit 
+    num //= 10
+print(sum)
+
+12. Print elements of a list using index + while loop.
+
+i = 0
+list_a = [1, 2, 3, 4, 2]
+while i < len(list_a):
+    print(list_a[i])
+    i = i + 1
+print()
+
+13. Find largest/smallest in a list using while loop.
+
+list_a = [1, 2, 3, 4, 2]
+i = 0
+largest = smallest = list_a[0]
+while i < len(list_a):
+    if list_a[i] < smallest:
+        smallest = list_a[i]
+    if list_a[i] > largest:
+        largest = list_a[i]
+    i = i + 1
+print(f"smallest is {smallest}")
+print(f"largest is : {largest}")
+
+
+14. Count vowels in a string using while.
+
+string_a = "apple"
+vow = "aeiou"
+i = 0
+count = 0
+while i < len(string_a):
+    if string_a[i] in vow:
+        count = count + 1
+    i = i + 1
+print(f"count is : {count}")
+
+
+15. Print multiplication table of a number.
+
+num = 6
+i = 1
+while i < 11:
+    print(i*num)
+    i = i + 1
+    
+16. Check if a number is palindrome using while.
+
+num = 12321
+reversed = 0
+original = num
+while num > 0:
+    digit = num%10
+    reversed = reversed * 10 + digit 
+    num //= 10
+if original == reversed:
+    print(f" {original} is a palindrome")
+    print(f"{reversed} is the reversed version")
+else:
+    print(f"{original} is not a palindrome")
+    print(f"{reversed} is the reversed version")
+
+
+17. Print Fibonacci series using while.
+
+a, b = 0, 1
+count = 0
+n = 15
+while count < n:
+    print(f"a = {a}, b = {b}")
+    a, b = b, a+b
+    count = count + 1
+print()
+
+18. Convert decimal to binary using while.
+
+num = int(input("enter a decimal number :"))
+if num == 0:
+    binary = "0"
+else:
+    binary = " "
+    temp = num
+    while temp > 0:
+        binary = str(temp%2) + binary
+        temp//=2
+print(f"binary of {num} is {binary}")
+
+
+19. Print square of numbers 1 to 20.
+
+i = 1
+count = 20
+while i <= count:
+    print(i*i)
+    i = i + 1
+
+
+20. Print cube of numbers 1 to 20.
+
+i = 1
+count = 20
+while i <= count:
+    print(i**3)
+    i = i + 1
+
+
+### 🔹 Intermediate Level (21–40)
+21. Print all prime numbers under 100 using while.
+
+i = 2
+prime = []
+
+while i <= 100:
+    is_prime = True
+    for n in range(i,int((i/2))+1):
+        if i%n == 0:
+            is_prime = False       
+            break
+    if is_prime:
+        prime.append(i)
+    i = i + 1
+print(prime)        
+
+22. Find LCM of two numbers using loops.
+
+a, b = 12, 18
+x, y = a, b
+while b!=0:
+    a, b = b, a%b
+gcd = a
+lcm = (x*y)//gcd
+print(f"lcm is : {lcm}")
+
+23. Find HCF/GCD using repeated subtraction.
+
+a, b = 48, 18
+while a!=b:
+    if a>b:
+        a = a - b
+    else:
+        b = b - a
+print(f"gcd is {a}")
+
+
+24. Print all factors of a number.
+
+n = 20
+i = 1
+factor = []
+while i <= n:
+    if n%i == 0:
+        factor.append(i)
+    i = i + 1
+print(factor)
+
+25. Check if a number is Armstrong.
+
+num = 153
+var = num
+arm = num
+total= 0
+count = 0
+
+while num > 0:
+    count = count + 1
+    num//=10
+print(count)
+
+while var > 0:
+    dig = var%10
+    total = total + (dig**count)
+    var//=10
+print(total)
+
+if (arm == total):
+    print(f"its an armstrong number")
+else:
+    print(f"not an armstrong number")
+
+
+
+    
+26. Print reverse star pattern using while:
+    *****
+    ****
+    ***
+    **
+    *
+
+i = 5
+while i>0:
+    print('*'*i)
+    i = i - 1
+
+
+27. Accept numbers until a negative number is entered.
+
+
+while True:
+    num = int(input("enter a number"))
+    if num < 0:
+        break 
+    print(num)
+
+
+28. Print numbers divisible by 9 between 1 and 200.
+
+i = 1
+while i<=200:
+    if i%9 == 0:
+        print(i)
+    i = i + 1
+
+29. Implement a menu-driven program using while loop.
+
+while True:
+    ch = int(input("enter a number"))
+    a = int(input("a ="))
+    b = int(input("b ="))
+    if ch == 3:
+        break
+    if ch == 1:
+        print(f"result: a + b: {a+b}")
+    elif ch == 2:
+        print(f"result: a - b: {a-b}")
+
+
+30. Sum all elements in a list using while.
+
+list_a = [1, 2, 3, 4, 5, 5, 5]
+i = 0
+total = 0
+while i < len(list_a):
+    total = total + list_a[i]
+    i = i + 1
+print(total)
+
+
+31. Remove duplicates from a list using while.
+
+
+list_a = [1, 2, 3, 4, 5, 5, 5]
+unique = []
+i = 0
+while i < len(list_a):
+    if list_a[i] not in unique:
+        unique.append(list_a[i])
+    i = i + 1
+print(unique)
+
+
+32. Find second largest number using while.
+
+nums = [90, 50, 30, 80, 70]
+i = 1
+smallest = nums[0]
+while i < len(nums):
+    if nums[i] < smallest:
+        smallest = nums[i]
+    i = i + 1
+print(smallest)
+
+
+33. Count uppercase and lowercase letters using while.
+
+string_a = "AlpHAbet"
+i = 0
+count_up = 0
+count_down = 0
+while i < len(string_a):
+    if string_a[i].isupper():
+        count_up += 1
+       
+    else:
+        count_down += 1
+    i = i + 1
+print(f"upper count is : {count_up}")
+print(f"lower count is : {count_down}")
+
+
+34. Check if a string is an anagram of another using loops.
+
+
+35. Generate sequence of powers: 2, 4, 8, 16, ...
+
+i = 0
+pow = 0
+num = 2
+while i >= 0:
+    pow = pow + (num**i)
+    print(pow)
+    i = i + 1
+    
+
+36. Print triangular number pattern.
+
+i = 0
+while i<=5:
+    print(" "*(5-i) + '*'*(2*i+1))
+    i = i + 1
+
+37. Print alternating number pattern:
+    1
+    12
+    123
+    1234
+
+j = 1
+while j <= 4:
+    i = 1
+    while i <= j:
+        print(i, end = "")
+        i = i + 1
+    print()
+    j = j + 1
+
+
+38. Print factorial series: 1!, 2!, 3!, ...
+
+def fact(n):
+    fact = 1
+    i = n
+    while i > 0:
+        fact = fact * i
+        i = i - 1
+    return fact
+
+for i in range(1, 6):
+    print(f"factorial of {i} : {fact(i)}")
+
+
+
+39. Find sum of first N natural numbers.
+
+def find_sum(n):
+    i = 0
+    sum = 0
+    while i <= n:
+        sum = sum + i
+        i = i + 1
+    return sum
+
+find_sum(10)
+
+40. Print harmonic series up to N.
+
+i = 1
+n = 5
+sum = 0
+while i <= n:
+    sum = sum + (1/i)
+    i= i + 1
+print(sum)
+
+### 🔹 Advanced Level (41–50)
+41. Implement bubble sort using while loop.
+
+arr = [1, 7, 6, 2, 3]
+j = 1
+n = len(arr)
+while j < n:
+    i = 0
+    while i < (n-j):
+        if arr[i] > arr[i + 1]:
+            arr[i], arr[i+1] = arr[i+1], arr[i]
+        i = i + 1
+    j = j + 1
+print(arr)
+
+42. Implement insertion sort using while.
+
+arr = [12, 11, 13, 5, 6]
+i = 1
+while i < len(arr):
+    key = arr[i]
+    j = i - 1   # when comparing 11 and 13 then 13 is key ->arr[i] ->arr[2] compare with arr[1] so i < j
+    while arr[j] > key and j>=0:
+        arr[j+1] = arr[j]
+        j = j - 1
+    arr[j+1] = key 
+    i = i + 1
+print(arr)
+
+
+43. Generate Pascal’s triangle using while.
+
+
+44. Implement binary search using while.
+
+arr = [2, 5, 8, 12, 16, 23, 38]
+high = len(arr)-1
+low = 0
+index = 0
+target = 23
+while (high >  low):
+    
+    mid = (high + low)//2
+
+    if (target > arr[mid]):
+        low = mid + 1
+        high = len(arr)-1
+    elif (target < arr[mid]):
+        low = 0
+        high = mid - 1
+    elif (target == arr[mid]):
+        print(f"{mid} is the index")
+        break
+    else:
+        print(f"element not found")
+
+
+45. Print all substrings of a string using while + indexing.
+
+string_a = "abc"
+i = 0
+while i <= len(string_a):
+        j = i + 1
+        while j <= len(string_a):
+            print(string_a[i:j])
+            j = j + 1
+        i = i + 1
+
+
+46. Print a diamond pattern using while.
+
+n = 5 
+i = 0
+while i<=n:
+    print(" "*(n-i) + "*"*(2*i+1)) 
+    i = i + 1
+i = 5
+while i>=0:
+    print(" "*(n-i) + "*"*(2*i+1)) 
+    i = i - 1
+
+
+47. Simulate ATM PIN retry (max 3 attempts).
+
+card_detected = False
+
+def freq (pin):
+    return len(str(pin))
+
+scr = input("please insert your card")
+
+if scr.lower() == 'insert':
+    card_detected = True
+    print("card detected")
+else:
+    print("card not detected")
+    exit()
+
+
+i = 0
+while i < 3:
+    pin = input("enter your input")
+
+
+    if pin.lower() == 'cancel':
+        print(f"pin is cancelled")
+        break 
+
+    if not pin.isdigit():
+        print(f"please enter numbers only!")
+        continue
+
+    if freq(pin) != 4:
+        print(f"enter exact four characters")
+        continue 
+    
+    print(f"correct pin: {'*'*4}")
+    print(f"please wait! Processing your pin")
+    if (int(pin)==1234):
+        print(f"correct pin!success")
+        break
+    else:
+        i = i + 1
+        print(f"incorrect pin, plz try again")
+        if (i == 3):
+            print("too many wrong attempts")
+            count = 0
+            while count < 5:
+                print(f"incorrect pin!. card detained for security")
+                count = count + 1
+                card_detected = False
+      
+48. Find prime factors of a number.
+
+prime_factors = []
+num = 20
+
+def is_prime(n):
+    for j in range(2,(n/2)):
+        if n%j == 0:
+            return True
+        else:
+            return False
+        
+for i in range(num):
+    if is_prime(i)==True:
+        if num%i == 0:
+            prime_factors.append(i)
+
+49. Simulate login system using while.
+
+prime_factors = []
+num = 100
+temp = num
+
+def is_prime(n):
+   
+    j = 0
+    while j < (n/2):
+        if n <= 1:
+            return False
+        if n == 2:
+            return True
+        if n%2 == 0:
+            return False
+        
+        j = 3
+        while j * j <= n:
+            if n%j == 0:
+                return False
+            j = j + 2
+        return True
+        
+
+i = 2 
+while i*i <= temp:
+    if is_prime(i):
+        while temp%i == 0:
+            prime_factors.append(i)
+            temp//=i
+    i = i + 1     
+    
+
+if temp > 1:
+    prime_factors.append(temp)
+print(prime_factors)
+
+
+50. Simulate a game loop that continues until user chooses exit.
+
+while True:
+    ch = (input("enter an number"))
+    if ch == "1":
+        print("hi ! hello")
+    elif ch == "2":
+        print("building the game")
+    elif ch == 'exit':
+        print("Tata ! bye bye")
+        break
+    else :
+        print("invalid")
+
+

@@ -1,0 +1,334 @@
+# logistic regression 
+import mlflow
+import mlflow.sklearn 
+import pandas as pd 
+from sklearn.model_selection import train_test_split 
+from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
+from sklearn.metrics import f1_score, precision_score, recall_score 
+import pickle 
+
+## ================ import dataset =====================
+
+print("loading application_train.csv ....")
+df = pd.read_csv('application_train.csv')
+
+
+x = df.drop(['SK_ID_CURR', 'TARGET'], axis = 1)
+y = df ['TARGET']
+
+## convert categorical columns to numeric 
+
+categorical_cols = x.select_dtypes(include = ['object', 'category']).columns 
+print("categorical columns : ", list(categorical_cols))
+print("number of categorical columns : ", len(categorical_cols))
+
+## convert categorical columns to dummy variables 
+x_encoded = pd.get_dummies(
+    x, 
+    columns = categorical_cols,
+    drop_first = False, # if baseline is predictable else not needed
+    dummy_na = False,
+    dtype = int  # dummies are 0/1
+)
+
+# for numerical values 
+
+from sklearn.impute import SimpleImputer 
+
+# impute numerical values 
+
+numeric_cols = x_encoded.select_dtypes(include = ['int64', 'float64']).columns 
+imputer = SimpleImputer(strategy = 'median') 
+# if there are Nan numeric values then it takes median of column and assigns a value
+x_encoded[numeric_cols] = imputer.fit_transform(x_encoded)
+
+print(" final shape after encoding and imputation is :", x_encoded.shape)
+
+# trin test split 
+x_train, x_test, y_train, y_test = train_test_split(x_encoded, y, test_size = 0.2, random_state = 42, stratify = y)
+# stratify is used because in classification datasets if there isimabaalnce among classes then it will neutralize the change
+
+## ========== ml_flow setup =============
+mlflow.set_experiment("Home creadit default risk")
+
+# here we are setting the experiment name 
+
+## =============== Logistic Regression ===================
+print("starting loigistic regression training")
+
+data_versions = {
+    "normal" : (x_train, x_test),
+    "standardized" : (StandardScaler().fit_transform(x_train), StandardScaler().fit(x_train).transform(x_test)),
+    "minmax" : (MinMaxScaler().fit_transform(x_train), MinMaxScaler().fit(x_train).transform(x_test))
+}
+
+for version_name, (x_train_ver, x_test_ver) in data_versions.items():
+       
+    # to track the flow of code 
+    with mlflow.start_run(run_name = f"LogisticRegression_{version_name}"):
+        model = LogisticRegression(max_iter = 1000, solver = 'lbfgs', class_weight = 'balanced')
+        model.fit(x_train_ver, y_train)
+        y_pred = model.predict(x_test_ver)
+
+        # caluculate metrics 
+        metrics = {
+        "f1_score" : f1_score(y_test, y_pred),
+        "precision" : precision_score(y_test, y_pred),
+        "recall" : recall_score(y_test, y_pred)
+        }
+
+        # log to mlflow 
+        mlflow.log_param("model_type", "LogisticRegression")
+        mlflow.log_param("data_version", version_name)
+        mlflow.log_metrics(metrics)
+
+
+        # save model as pickle file and log as artifacts 
+        pickle_filename = f"logistic_{version_name}.pkl"
+        with open(pickle_filename, "wb") as f:
+            pickle.dump(model,f)
+        mlflow.log_artifact(pickle_filename)
+
+        mlflow.sklearn.log_model(model, "model")
+
+        print(f" Logged : LogisticRegression - {version_name}")
+        print(f"Metrics -> F1: {metrics['f1_score']:.4f}",
+              f"precision : {metrics['precision']:.4f}",
+              f"recall : {metrics['recall']:.4f}")
+
+
+# random_forest 
+
+import mlflow
+import mlflow.sklearn 
+import pandas as pd 
+from sklearn.model_selection import train_test_split 
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
+from sklearn.metrics import f1_score, precision_score, recall_score 
+import pickle 
+
+## ================ import dataset =====================
+
+print("loading application_train.csv ....")
+df = pd.read_csv(r'C:\Users\peepl\Downloads\mlflow_experiments\application_train.csv (1).zip')
+
+
+x = df.drop(['SK_ID_CURR', 'TARGET'], axis = 1)
+y = df ['TARGET']
+
+## convert categorical columns to numeric 
+
+categorical_cols = x.select_dtypes(include = ['object', 'category']).columns 
+print("categorical columns : ", list(categorical_cols))
+print("number of categorical columns : ", len(categorical_cols))
+
+## convert categorical columns to dummy variables 
+x_encoded = pd.get_dummies(
+    x, 
+    columns = categorical_cols,
+    drop_first = True, # if baseline is predictable else not needed
+    dummy_na = False,
+    dtype = int  # dummies are 0/1
+)
+
+# for numerical values 
+
+from sklearn.impute import SimpleImputer 
+
+# impute numerical values 
+
+numeric_cols = x_encoded.select_dtypes(include = ['int64', 'float64']).columns 
+imputer = SimpleImputer(strategy = 'median') 
+# if there are Nan numeric values then it takes median of column and assigns a value
+x_encoded[numeric_cols] = imputer.fit_transform(x_encoded)
+
+print(" final shape after encoding and imputation is :", x_encoded.shape)
+
+# trin test split 
+x_train, x_test, y_train, y_test = train_test_split(x_encoded, y, test_size = 0.2, random_state = 42, stratify = y)
+# stratify is used because in classification datasets if there isimabaalnce among classes then it will neutralize the change
+
+## ========== ml_flow setup =============
+mlflow.set_experiment("Home creadit default risk")
+
+# here we are setting the experiment name 
+
+## =============== Logistic Regression ===================
+print("starting randomForestClassifier training")
+
+data_versions = {
+    "normal" : (x_train, x_test),
+    "standardized" : (StandardScaler().fit_transform(x_train), StandardScaler().fit(x_train).transform(x_test)),
+    "minmax" : (MinMaxScaler().fit_transform(x_train), MinMaxScaler().fit(x_train).transform(x_test))
+}
+
+
+for version_name, (x_train_ver, x_test_ver) in data_versions.items():
+       
+    # to track the flow of code 
+    with mlflow.start_run(run_name = f"RandomForestClassifier_{version_name}"):
+        model = RandomForestClassifier(
+            n_estimators = 800, # number of decesion trees
+            max_depth = 15,  # Trees growing fully
+            class_weight = 'balanced',
+            random_state = 42,
+            n_jobs = -1, # uses all cpu cores
+            verbose = 0 #output not visible
+            )
+        
+        model.fit(x_train_ver, y_train)
+        y_pred = model.predict(x_test_ver)
+
+        # caluculate metrics 
+        metrics = {
+        "f1_score" : f1_score(y_test, y_pred),
+        "precision" : precision_score(y_test, y_pred),
+        "recall" : recall_score(y_test, y_pred)
+        }
+
+        # log to mlflow 
+        mlflow.log_param("model_type", "RandomForestClassifier")
+        mlflow.log_param("data_version", version_name)
+        mlflow.log_metrics(metrics)
+
+
+        # save model as pickle file and log as artifacts 
+        pickle_filename = f"RandomForestClassifier_{version_name}.pkl"
+        with open(pickle_filename, "wb") as f:
+            pickle.dump(model,f)
+        mlflow.log_artifact(pickle_filename)
+
+        mlflow.sklearn.log_model(model, "model")
+
+        print(f" Logged : RandomForestClassifier- {version_name}")
+        print(f"Metrics -> F1: {metrics['f1_score']:.4f}",
+              f"precision : {metrics['precision']:.4f}",
+              f"recall : {metrics['recall']:.4f}")
+
+
+
+# xgboost
+
+import mlflow
+import mlflow.xgboost
+import pandas as pd 
+from sklearn.model_selection import train_test_split 
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
+from sklearn.metrics import f1_score, precision_score, recall_score 
+from xgboost import XGBClassifier
+import pickle 
+
+
+## ================ import dataset =====================
+
+print("loading application_train.csv ....")
+df = pd.read_csv(r'C:\Users\peepl\Downloads\mlflow_experiments\application_train.csv (1).zip')
+
+
+x = df.drop(['SK_ID_CURR', 'TARGET'], axis = 1)
+y = df ['TARGET']
+
+## convert categorical columns to numeric 
+
+categorical_cols = x.select_dtypes(include = ['object', 'category']).columns 
+print("categorical columns : ", list(categorical_cols))
+print("number of categorical columns : ", len(categorical_cols))
+
+## convert categorical columns to dummy variables 
+x_encoded = pd.get_dummies(
+    x, 
+    columns = categorical_cols,
+    drop_first = True, # if baseline is predictable else not needed
+    dummy_na = False,
+    dtype = int  # dummies are 0/1
+)
+
+# for numerical values 
+
+from sklearn.impute import SimpleImputer 
+
+# impute numerical values 
+
+numeric_cols = x_encoded.select_dtypes(include = ['int64', 'float64']).columns 
+imputer = SimpleImputer(strategy = 'median') 
+# if there are Nan numeric values then it takes median of column and assigns a value
+x_encoded[numeric_cols] = imputer.fit_transform(x_encoded)
+
+print(" final shape after encoding and imputation is :", x_encoded.shape)
+
+# trin test split 
+x_train, x_test, y_train, y_test = train_test_split(x_encoded, y, test_size = 0.2, random_state = 42, stratify = y)
+# stratify is used because in classification datasets if there isimabaalnce among classes then it will neutralize the change
+
+## ========== ml_flow setup =============
+mlflow.set_experiment("Home credit default risk")
+
+neg, pos = y_train.value_counts()
+scale_pos_weight = neg / pos
+
+print(f"class distribution - negative : {neg}, positive : {pos}")
+print(f"scale_pos_weight : {scale_pos_weight}")
+
+# here we are setting the experiment name 
+
+## =============== Logistic Regression ===================
+print("starting XGBoost training")
+
+data_versions = {
+    "normal" : (x_train, x_test),
+    "standardized" : (StandardScaler().fit_transform(x_train), StandardScaler().fit(x_train).transform(x_test)),
+    "minmax" : (MinMaxScaler().fit_transform(x_train), MinMaxScaler().fit(x_train).transform(x_test))
+}
+
+
+for version_name, (x_train_ver, x_test_ver) in data_versions.items():
+       
+    # to track the flow of code 
+    with mlflow.start_run(run_name = f"XGBoost_{version_name}"):
+        model = XGBClassifier(
+            n_estimators = 300, # number of decesion trees
+            max_depth = 8,  # Trees growing fully
+            learning_rate = 0.1,
+            subsample = 0.8, 
+            colsample_bytree = 0.8,
+            eval_metric = 'logloss',
+            scale_pos_weight = scale_pos_weight,
+            random_state = 42,
+            n_jobs = -1, # uses all cpu cores
+            verbosity = 0 #output not visible
+            )
+        
+        model.fit(x_train_ver, y_train)
+        y_pred = model.predict(x_test_ver)
+
+        # caluculate metrics 
+        metrics = {
+        "f1_score" : f1_score(y_test, y_pred),
+        "precision" : precision_score(y_test, y_pred),
+        "recall" : recall_score(y_test, y_pred)
+        }
+
+        # log to mlflow 
+        mlflow.log_param("model_type", "XGBoostClassifier")
+        mlflow.log_param("data_version", version_name)
+        mlflow.log_metrics(metrics)
+
+
+        # save model as pickle file and log as artifacts 
+        pickle_filename = f"XGBoost_{version_name}.pkl"
+        with open(pickle_filename, "wb") as f:
+            pickle.dump(model,f)
+        mlflow.log_artifact(pickle_filename)
+
+        mlflow.xgboost.log_model(model, "model")
+
+        print(f" Logged : XGBoost- {version_name}")
+        print(f"Metrics -> F1: {metrics['f1_score']:.4f},"
+              f"precision : {metrics['precision']:.4f},"
+              f"recall : {metrics['recall']:.4f}")
+
+
+

@@ -1,0 +1,557 @@
+import numpy as np
+
+# =========================================================
+# BANKING DATASET (ARRAY CREATION ONLY)
+# =========================================================
+# Rows → Customers
+# Columns →
+# [Account_Balance, Credit_Score, Loan_Amount, EMI,
+#  Age, Tenure_Years, Num_Transactions, Missed_Payments]
+
+banking_data = np.array([
+    [500000, 750, 200000, 8500, 35, 5, 120, 0],
+    [150000, 680, 500000, 15000, 42, 10, 95, 2],
+    [80000, 620, 300000, 12000, 28, 3, 60, 1],
+    [1200000, 820, 1000000, 25000, 50, 15, 200, 0],
+    [300000, 700, 400000, 14000, 33, 6, 110, 1],
+    [45000, 590, 150000, 7000, 26, 2, 40, 3],
+    [950000, 780, 600000, 18000, 45, 12, 160, 0],
+    [200000, 660, 350000, 13000, 38, 8, 90, 2],
+    [600000, 740, 450000, 16000, 41, 9, 130, 0],
+    [100000, 610, 250000, 11000, 29, 4, 55, 1]
+])
+
+columns = np.array([
+    "Account_Balance", #0
+    "Credit_Score", #1
+    "Loan_Amount", #2
+    "EMI", #3
+    "Age", #4
+    "Tenure_Years", #5
+    "Num_Transactions", # 6
+    "Missed_Payments" #7
+])
+
+# =========================================================
+# 100 BANKING DATA SCIENCE QUESTIONS (QUESTIONS ONLY)
+# =========================================================
+
+# 1. What is the total account balance across all customers?
+
+print(f" total account balance across all customers : ", np.sum(banking_data[:,0]))
+
+# 2. What is the average credit score of customers?
+
+print(f"average credit score of customers : ", np.mean(banking_data[:, 1]))
+
+# 3. Which customer has the highest loan amount?
+
+print(f"customer with the highest loan amount :", banking_data[np.argmax(banking_data[:,2])])
+
+# 4. Which customer has the lowest account balance?
+
+print(f"customer has the lowest account balance : ", banking_data[np.argmin(banking_data[:,0])])
+
+# 5. What is the total loan amount issued by the bank?
+
+print(f"total loan amount issued by the bank : ", np.sum(banking_data[:,2]))
+
+# 6. What is the average EMI across all customers?
+
+print(f"the average EMI across all customers : ", np.mean(banking_data[:, 3]))
+
+
+# 7. Which customer has the highest EMI-to-income proxy (EMI vs balance)?
+
+print(f" customer with the highest EMI-to-income proxy : ",banking_data[np.argmax((banking_data[:,3]/banking_data[:,0]))])
+
+# 8. What is the median credit score?
+
+print(f" the median credit score : ", np.median(banking_data[:,1]))
+
+# 9. How many customers have credit score above 750?
+
+print(f" The number of customers have credit score above 750 : ", np.sum(banking_data[:,1] > 750 ))
+
+
+# 10. How many customers have credit score below 650?
+
+print(f"Number of customers have credit score below 650 : ", np.sum(banking_data[:,1] < 650))
+
+# 11. What is the average age of customers?
+
+print(f"Average age of customers :", np.mean(banking_data[:,4]))
+
+# 12. Which customer is the youngest?
+
+print(f" youngest customer is : ", banking_data[np.argmin(banking_data[:,4])])
+
+
+# 13. Which customer is the oldest?
+
+print(f" Oldest customer is  : ",banking_data[np.argmax(banking_data[:,4])] )
+
+
+# 14. What is the average tenure with the bank?
+
+print(f" the average tenure with the bank : ", np.mean(banking_data[:,5]))
+
+
+# 15. How many customers have tenure greater than 10 years?
+
+print(f"customers with tenure greater than 10 years : ", np.sum(banking_data[:,5] > 10))
+
+
+# 16. What is the correlation between tenure and account balance?
+
+print(f"the correlation between tenure and account balance :")
+
+
+# 17. What is the correlation between credit score and missed payments?
+
+print(f"the correlation between credit score and missed payments : ", np.corrcoef(banking_data[:,1], banking_data[:,7])[0,1])
+
+
+# 18. Which customer has the highest number of transactions?
+
+print(f" customer with the highest number of transactions : ", banking_data[np.argmax(banking_data[:,6])] )
+
+
+# 19. What is the average number of transactions per customer?
+
+print(f"average number of transactions per customer : ", np.mean(banking_data[:, 6]))
+
+
+# 20. Which customers have transactions below the average?
+
+print(f"customers with transactions below the average : ", banking_data[banking_data [:,6] < np.mean(banking_data[:,6])])
+
+# 21. How many customers have missed at least one payment?
+
+print(f" Number of customers who have missed at least one payment: ", np.sum(banking_data[:,7] > 0))
+
+
+# 22. How many customers have never missed a payment?
+
+print(f" Number of customers that never missed a payment : ", np.sum(banking_data[:,7] == 0))
+
+# 23. What percentage of customers are defaulters (missed payments > 0)?
+
+print(f" percentage of customers are defaulters (missed payments > 0) : ", ((np.sum(banking_data[:,7] > 0)*100)/(banking_data.shape[0])))
+
+# 24. Which customer has the highest number of missed payments?
+
+print(f" Customer with highest number of missed payments : ", banking_data[np.argmax(banking_data[:,7])])
+
+# 25. What is the average credit score of defaulters?
+
+print(f"the average credit score of defaulters :", np.mean(banking_data[:,7] > 0))
+
+
+# 26. What is the average credit score of non-defaulters?
+
+print(f" the average credit score of non-defaulters : ",np.mean(banking_data[:,7] == 0) )
+
+
+# 27. Is the average credit score of non-defaulters?
+
+print(f" the average credit score of non-defaulters : ",np.mean(banking_data[:,7] == 0) )
+
+
+# 28. What is the average loan amount for defaulters?
+
+print(f"the average loan amount for defaulters : ", np.mean(banking_data[:,2] > 0))
+
+
+# 29. What is the average loan amount for non-defaulters?
+
+print(f" average loan amount for non-defaulters : ", np.mean(banking_data[:,2]))
+
+
+# 30. Do customers with higher tenure miss fewer payments?
+
+print(f"customers with higher tenure miss fewer payments : ", np.logical_and(banking_data[:,5] > 3, banking_data[:,7] < 3))
+
+# 31. Which customers are high-risk (low credit score + missed payments)?
+
+print(f"Customers with high risk : ", np.logical_and(banking_data[:,1] < 500, banking_data[:,7]))
+      
+# 32. Which customers are premium customers (high balance + high score)?
+
+print(f"Premium customers :",np.logical_and((banking_data[:,0] > 10000) & (banking_data[:,1] > 500) )
+
+# 33. Which customers are over-leveraged (loan > balance)?
+
+print(f" customers are over-leveraged (loan > balance) : ", banking_data[banking_data[:,2] > banking_data[:,0]])
+
+
+# 34. How many customers fall into over-leveraged category?
+
+print(f" Number of customers in over leveraged category :", np.sum(banking_data[:,2] > banking_data[:,0]))
+      
+# 35. What is the EMI burden ratio for each customer?
+
+print(f"emi proportional to risk")
+
+# 36. Which customer has the highest EMI burden?
+
+print(f" Customer with highest emi burden :", banking_data[np.argmax(banking_data[:,3])])
+
+
+# 37. Which customers have EMI burden above average?
+
+print(f" Customers have EMI burden above average : ", banking_data[banking_data[:,3] > np.mean(banking_data[:,3])])
+
+# 38. What is the distribution of credit scores?
+
+print(f"the distribution of credit scores : ", )
+
+# 39. How many customers fall into each credit score bucket?
+
+print(f" ")
+
+# 40. Which age group has the highest average loan amount?
+
+age_group = banking_data[:,4]
+loan_group = banking_data[:,2]
+
+age_bins = np.floor(banking_data[:,4]/10)*10
+unique_age = np.unique(age_bins)
+group_means = []
+
+for group in unique_age:
+    if_bin = (age_bins == group)
+    mean_group = np.mean(loan_group[if_bin])
+    group_means.append((group, mean_group))
+
+best_group, best_avg = max(group_means, key = lambda x : x[1])
+
+print(f"age group has the highest average loan amount : ", best_group, best_avg )
+
+# 41. What is the average balance for customers aged above 40?
+
+age_above_40 = banking_data[banking_data[:,4] > 40]
+avg_balance = np.mean(age_above_40[:,0])
+
+print(f" the average balance for customers aged above 40 : ",avg_balance)
+
+
+# 42. What is the average balance for customers aged below 30?
+
+age_below_30 = banking_data[banking_data[:,4] < 30]
+avg_balance = np.mean(age_below_30[:,0])
+
+print(f"average balance for customers aged below 30 : ", avg_balance)
+
+
+# 43. Is there a relationship between age and credit score?
+
+correlation = np.corrcoef(banking_data[:,4], banking_data[:,1])
+
+if abs(correlation) >= 0.7:
+    strength = "strong"
+elif abs(correlation) >= 0.5:
+    strength = "normal"
+else:
+    strength = "weak"
+
+print(f"relationship between age and credit score :", strength)
+
+
+# 44. What is the total EMI collected monthly by the bank?
+
+print(f" Monthly emi collected : ",np.sum(banking_data[:,3]))
+
+# 45. What is the annual EMI collection estimate?
+
+print(f" Annual EMI collection estimate : ", np.sum(banking_data[:,3])*12 )
+
+# 46. Which customer contributes most to EMI revenue?
+
+print(f" customer who contributes most to EMI revenue : ", banking_data[np.argmax(banking_data[:,3])])
+
+# 47. What percentage of total EMI comes from top 3 customers?
+
+top_3_emi = np.sum(np.sort(banking_data[:,3])[-3:])
+total_emi = np.sum(banking_data[:,3])
+per_cent = (top_3_emi * 100) / total_emi
+
+print(f" Total emi comes from top 3 customers : ", per_cent )
+
+# 48. What is the loan-to-balance ratio for each customer?
+
+print(f" loan to balance ratio : ", (banking_data[:,2]/banking_data[:,0]))
+
+# 49. Which customers have loan-to-balance ratio above 1?
+
+print("customers have loan-to-balance ratio above 1 : ", banking_data[(banking_data[:,2]/banking_data[:,0]) > 1])
+
+# 50. How many customers are financially stressed?
+
+print(f" Number of customers who are financially stressed  : ", np.num(banking_data[(banking_data[:,0] < 10000) & (banking_data[:,2] > 10000)]))
+
+# 51. What is the standard deviation of credit scores?
+
+print(f" standard deviation of credit scores is : ", np.std(banking_data[:,1]))
+
+# 52. What is the variance of account balances?
+
+print(f"Variance of accoubt balance : ", np.var(banking_data[:,0]))
+
+# 53. Which customer is an outlier in account balance?
+
+quantile_25 = np.quantile(banking_data[:,0], 0.25)
+quantile_75 = np.quantile(banking_data[:,0], 0.75)
+
+print(f"customer who are outlier in account balance : ",
+      banking_data[np.where(np.logical_or((banking_data[:,0] < quantile_25) , (banking_data[:,0] > quantile_75), "outlier", " normal_value")])
+
+# 54. Which customer is an outlier in EMI?
+
+quantile_25_2 = np.quantile(banking_data[:,3], 0.25)
+quantile_75_2 = np.quantile(banking_data[:,3], 0.75)
+
+print(f" Emi outliners : ",
+      banking_data[np.where(np.logical_or(banking_data[:,3] < quantile_25_2, banking_data[:,3] > quantile_75_2),"outier", "normal" )])
+
+# 55. Detect outliers using z-score on loan amount.
+
+mean_out = np.mean(banking_data[:,2])
+std_dev = np.std(banking_data[:,2]) 
+print(f" z_score on loan_amount : ", banking_data[np.where(banking_data[:,2] - mean_out > 2 * std_dev, "outlier", "not")])
+
+# 56. Detect outliers using IQR on credit score.
+
+quantile_25 = np.quantile(banking_data[:,2], 0.25)
+quantile_75 = np.quantile(banking_data[:,2], 0.75)
+iqr = quantile_75 - quantile_25
+
+print(f" Not an Outlier if : ", np.isin(banking_data[:,2], [iqr]))
+
+# 57. Normalize account balance for ML modeling.
+
+print(f" Normalized account balance is : ", banking_data[:,0]/np.max(banking_data[:,0]))
+
+# 58. Standardize credit scores for ML models.
+
+
+# 59. Create a binary feature for default risk.
+
+binary_feture = tuple(banking_data[:,7] > 5 , banking_data[:,2])
+bin_feature = np.where(((banking_data[:,7] > 5) & (banking_data[:,2] > 30000))), "1", "0", axis = 1)
+print(f" Binary feature for default risk :", bin_feature )
+
+# 60. Create a binary feature for premium customer.
+
+bin_feature = np.where(((banking_data[:,7] < 3) & (banking_data[:,2] < 10000)), "1", "0", axis = 1)
+print(f" Binary feature for defaulat risk :", bin_feature )
+
+# 61. Rank customers by account balance.
+
+print(f"Rank customers by account balance : ",np.argsort(- banking_data[:,0])+1)
+
+
+# 62. Rank customers by credit score.
+
+print(f"ranking customers by credit score : ", np.argsort(-banking_data[:,1]))
+
+# 63. Rank customers by loan amount.
+
+print(f" ranking customers by loan amount : ", np.argsort(-banking_data[:,2]) + 1)
+
+
+# 64. Identify top 20% customers by balance.
+
+print(f" top 20 % of customers by balance : ", banking_data[np.argsort(-banking_data[:,0])[:2]])
+
+# 65. Identify bottom 20% customers by credit score.
+
+print(f" bottom 20 % customers by credit score : ", banking_data[np.argsort(banking_data[:,1])[:2]])
+
+# 66. Segment customers into low, medium, high credit risk.
+
+risk_segment = np.where(banking_data[:,1] < 650 , 'high', np.where(banking_data[:,1] <= 750, 'medium', 'low'))
+print(f"segmenting customers to low, medium, high : ", risk_segment)
+
+# 67. Segment customers into low, medium, high value.
+
+value_seg = np.where(banking_data[:,0] < 20000, 'low', np.where(banking_data[:,0] <= 60000, 'medium', 'high'))
+print(f" segment customers to low, high , medium based on the value ", value_seg)
+
+# 68. Which segment contributes most to loan book?
+
+loan_seg = {seg : np.sum(banking_data[value_seg == seg],2) for seg in np.unique(value_seg) }
+print(f" loan_segment for wach segment : ", loan_seg)
+
+
+# 69. Which segment has highest default rate?
+
+def_rate = {seg : np.sum(banking_data[value_seg == seg], 7) for seg in np.unique(value_seg) }
+print(f" loan_segment with highest default rate : ", def_rate)
+
+
+# 70. What is the average EMI per segment?
+
+avg_emi = {seg : np.mean(banking_data[value_seg == seg], 3) for seg in np.unique(value_seg)}
+print(f" average rate per segments : ", avg_emi)
+
+
+# 71. Which customers are eligible for loan upsell?
+
+print(f" customers eligible for loan : ", banking_data[(banking_data[:,1] > 600) & (banking_data[:,2] < 60000)])
+
+# 72. Which customers should be targeted for retention?
+
+print(f" customers targeted for retention is : ", banking_data[(banking_data[:,0] > 50000) & (banking_data[:,7] > 4)])
+
+
+# 73. Which customers are likely churn risks (low activity)?
+
+print(f" customers with low activity : ",banking_data[(banking_data[:,6] < 60)] )
+
+# 74. Which customers have declining engagement proxy?
+
+print(f" customers with declining engagement proxy : ",banking_data[(banking_data[:,6] < np.mean(banking_data[:,6])) & (banking_data[:,5] < 5)] )
+
+# 75. Create features suitable for churn prediction.
+
+print(" suggested features for churn prediction : Account balance, tenure_years, num_transactions, age")
+
+# 76. Create features suitable for default prediction.
+
+print(" suggested features for default prediction : credit score, missed payments, emi burden, loan_to_balance ratio ")
+
+# 77. Which feature is most correlated with missed payments?
+
+corr_missed = [abs(np.corrcoef(banking_data[:,i], banking_data[:,7][0,1])) for i in range(7)]
+print(f"feature which is most corelated with missed payments :",corr_missed)
+
+
+# 78. Which feature is most correlated with credit score?
+
+corr_credit = [abs(np.corrcoef(banking_data[:,i], banking_data[:,1][0,1])) for i in range(8)]
+print(f" most correlated feature with credit score is : ", corr_credit)
+
+
+# 79. Build a feature matrix X from banking data.
+
+x = banking_data[:, :-1]
+print(f" feature matrix x for banking_data : ", x)
+
+# 80. Build a target vector y for default classification.
+
+y = (banking_data[:, 7].astype(int))
+print(f" target vector y : ", y) 
+
+# 81. How many customers satisfy all eligibility criteria?
+
+elig = np.num((banking_data[:,1] > 700) & (banking_data[:,5] > 5) & (banking_data[:,7] == 0)
+              & (banking_data[:,0] > 200000))
+print(f" customers satifying all requiremnets : ", elig)
+
+# 82. How many customers violate at least one eligibility rule?
+
+not_elig = np.num((banking_data[:,1] < 700) & (banking_data[:,5] < 5) & (banking_data[:,7] != 0)
+              & (banking_data[:,0] < 200000))
+
+print(f" customers who violate the criteria : " )
+
+# 83. Which customers fail KYC-like thresholds?
+
+print(f" customers who fail kvc like thresholds : ", banking_data[banking_data[:,4] < 25])
+
+# 84. Which customers meet premium banking criteria?
+
+print(f"customers who meet premium eligiblity criteria : ",
+      banking_data[(banking_data[:,0] > 500000) & (banking_data[:,1] > 750)])
+
+
+# 85. What is the customer lifetime value proxy?
+# balance * tenure/100 + trans*100
+
+clv = banking_data[:,0] * banking_data[:,5]/100 + banking_data[:,6]*100
+print(f" customer lifetime value proxy : ", clv)
+
+
+# 86. Which customers have high CLV?
+
+print(f" customers have high clv : ", banking_data[clv > np.quantile(clv, 0.8)] )
+
+
+# 87. Which customers have low CLV?
+
+print(f"customers with low clv : ", banking_data[clv < np.quantile(clv, 0.20)])
+
+# 88. What is the average CLV across customers?
+
+print("average of clv : ", np.mean(clv))
+
+# 89. How does tenure affect CLV?
+
+print(f"correlation factor between tenure and clv : ",
+      np.corrcoef(banking_data[:,5], clv)[0,1])
+
+# 90. How does transaction count affect CLV?
+
+print("correlation between transaction count and clv : ",
+       np.corrcoef(banking_data[:,6], clv)[0,1])
+
+# 91. What-if analysis: EMI increase by 10% impact?
+
+new_emi_total = np.sum(banking_data[:,3] * 1.1)
+print(f" total monthly emi after 10 % increase : ", new_emi_total)
+diff = np.sum(banking_data[:,3]) - new_emi_total
+
+# 92. What-if analysis: credit score drop by 50 points impact?
+
+new_credit_score = np.sum(banking_data[:,1] - 50)
+print(f" customers after 50 points drop : ", new_credit_score)
+
+# 93. Sensitivity of default risk to missed payments.
+
+print(" default risk constantly proportional to missed payments ")
+
+# 94. Sensitivity of loan eligibility to credit score.
+
+corr_btw_1 = np.corrcoef(banking_data[:,1], banking_data[:,2])
+print(f" correlation coefficient between the loan_eligiblity and credit score",
+      corr_btw_1)
+
+# 95. Stress test: recession scenario on balances.
+# assuning there will be 20 points cut 
+
+recession_test = banking_data[banking_data[:,1] - 20] 
+print("recession test : ", recession_test)
+
+# 96. Stress test: interest rate hike on EMI.
+
+stress_test = banking_data[banking_data[:,3] * 1.1]
+print("interest hike test : ",stress_test )
+
+# 97. Which customers are most vulnerable in stress test?
+
+print(f" most vulnerable to stress test :", 
+      banking_data[np.argsort(banking_data[:,3]/banking_data[:,0])[-3:]])
+
+# 98. Which customers are resilient in stress test?
+
+print(f" resilient to stress test :", 
+      banking_data[np.argsort(banking_data[:,3]/banking_data[:,0])[:3]])
+
+# 99. Final data sanity check before ML modeling.
+
+negative_count = []
+columns_list = ["Account_Balance", "Credit_Score", "Loan_Amount", "EMI",
+                "Age", "Tenure_Years", "Num_Transactions", "Missed_Payments"]
+for i, col in enumerate(columns_list):
+    neg_count = np.sum(banking_data[:,i] < 0)
+    negative_count.append(neg_count)
+    
+print(f" final data sanity check : ", np.isnan(banking_data).sum(),
+      np.isinf(banking_data).sum(), banking_data.dtype, banking_data.shape,
+        negative_count )
+
+# 100. Is the banking dataset ready for production ML pipeline?
+
+print(f" the data is clean and consistent and ready for deplaoyment
+and prototyping ")
