@@ -1,12 +1,10 @@
 *.csv
-*.zip
-*.rar
-*.7z
-*.mp4
-*.h5
-*.joblib
-*.csv
 *.joblib
 *.png
 *.jpeg
 *.jpg
+*.zip
+*.rar
+__pycache__/
+*.pyc
+.DS_Store
