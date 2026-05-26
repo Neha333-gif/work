@@ -1,0 +1,5 @@
+Model evaluation for employee salary prediction
+Dataset: job_salary_prediction_dataset.csv (250000 samples)
+MAE: 8610.02
+RMSE: 10940.63
+R2: 0.9139
