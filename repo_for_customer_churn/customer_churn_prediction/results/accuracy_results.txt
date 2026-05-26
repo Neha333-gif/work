@@ -1,0 +1,62 @@
+
+=== CUSTOMER CHURN PREDICTION - RESULTS REPORT ===
+
+Dataset Information:
+  Total Records: 14006
+  Features: 30
+  Target Classes: No Churn / Churn
+
+Data Split:
+  Training Set: 5602 samples
+  Test Set: 1401 samples
+
+Model Configuration:
+  Algorithm: Random Forest Classifier
+  n_estimators: 300
+  max_depth: 10
+  criterion: gini
+  class_weight: balanced
+
+Performance Metrics (Test Set):
+  Accuracy: 0.7744
+  Precision: 0.5614
+  Recall: 0.6676
+  F1-Score: 0.6099
+  ROC-AUC: 0.8321
+
+Confusion Matrix:
+  True Negatives: 838
+  False Positives: 193
+  False Negatives: 123
+  True Positives: 247
+
+Class Distribution (Training):
+  No Churn: 4125
+  Churn: 1477
+
+Class Distribution (After SMOTE):
+  No Churn: 4125
+  Churn: 4125
+
+Top 5 Important Features:
+                       feature  importance
+                        tenure    0.164001
+PaymentMethod_Electronic check    0.148923
+                  TotalCharges    0.109512
+   InternetService_Fiber optic    0.084045
+                MonthlyCharges    0.081363
+
+Generated Visualizations:
+  - confusion_matrix.png
+  - feature_importance.png
+  - class_distribution.png
+  - roc_curve.png
+  - precision_recall_curve.png
+  - correlation_heatmap.png
+
+Model Artifacts:
+  - customer_churn_model.joblib
+  - customer_churn_preprocessors.joblib
+  - customer_churn_features.joblib
+
+Generated on: 2026-05-26 12:32:10.451246
