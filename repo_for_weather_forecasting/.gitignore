@@ -8,3 +8,8 @@ __pycache__/
 .venv/
 venv/
 env/
+
+# Allow tracking results images, text reports, datasets and joblib models in this subfolder
+!results/**
+!weather_forecasting_data/**
+!*.joblib
