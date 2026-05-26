@@ -1,0 +1,16 @@
+Flight Price Prediction Model Evaluation Report
+=================================================
+Trained on Easemytrip Dataset (300,153 rows)
+Model Selected: Random Forest Regressor (Lightweight ML Model)
+
+Performance metrics of Random Forest Regressor model:
+------------------------------------------
+R2 Score (Coefficient of Determination): 0.9704
+Mean Absolute Error (MAE)            : INR 2134.37
+Mean Squared Error (MSE)             : 15248648.80
+Root Mean Squared Error (RMSE)       : INR 3904.95
+
+Model Comparison:
+---------------------------
+Linear Regression Baseline   -> R2: 0.9255
+Random Forest Regressor      -> R2: 0.9704 | MAE: INR 2134.37 | RMSE: INR 3904.95

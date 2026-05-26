@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Email Agent</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="nav-header">
+        <a href="{{ url_for('logout') }}" class="logout-link">
+            <i class="fas fa-user-circle"></i> {{ username }} &nbsp;|&nbsp;
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+    </nav>
+    <div class="container">
+        <header>
+            <h1>AI Email Assistant</h1>
+            <p class="subtitle">Intelligent classification, drafting, and scheduling.</p>
+        </header>
+
+        <section class="glass-card input-section">
+            <textarea id="emailInput" placeholder="Paste incoming email content here...">Subject: Question About Your Enterprise Pricing Plans
+
+Hi there,
+
+I came across your product while researching solutions for our team and I am quite interested in learning more about what you offer.
+
+We are a mid-sized company with around 50 employees, and we are currently evaluating a few different tools. Could you please send over information about your enterprise pricing plans, available features, and whether you offer a free trial period?
+
+We would also love to schedule a demo call at your convenience sometime next week if possible.
+
+Looking forward to your response.
+
+Best regards,
+Sarah Mitchell
+Head of Operations, Brightline Co.</textarea>
+            <button id="processBtn" class="btn-primary">
+                <i class="fas fa-magic"></i>
+                <span id="btnText">Process Email</span>
+                <div id="loader" class="loader"></div>
+            </button>
+        </section>
+
+        <section id="resultsSection" class="results-section">
+            <div class="glass-card result-card">
+                <h3><i class="fas fa-tags"></i> Classification</h3>
+                <div class="badges">
+                    <span id="priorityBadge" class="badge badge-priority">Priority</span>
+                    <span id="categoryBadge" class="badge badge-category">Category</span>
+                </div>
+                <div class="result-content" id="reasonText"></div>
+            </div>
+
+            <div class="results-grid">
+                <div class="glass-card result-card">
+                    <h3><i class="fas fa-pen-fancy"></i> Drafted Reply</h3>
+                    <div class="result-content" id="replyText"></div>
+                </div>
+
+                <div class="glass-card result-card">
+                    <h3><i class="fas fa-calendar-check"></i> Follow-up Actions</h3>
+                    <div class="result-content" id="followupText"></div>
+                </div>
+            </div>
+
+            <div class="glass-card result-card history-card" style="margin-top: 2rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h3><i class="fas fa-history"></i> AI History Log</h3>
+                    <div class="history-tabs">
+                        <button class="tab-btn active" data-folder="inbox"><i class="fas fa-inbox"></i> Inbox</button>
+                        <button class="tab-btn" data-folder="starred"><i class="fas fa-star"></i> Starred</button>
+                        <button class="tab-btn" data-folder="trash"><i class="fas fa-trash-alt"></i> Trash</button>
+                    </div>
+                </div>
+                <div class="result-content" id="historyText" style="background: transparent; padding: 0;"></div>
+            </div>
+        </section>
+
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

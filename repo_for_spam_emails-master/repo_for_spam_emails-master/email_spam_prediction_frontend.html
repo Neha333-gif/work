@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SpamGuard AI | Email Spam Detector</title>
+  <meta name="description" content="SpamGuard AI — Intelligent email spam detection powered by Machine Learning. Paste any email to instantly classify it as spam or ham with confidence scoring.">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark:           #06090f;
+      --bg-card:           rgba(12, 20, 38, 0.6);
+      --border-color:      rgba(255, 255, 255, 0.07);
+      --text-main:         #f1f5f9;
+      --text-muted:        #94a3b8;
+
+      --color-primary:     #6366f1;   /* Indigo */
+      --color-primary-glow: rgba(99, 102, 241, 0.3);
+      --color-accent:      #8b5cf6;   /* Violet */
+
+      --color-spam:        #f43f5e;   /* Rose – spam */
+      --color-spam-glow:   rgba(244, 63, 94, 0.3);
+      --color-ham:         #10b981;   /* Emerald – safe */
+      --color-ham-glow:    rgba(16, 185, 129, 0.3);
+      --color-warn:        #f59e0b;   /* Amber */
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background-color: var(--bg-dark);
+      background-image:
+        radial-gradient(ellipse at 15% 15%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+        radial-gradient(ellipse at 85% 85%, rgba(139, 92, 246, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 0%, rgba(244, 63, 94, 0.05) 0%, transparent 40%);
+      background-attachment: fixed;
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px 80px;
+      overflow-x: hidden;
+    }
+
+    .container { width: 100%; max-width: 1120px; }
+
+    /* ─── Header ─── */
+    .header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+    .header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(99, 102, 241, 0.12);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      border-radius: 30px;
+      padding: 6px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #a5b4fc;
+      letter-spacing: 0.04em;
+      margin-bottom: 20px;
+    }
+    .header-badge span { width: 7px; height: 7px; border-radius: 50%; background: #6366f1; box-shadow: 0 0 8px #6366f1; display: inline-block; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:.6;transform:scale(1.3);} }
+
+    .header h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(36px, 6vw, 56px);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #fff 20%, #818cf8 55%, #c084fc 85%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 14px;
+      line-height: 1.1;
+    }
+    .header p {
+      font-size: 16px;
+      color: var(--text-muted);
+      max-width: 580px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* ─── API Status Banner ─── */
+    .api-banner {
+      background: rgba(99, 102, 241, 0.08);
+      border: 1px solid rgba(99, 102, 241, 0.18);
+      border-radius: 14px;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+    .api-status { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+    .status-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: #94a3b8;
+      box-shadow: 0 0 8px rgba(148,163,184,.3);
+      transition: all .4s;
+    }
+    .status-dot.connected  { background: var(--color-ham);  box-shadow: 0 0 10px var(--color-ham-glow); }
+    .status-dot.disconnected { background: var(--color-spam); box-shadow: 0 0 10px var(--color-spam-glow); }
+    .api-url-wrap { display: flex; align-items: center; gap: 10px; }
+    .api-url-wrap label { font-weight: 500; color: var(--text-muted); font-size: 13px; }
+    .api-url-wrap input {
+      background: rgba(0,0,0,.35);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 7px 12px;
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 13px;
+      width: 220px;
+      outline: none;
+      transition: border-color .3s;
+    }
+    .api-url-wrap input:focus { border-color: var(--color-primary); }
+
+    /* ─── Card ─── */
+    .card {
+      background: var(--bg-card);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      box-shadow: 0 30px 60px -15px rgba(0,0,0,.6);
+      padding: 40px;
+      margin-bottom: 28px;
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content:'';
+      position:absolute;
+      top:0;left:0;right:0;height:1px;
+      background: linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);
+    }
+
+    /* ─── Tabs ─── */
+    .tab-container {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 36px;
+      border-bottom: 1px solid rgba(255,255,255,.05);
+      padding-bottom: 0;
+    }
+    .tab-btn {
+      padding: 12px 22px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-radius: 10px 10px 0 0;
+      position: relative;
+      transition: all .3s;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .tab-btn .tab-icon { font-size: 16px; }
+    .tab-btn:hover { color: var(--text-main); background: rgba(255,255,255,.02); }
+    .tab-btn.active { color: var(--color-primary); }
+    .tab-btn.active::after {
+      content:'';
+      position:absolute;
+      bottom:-1px;left:0;right:0;height:3px;
+      background: var(--color-primary);
+      border-radius: 3px 3px 0 0;
+      box-shadow: 0 0 14px var(--color-primary);
+    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; animation: fadeSlide .35s ease-out; }
+    @keyframes fadeSlide { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
+
+    /* ─── Form Fields ─── */
+    .field { display: flex; flex-direction: column; margin-bottom: 24px; }
+    .field label {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+    textarea, input[type="text"] {
+      padding: 16px;
+      background: rgba(0,0,0,.3);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 15px;
+      outline: none;
+      transition: all .3s;
+      width: 100%;
+    }
+    textarea { min-height: 180px; resize: vertical; line-height: 1.6; }
+    textarea:focus, input[type="text"]:focus {
+      border-color: var(--color-primary);
+      background: rgba(0,0,0,.4);
+      box-shadow: 0 0 0 3px var(--color-primary-glow);
+    }
+
+    /* ─── Buttons ─── */
+    .btn {
+      padding: 15px 28px;
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .3s;
+      box-shadow: 0 4px 20px rgba(99,102,241,.3);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(99,102,241,.45); }
+    .btn:active { transform: none; }
+    .btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid rgba(99,102,241,.4);
+      color: #a5b4fc;
+      box-shadow: none;
+    }
+    .btn-outline:hover { background: rgba(99,102,241,.1); box-shadow: none; }
+
+    /* ─── Loading Spinner ─── */
+    .loading-spinner {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 20px;
+      color: var(--color-primary);
+      font-weight: 600;
+    }
+    .spinner {
+      width: 24px; height: 24px;
+      border: 3px solid rgba(99,102,241,.2);
+      border-top-color: var(--color-primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to{transform:rotate(360deg);} }
+
+    /* ─── Error Box ─── */
+    .error-box {
+      background: rgba(244,63,94,.1);
+      border-left: 4px solid var(--color-spam);
+      color: #fda4af;
+      padding: 14px 18px;
+      border-radius: 8px;
+      margin-top: 16px;
+      display: none;
+      font-size: 14px;
+    }
+
+    /* ─── Results Grid ─── */
+    .results-grid {
+      display: none;
+      grid-template-columns: 1fr;
+      gap: 28px;
+      margin-top: 36px;
+    }
+    .results-grid.show { display: grid; animation: fadeSlide .4s ease-out; }
+    @media (min-width: 800px) {
+      .results-grid { grid-template-columns: 320px 1fr; }
+    }
+
+    /* ─── Gauge Dial ─── */
+    .dial-card {
+      background: rgba(0,0,0,.22);
+      border: 1px solid var(--border-color);
+      border-radius: 22px;
+      padding: 36px 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .dial-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--text-muted); margin-bottom: 20px; }
+    .svg-gauge { width: 180px; height: 180px; transform: rotate(-90deg); }
+    .gauge-bg  { fill: none; stroke: rgba(255,255,255,.05); stroke-width: 14px; }
+    .gauge-fill {
+      fill: none; stroke-width: 14px; stroke-linecap: round;
+      stroke-dasharray: 502.65;
+      stroke-dashoffset: 502.65;
+      transition: stroke-dashoffset 1.4s cubic-bezier(.4,0,.2,1), stroke 1.4s ease;
+    }
+    .dial-value {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 34px; font-weight: 800;
+      margin-top: -113px; margin-bottom: 70px; z-index: 2;
+    }
+    .verdict-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 20px;
+      border-radius: 30px;
+      font-weight: 800;
+      font-size: 15px;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      margin-top: 8px;
+    }
+    .badge-spam { background: rgba(244,63,94,.15); border: 1px solid rgba(244,63,94,.3); color: #fda4af; }
+    .badge-ham  { background: rgba(16,185,129,.15); border: 1px solid rgba(16,185,129,.3); color: #6ee7b7; }
+
+    .prob-row {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      margin-top: 22px;
+      gap: 12px;
+    }
+    .prob-item {
+      flex: 1;
+      background: rgba(0,0,0,.2);
+      border-radius: 12px;
+      padding: 12px;
+      text-align: center;
+    }
+    .prob-item .prob-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); margin-bottom: 6px; }
+    .prob-item .prob-val { font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 700; }
+    .spam-val { color: #fda4af; }
+    .ham-val  { color: #6ee7b7; }
+
+    /* ─── Info Card ─── */
+    .info-card {
+      background: rgba(0,0,0,.22);
+      border: 1px solid var(--border-color);
+      border-radius: 22px;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .info-card h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 22px; font-weight: 700;
+      border-left: 3px solid var(--color-primary);
+      padding-left: 12px;
+    }
+    .info-card h3 {
+      font-size: 12px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .07em;
+      color: var(--text-muted); margin-bottom: 12px;
+    }
+
+    /* Indicator word chips */
+    .indicator-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .indicator-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(244,63,94,.1);
+      border: 1px solid rgba(244,63,94,.25);
+      border-radius: 20px;
+      padding: 5px 12px;
+      font-size: 13px; color: #fda4af;
+    }
+    .indicator-chip .chip-score { font-size: 11px; color: rgba(253,164,175,.6); }
+    .no-indicators { font-size: 14px; color: var(--text-muted); font-style: italic; }
+
+    /* ─── Upload Zone ─── */
+    .upload-zone {
+      border: 2px dashed rgba(255,255,255,.12);
+      background: rgba(0,0,0,.18);
+      border-radius: 20px;
+      padding: 50px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all .3s;
+      margin-bottom: 28px;
+    }
+    .upload-zone:hover, .upload-zone.drag-over {
+      border-color: var(--color-primary);
+      background: rgba(99,102,241,.05);
+    }
+    .upload-icon { font-size: 48px; margin-bottom: 14px; }
+    .upload-zone p { font-size: 15px; color: var(--text-muted); line-height: 1.6; }
+    .upload-zone strong { color: var(--text-main); }
+    #batchFileInput { display: none; }
+
+    /* ─── Batch Table ─── */
+    .table-container {
+      overflow-x: auto;
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      background: rgba(0,0,0,.18);
+      display: none;
+      margin-top: 28px;
+    }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th {
+      padding: 14px 18px;
+      background: rgba(0,0,0,.25);
+      color: var(--text-muted);
+      font-weight: 700;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      border-bottom: 1px solid var(--border-color);
+    }
+    td { padding: 13px 18px; font-size: 14px; border-bottom: 1px solid rgba(255,255,255,.03); color: #cbd5e1; }
+    tr:hover td { background: rgba(255,255,255,.015); }
+    .row-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; }
+    .badge-s { background: rgba(244,63,94,.15); border: 1px solid rgba(244,63,94,.3); color: #fda4af; }
+    .badge-h { background: rgba(16,185,129,.15); border: 1px solid rgba(16,185,129,.3); color: #6ee7b7; }
+
+    /* ─── Stats Grid ─── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 18px;
+      margin-bottom: 40px;
+    }
+    .stat-card {
+      background: rgba(0,0,0,.22);
+      border: 1px solid var(--border-color);
+      border-radius: 18px;
+      padding: 24px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-card::after {
+      content:'';
+      position:absolute;
+      top:0;left:0;right:0;height:3px;
+      background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+    }
+    .stat-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--text-muted); margin-bottom: 10px; }
+    .stat-value { font-family: 'Space Grotesk', sans-serif; font-size: 30px; font-weight: 800; color: #fff; }
+    .stat-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+    /* ─── Plots Grid ─── */
+    .plots-grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
+    @media (min-width: 768px) { .plots-grid { grid-template-columns: 1fr 1fr; } }
+
+    .plot-card {
+      background: rgba(0,0,0,.2);
+      border: 1px solid var(--border-color);
+      border-radius: 18px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .plot-card h3 {
+      font-size: 14px; font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 16px;
+      align-self: flex-start;
+      border-left: 3px solid var(--color-accent);
+      padding-left: 10px;
+    }
+    .plot-img-wrap {
+      width: 100%; border-radius: 10px;
+      background: rgba(0,0,0,.35);
+      overflow: hidden;
+      min-height: 220px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .plot-img {
+      max-width: 100%; height: auto; display: block;
+      border-radius: 6px;
+      transition: transform .3s;
+      cursor: zoom-in;
+    }
+    .plot-img:hover { transform: scale(1.02); }
+    .plot-placeholder { color: var(--text-muted); font-size: 13px; text-align: center; padding: 30px; }
+
+    /* ─── Model Info Banner ─── */
+    .model-info {
+      display: flex; align-items: center; gap: 14px;
+      background: rgba(99,102,241,.08);
+      border: 1px solid rgba(99,102,241,.18);
+      border-radius: 14px;
+      padding: 14px 20px;
+      margin-bottom: 30px;
+      font-size: 14px;
+      color: #a5b4fc;
+    }
+    .model-icon { font-size: 28px; }
+    .model-info strong { color: #fff; display: block; font-size: 15px; }
+
+    /* ─── Image Modal ─── */
+    .image-modal {
+      position: fixed; top:0;left:0;right:0;bottom:0;
+      background: rgba(4,7,17,.92);
+      z-index: 1000;
+      display: none; align-items: center; justify-content: center;
+      padding: 40px;
+      cursor: zoom-out;
+    }
+    .image-modal.show { display: flex; }
+    .modal-img { max-width: 90%; max-height: 90%; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,.8); }
+    .modal-close {
+      position: fixed; top: 20px; right: 30px;
+      font-size: 32px; color: #fff; cursor: pointer;
+      background: none; border: none; opacity: .7; transition: opacity .2s;
+    }
+    .modal-close:hover { opacity: 1; }
+
+    /* Retrain btn */
+    .retrain-bar {
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
+      gap: 12px; margin-bottom: 24px;
+    }
+    .retrain-info { font-size: 13px; color: var(--text-muted); }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-badge"><span></span> AI-Powered Detection</div>
+    <h1>SpamGuard AI</h1>
+    <p>Intelligent email spam detection powered by Random Forest &amp; TF-IDF NLP. Paste any email to instantly classify it as spam or ham with confidence scoring and word-level explainability.</p>
+  </div>
+
+  <!-- API Banner -->
+  <div class="api-banner">
+    <div class="api-status">
+      <div id="statusDot" class="status-dot"></div>
+      <span id="statusText">Connecting to API…</span>
+    </div>
+    <div class="api-url-wrap">
+      <label for="apiUrlInput">API URL:</label>
+      <input type="text" id="apiUrlInput" value="http://127.0.0.1:8000">
+    </div>
+  </div>
+
+  <!-- Main Card -->
+  <div class="card">
+    <div class="tab-container">
+      <button id="tab-analyze"     class="tab-btn active"  onclick="switchTab('analyze')">
+        <span class="tab-icon">🔍</span> Email Analyzer
+      </button>
+      <button id="tab-diagnostics" class="tab-btn"         onclick="switchTab('diagnostics')">
+        <span class="tab-icon">📊</span> Model Diagnostics
+      </button>
+    </div>
+
+    <!-- ══════ TAB 1: Single Email Analyzer ══════ -->
+    <div id="analyzeTab" class="tab-content active">
+      <div class="field">
+        <label for="emailInput">Paste Email Body</label>
+        <textarea id="emailInput" placeholder="Paste the full email content here…&#10;&#10;Example:&#10;Congratulations! You've been selected to receive a $1,000 gift card. Call 1-800-555-0100 now to claim your prize before it expires!"></textarea>
+      </div>
+
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <button id="analyzeBtn" class="btn" onclick="analyzeEmail()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          Analyze Email
+        </button>
+        <button class="btn btn-outline" onclick="clearAnalyzer()">Clear</button>
+      </div>
+
+      <div id="analyzeSpinner" class="loading-spinner">
+        <div class="spinner"></div> Analyzing email with AI model…
+      </div>
+      <div id="analyzeError" class="error-box"></div>
+
+      <!-- Results -->
+      <div id="resultsGrid" class="results-grid">
+        <!-- Gauge Dial -->
+        <div class="dial-card">
+          <div class="dial-title">Spam Probability</div>
+          <svg class="svg-gauge" viewBox="0 0 180 180">
+            <circle class="gauge-bg"   cx="90" cy="90" r="80"/>
+            <circle id="gaugeFill" class="gauge-fill" cx="90" cy="90" r="80"/>
+          </svg>
+          <div id="dialValue" class="dial-value">0%</div>
+          <div id="verdictBadge" class="verdict-badge badge-ham">✅ Safe</div>
+
+          <div class="prob-row">
+            <div class="prob-item">
+              <div class="prob-label">Spam</div>
+              <div class="prob-val spam-val" id="spamProb">—</div>
+            </div>
+            <div class="prob-item">
+              <div class="prob-label">Ham</div>
+              <div class="prob-val ham-val" id="hamProb">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Info Card -->
+        <div class="info-card">
+          <div>
+            <h2 id="resultLabel">Result</h2>
+          </div>
+          <div>
+            <h3>⚠️ Detected Spam Indicators</h3>
+            <div id="indicatorsContainer" class="indicator-chips">
+              <span class="no-indicators">No spam indicators detected.</span>
+            </div>
+          </div>
+          <div>
+            <h3>💡 What does this mean?</h3>
+            <p id="resultExplanation" style="font-size:15px;line-height:1.6;color:#cbd5e1;">
+              Submit an email above to see the prediction result and analysis.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div><!-- /analyzeTab -->
+
+    <!-- Batch Analysis removed -->
+
+    <!-- ══════ TAB 3: Model Diagnostics ══════ -->
+    <div id="diagnosticsTab" class="tab-content">
+      <div class="retrain-bar">
+        <div class="retrain-info">🔄 Last training run on the spam dataset using TF-IDF + Random Forest.</div>
+        <button class="btn btn-outline" onclick="triggerRetrain()" id="retrainBtn" style="padding:10px 18px;font-size:13px;">
+          🔄 Retrain Model
+        </button>
+      </div>
+
+      <div class="model-info">
+        <div class="model-icon">🤖</div>
+        <div>
+          <strong id="modelType">Random Forest Classifier (TF-IDF)</strong>
+          <span>Email spam classification model trained on SMS Spam Collection dataset</span>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Accuracy</div>
+          <div class="stat-value" id="metricAccuracy">—</div>
+          <div class="stat-sub">Overall correct predictions</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Precision</div>
+          <div class="stat-value" id="metricPrecision">—</div>
+          <div class="stat-sub">Spam detection precision</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Recall</div>
+          <div class="stat-value" id="metricRecall">—</div>
+          <div class="stat-sub">Spam catch rate</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">F1-Score</div>
+          <div class="stat-value" id="metricF1">—</div>
+          <div class="stat-sub">Harmonic precision-recall</div>
+        </div>
+      </div>
+
+      <!-- Text Report -->
+      <div style="margin-bottom:28px;">
+        <h3 style="font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:12px;border-left:3px solid var(--color-accent);padding-left:10px;">Classification Report</h3>
+        <pre id="textReport" style="background:rgba(0,0,0,.3);border:1px solid var(--border-color);border-radius:14px;padding:20px;font-size:13px;line-height:1.6;color:#cbd5e1;white-space:pre-wrap;overflow-x:auto;max-height:300px;overflow-y:auto;">Loading report…</pre>
+      </div>
+
+      <!-- Plots -->
+      <h3 style="font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:20px;border-left:3px solid var(--color-accent);padding-left:10px;">Visualization Gallery</h3>
+      <div class="plots-grid">
+        <div class="plot-card">
+          <h3>Confusion Matrix</h3>
+          <div class="plot-img-wrap">
+            <img id="plotCM"  class="plot-img" alt="Confusion Matrix" style="display:none;" onclick="openModal(this.src)">
+            <div class="plot-placeholder" id="phCM">Loading…</div>
+          </div>
+        </div>
+        <div class="plot-card">
+          <h3>Class Distribution</h3>
+          <div class="plot-img-wrap">
+            <img id="plotCD"  class="plot-img" alt="Class Distribution" style="display:none;" onclick="openModal(this.src)">
+            <div class="plot-placeholder" id="phCD">Loading…</div>
+          </div>
+        </div>
+        <div class="plot-card">
+          <h3>ROC Curve</h3>
+          <div class="plot-img-wrap">
+            <img id="plotROC" class="plot-img" alt="ROC Curve" style="display:none;" onclick="openModal(this.src)">
+            <div class="plot-placeholder" id="phROC">Loading…</div>
+          </div>
+        </div>
+        <div class="plot-card">
+          <h3>Feature Importance</h3>
+          <div class="plot-img-wrap">
+            <img id="plotFI"  class="plot-img" alt="Feature Importance" style="display:none;" onclick="openModal(this.src)">
+            <div class="plot-placeholder" id="phFI">Loading…</div>
+          </div>
+        </div>
+        <div class="plot-card" style="grid-column: 1 / -1;">
+          <h3>Correlation Heatmap (Top 15 Predictor Words)</h3>
+          <div class="plot-img-wrap">
+            <img id="plotHM"  class="plot-img" alt="Correlation Heatmap" style="display:none;" onclick="openModal(this.src)">
+            <div class="plot-placeholder" id="phHM">Loading…</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="diagnosticsError" class="error-box" style="margin-top:20px;"></div>
+    </div><!-- /diagnosticsTab -->
+  </div><!-- /card -->
+
+</div><!-- /container -->
+
+<!-- Image Modal -->
+<div id="imageModal" class="image-modal" onclick="closeModal()">
+  <button class="modal-close" onclick="closeModal()">✕</button>
+  <img id="modalImg" class="modal-img" alt="Expanded plot">
+</div>
+
+<script>
+  // ═══════════════════════════════════════════════════
+  //  Utilities
+  // ═══════════════════════════════════════════════════
+  let API_URL = 'http://127.0.0.1:8000';
+  
+
+  function getApiUrl() {
+    return document.getElementById('apiUrlInput').value.trim().replace(/\/$/, '');
+  }
+
+  // ═══════════════════════════════════════════════════
+  //  Tab switching
+  // ═══════════════════════════════════════════════════
+  function switchTab(name) {
+    ['analyze','diagnostics'].forEach(t => {
+      document.getElementById(t+'Tab').classList.toggle('active', t===name);
+      document.getElementById('tab-'+t).classList.toggle('active', t===name);
+    });
+    if (name === 'diagnostics') loadDiagnostics();
+  }
+
+  // ═══════════════════════════════════════════════════
+  //  Health Check
+  // ═══════════════════════════════════════════════════
+  async function checkHealth() {
+    const dot  = document.getElementById('statusDot');
+    const text = document.getElementById('statusText');
+    try {
+      const res = await fetch(getApiUrl() + '/health', {signal: AbortSignal.timeout(4000)});
+      const data = await res.json();
+      if (data.status === 'ok') {
+        dot.className  = 'status-dot connected';
+        text.textContent = '✓ Connected — ' + (data.model || 'Email Spam Classifier');
+      } else {
+        dot.className  = 'status-dot disconnected';
+        text.textContent = '⚠ Model not loaded — run training script';
+      }
+    } catch {
+      dot.className  = 'status-dot disconnected';
+      text.textContent = '✗ Cannot reach API at ' + getApiUrl();
+    }
+  }
+
+  document.getElementById('apiUrlInput').addEventListener('change', checkHealth);
+  checkHealth();
+  setInterval(checkHealth, 30000);
+
+  // ═══════════════════════════════════════════════════
+  //  TAB 1 — Single Email Analyzer
+  // ═══════════════════════════════════════════════════
+  async function analyzeEmail() {
+    const emailText = document.getElementById('emailInput').value.trim();
+    if (!emailText) {
+      showError('analyzeError', 'Please paste an email body before analyzing.');
+      return;
+    }
+
+    hideError('analyzeError');
+    document.getElementById('resultsGrid').classList.remove('show');
+    setLoading('analyzeBtn', 'analyzeSpinner', true);
+
+    try {
+      const res = await fetch(getApiUrl() + '/predict', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({email_text: emailText}),
+        signal: AbortSignal.timeout(15000)
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.detail || 'Prediction request failed');
+      }
+      const data = await res.json();
+      renderResult(data);
+    } catch (e) {
+      showError('analyzeError', 'Error: ' + e.message);
+    } finally {
+      setLoading('analyzeBtn', 'analyzeSpinner', false);
+    }
+  }
+
+  function renderResult(data) {
+    const isSpam   = data.is_spam;
+    const spamProb = data.spam_probability;
+    const hamProb  = data.ham_probability;
+    const pct      = Math.round(spamProb * 100);
+
+    // Gauge
+    const circumference = 2 * Math.PI * 80;   // r=80 → 502.65
+    const offset = circumference - (spamProb * circumference);
+    const fill = document.getElementById('gaugeFill');
+    fill.style.strokeDashoffset = offset;
+    fill.style.stroke = isSpam ? '#f43f5e' : '#10b981';
+
+    document.getElementById('dialValue').textContent  = pct + '%';
+    document.getElementById('spamProb').textContent   = (spamProb * 100).toFixed(1) + '%';
+    document.getElementById('hamProb').textContent    = (hamProb  * 100).toFixed(1) + '%';
+
+    // Verdict badge
+    const badge = document.getElementById('verdictBadge');
+    if (isSpam) {
+      badge.className   = 'verdict-badge badge-spam';
+      badge.textContent = '🚨 SPAM';
+    } else {
+      badge.className   = 'verdict-badge badge-ham';
+      badge.textContent = '✅ SAFE (Ham)';
+    }
+
+    // Label
+    document.getElementById('resultLabel').textContent =
+      isSpam ? '🚨 This email is SPAM' : '✅ This email looks Safe';
+    document.getElementById('resultLabel').style.color =
+      isSpam ? '#f43f5e' : '#10b981';
+
+    // Explanation
+    const explanations = {
+      spam: `This email shows strong signals of spam or phishing. Our AI model identified it as <strong>spam</strong> with <strong>${pct}% confidence</strong>. Common spam patterns include promotional offers, urgency language, prize claims, and suspicious links.`,
+      ham:  `This email appears to be <strong>legitimate (ham)</strong> with <strong>${Math.round(hamProb*100)}% confidence</strong>. No significant spam indicators were detected. It's safe to engage with this email normally.`
+    };
+    document.getElementById('resultExplanation').innerHTML =
+      isSpam ? explanations.spam : explanations.ham;
+
+    // Indicators
+    const container = document.getElementById('indicatorsContainer');
+    const words     = data.matched_spam_indicators || [];
+    if (words.length > 0) {
+      container.innerHTML = words.map(w =>
+        `<span class="indicator-chip">
+           ${w.word}
+           <span class="chip-score">${(w.importance * 100).toFixed(2)}%</span>
+         </span>`
+      ).join('');
+    } else {
+      container.innerHTML = '<span class="no-indicators">No spam indicator words detected in this email.</span>';
+    }
+
+    document.getElementById('resultsGrid').classList.add('show');
+  }
+
+  function clearAnalyzer() {
+    document.getElementById('emailInput').value = '';
+    document.getElementById('resultsGrid').classList.remove('show');
+    hideError('analyzeError');
+  }
+
+  // Batch Analysis removed from frontend — single email analyzer and diagnostics remain.
+
+  // ═══════════════════════════════════════════════════
+  //  TAB 3 — Model Diagnostics
+  // ═══════════════════════════════════════════════════
+  async function loadDiagnostics() {
+    hideError('diagnosticsError');
+    try {
+      const res = await fetch(getApiUrl() + '/results/metrics', {signal: AbortSignal.timeout(8000)});
+      if (!res.ok) throw new Error('Metrics endpoint returned ' + res.status);
+      const data = await res.json();
+
+      // Text report
+      document.getElementById('textReport').textContent = data.text_report || 'No report available.';
+
+      // Structured metrics
+      const s = data.structured || {};
+      setText('metricAccuracy',  s.accuracy  != null ? (s.accuracy  * 100).toFixed(2) + '%' : '—');
+      setText('metricPrecision', s.precision != null ? (s.precision * 100).toFixed(2) + '%' : '—');
+      setText('metricRecall',    s.recall    != null ? (s.recall    * 100).toFixed(2) + '%' : '—');
+      setText('metricF1',        s.f1_score  != null ? (s.f1_score  * 100).toFixed(2) + '%' : '—');
+      if (s.model_type) setText('modelType', s.model_type);
+
+      // Load plots
+      const baseUrl = getApiUrl();
+      const plots = {
+        plotCM:  { src: baseUrl + '/results/image/confusion_matrix.png',    ph: 'phCM'  },
+        plotCD:  { src: baseUrl + '/results/image/class_distribution.png',  ph: 'phCD'  },
+        plotROC: { src: baseUrl + '/results/image/roc_curve.png',           ph: 'phROC' },
+        plotFI:  { src: baseUrl + '/results/image/feature_importance.png',  ph: 'phFI'  },
+        plotHM:  { src: baseUrl + '/results/image/correlation_heatmap.png', ph: 'phHM'  },
+      };
+      Object.entries(plots).forEach(([id, cfg]) => {
+        const img = document.getElementById(id);
+        const ph  = document.getElementById(cfg.ph);
+        img.onload  = () => { img.style.display = 'block'; ph.style.display = 'none'; };
+        img.onerror = () => { ph.textContent = '⚠ Plot not found. Run training script first.'; };
+        img.src = cfg.src + '?t=' + Date.now();
+      });
+
+    } catch (e) {
+      showError('diagnosticsError', 'Could not load diagnostics: ' + e.message + '. Make sure the API server is running and the model is trained.');
+    }
+  }
+
+  async function triggerRetrain() {
+    const btn = document.getElementById('retrainBtn');
+    btn.disabled = true;
+    btn.textContent = '⏳ Retraining…';
+    try {
+      const res = await fetch(getApiUrl() + '/retrain', {method: 'POST', signal: AbortSignal.timeout(8000)});
+      const data = await res.json();
+      btn.textContent = '✓ Retrain Queued';
+      setTimeout(() => {
+        btn.disabled    = false;
+        btn.textContent = '🔄 Retrain Model';
+        loadDiagnostics();
+      }, 15000);
+    } catch (e) {
+      btn.disabled    = false;
+      btn.textContent = '🔄 Retrain Model';
+      alert('Retrain failed: ' + e.message);
+    }
+  }
+
+  // ═══════════════════════════════════════════════════
+  //  Image Modal
+  // ═══════════════════════════════════════════════════
+  function openModal(src) {
+    document.getElementById('modalImg').src = src;
+    document.getElementById('imageModal').classList.add('show');
+  }
+  function closeModal() {
+    document.getElementById('imageModal').classList.remove('show');
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  // ═══════════════════════════════════════════════════
+  //  Helpers
+  // ═══════════════════════════════════════════════════
+  function setLoading(btnId, spinnerId, loading) {
+    document.getElementById(btnId).disabled = loading;
+    document.getElementById(spinnerId).style.display = loading ? 'flex' : 'none';
+  }
+  function showError(id, msg) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.style.display = 'block';
+  }
+  function hideError(id) { document.getElementById(id).style.display = 'none'; }
+  function setText(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
+</script>
+</body>
+</html>

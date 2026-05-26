@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Customer Support AI Agent</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0d0f1a;
+      --surface:  #151828;
+      --card:     #1c2035;
+      --border:   #272b40;
+      --accent:   #6c63ff;
+      --accent2:  #a78bfa;
+      --success:  #22d3a5;
+      --warn:     #f59e0b;
+      --danger:   #f87171;
+      --txt:      #e2e8f0;
+      --txt-mute: #64748b;
+      --radius:   14px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--txt);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── Header ── */
+    header {
+      background: linear-gradient(135deg, #1a1d30 0%, #0f1120 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 15px 32px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      z-index: 10;
+      backdrop-filter: blur(12px);
+    }
+    .logo-ring {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 0 20px #6c63ff55;
+      flex-shrink: 0;
+    }
+    header h1 { font-size: 1.2rem; font-weight: 700; letter-spacing: -.3px; margin-bottom:2px; }
+    header p  { font-size: .78rem; color: var(--txt-mute); }
+    .status-dot {
+      margin-left: auto;
+      display: flex; align-items: center; gap: 7px;
+      font-size: .78rem; color: var(--txt-mute);
+    }
+    .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--warn);
+      animation: pulse 2s infinite;
+    }
+    .dot.online { background: var(--success); }
+    .dot.offline { background: var(--danger); animation: none; }
+    
+    @keyframes pulse {
+      0%,100% { box-shadow: 0 0 0 0 rgba(34, 211, 165, 0.3); }
+      50%      { box-shadow: 0 0 0 6px rgba(34, 211, 165, 0); }
+    }
+
+    /* ── Layout ── */
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 400px;
+      gap: 0;
+      height: calc(100vh - 73px);
+    }
+
+    /* ── Chat pane ── */
+    .chat-pane {
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--border);
+      height: 100%;
+    }
+
+    #chat-window {
+      flex: 1;
+      overflow-y: auto;
+      padding: 28px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      scroll-behavior: smooth;
+    }
+    #chat-window::-webkit-scrollbar { width: 5px; }
+    #chat-window::-webkit-scrollbar-thumb { background: var(--border); border-radius: 8px; }
+
+    .bubble {
+      max-width: 85%;
+      padding: 12px 16px;
+      border-radius: 16px;
+      font-size: .9rem;
+      line-height: 1.55;
+      animation: fadeUp .3s ease;
+      word-wrap: break-word;
+    }
+    @keyframes fadeUp {
+      from { opacity:0; transform: translateY(10px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+    .bubble.user {
+      align-self: flex-end;
+      background: linear-gradient(135deg, var(--accent), #9b75ff);
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+    .bubble.agent {
+      align-self: flex-start;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-bottom-left-radius: 4px;
+    }
+    .bubble .meta {
+      font-size: .7rem;
+      color: var(--txt-mute);
+      margin-top: 5px;
+    }
+    .bubble.user .meta { color: #e2e8f0; opacity: 0.8; }
+    
+    .agent-result {
+        background: rgba(0,0,0,0.2);
+        padding: 10px;
+        border-radius: 8px;
+        margin-top: 8px;
+        font-family: monospace;
+        font-size: 0.8rem;
+        white-space: pre-wrap;
+    }
+
+    /* typing indicator */
+    .typing {
+      align-self: flex-start;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      border-bottom-left-radius: 4px;
+      padding: 12px 18px;
+      display: flex; gap: 5px; align-items: center;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .typing-dots { display: flex; gap: 5px; margin-bottom: 5px; }
+    .typing-dots span {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--accent);
+      animation: bounce 1.2s infinite;
+    }
+    .typing-dots span:nth-child(2) { animation-delay: .2s; }
+    .typing-dots span:nth-child(3) { animation-delay: .4s; }
+    .typing-text { font-size: 0.75rem; color: var(--txt-mute); }
+    
+    @keyframes bounce {
+      0%,80%,100% { transform: translateY(0); }
+      40%          { transform: translateY(-8px); }
+    }
+
+    /* ── Input bar ── */
+    .input-bar {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .user-meta {
+      display: flex; gap: 10px; margin-bottom: 10px;
+    }
+    .user-meta input {
+      flex: 1;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 7px 12px;
+      color: var(--txt);
+      font-size: .8rem;
+      outline: none;
+      transition: border .2s;
+    }
+    .user-meta input:focus { border-color: var(--accent); }
+
+    .input-row {
+      display: flex; gap: 10px;
+    }
+    #msg-input {
+      flex: 1;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      color: var(--txt);
+      font-size: .9rem;
+      outline: none;
+      resize: none;
+      height: 48px;
+      font-family: inherit;
+    }
+    #msg-input:focus { border-color: var(--accent); }
+    #send-btn {
+      background: linear-gradient(135deg, var(--accent), #9b75ff);
+      border: none;
+      border-radius: 10px;
+      padding: 0 20px;
+      color: #fff;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: opacity .2s, transform .15s;
+    }
+    #send-btn:hover:not(:disabled)  { opacity: .9; transform: scale(1.04); }
+    #send-btn:active:not(:disabled) { transform: scale(.97); }
+    #send-btn:disabled { opacity: .45; cursor: not-allowed; }
+
+    /* ── Side panel ── */
+    .side-panel {
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 20px;
+      gap: 16px;
+      background: var(--surface);
+      height: 100%;
+    }
+    .side-panel::-webkit-scrollbar { width: 5px; }
+    .side-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 8px; }
+
+    .panel-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+    .panel-card h3 {
+      font-size: .78rem;
+      font-weight: 600;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      color: var(--txt-mute);
+      margin-bottom: 12px;
+      display: flex; align-items: center; gap: 7px;
+    }
+    
+    .list-container {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .list-item {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 8px;
+        font-size: 0.75rem;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px; border-radius: 12px;
+      font-size: .65rem; font-weight: 600;
+      margin-left: auto;
+    }
+    .badge.resolved  { background: #22d3a520; color: var(--success); }
+    .badge.escalated { background: #f59e0b20; color: var(--warn); }
+    .badge.fraud { background: rgba(248, 113, 113, 0.2); color: var(--danger); }
+    .badge.sensitive { background: rgba(245, 158, 11, 0.2); color: var(--warn); }
+
+    .empty-state {
+      text-align: center;
+      color: var(--txt-mute);
+      font-size: .75rem;
+      padding: 8px 0;
+      font-style: italic;
+    }
+
+    .stat-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.75rem;
+        padding: 4px 0;
+        border-bottom: 1px solid var(--border);
+    }
+    .stat-row:last-child { border-bottom: none; }
+    .stat-label { color: var(--txt-mute); }
+    .stat-val { color: var(--accent2); font-weight: 500; }
+
+    #clear-btn {
+      background: transparent;
+      border: 1px solid var(--danger);
+      border-radius: 8px;
+      color: var(--danger);
+      padding: 10px;
+      font-size: .8rem;
+      cursor: pointer;
+      transition: all .2s;
+      margin-top: 10px;
+    }
+    #clear-btn:hover { background: rgba(248, 113, 113, 0.1); }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo-ring">🤖</div>
+  <div>
+    <h1>Customer Support AI</h1>
+    <p>Powered by crewAI</p>
+  </div>
+  <div class="status-dot">
+    <div class="dot" id="api-dot"></div>
+    <span id="api-status">Connecting...</span>
+  </div>
+</header>
+
+<main>
+  <!-- ── Chat ── -->
+  <div class="chat-pane">
+    <div id="chat-window">
+      <div class="bubble agent">
+        👋 Hello! I'm your AI customer support agent. Describe your issue. Note: Processing might take 1-3 minutes as the agent crew works.
+        <div class="meta">Agent · System</div>
+      </div>
+    </div>
+
+    <div class="input-bar">
+      <div class="user-meta">
+        <input id="user-name" type="text" placeholder="Your Name" value="Guest" />
+        <input id="user-id"   type="text" placeholder="User ID"   value="1" />
+      </div>
+      <div class="input-row">
+        <textarea id="msg-input" placeholder="Type your issue here..."></textarea>
+        <button id="send-btn" title="Send">➤</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Side Panel ── -->
+  <div class="side-panel">
+      
+    <!-- Ticket & Escalation -->
+    <div class="panel-card">
+      <h3>🎫 Ticket Status</h3>
+      <div id="ticket-body" class="list-container">
+          <p class="empty-state">No tickets</p>
+      </div>
+    </div>
+
+    <!-- Security & Routing -->
+    <div class="panel-card">
+      <h3>🛡️ Security & Routing</h3>
+      <div class="stat-row" style="cursor: pointer; transition: background 0.2s;" onclick="showSecurityDetail('fraud', 'Fraud Messages')">
+          <span class="stat-label">Fraud Messages</span>
+          <span class="stat-val" id="cnt-fraud">0</span>
+      </div>
+      <div class="stat-row" style="cursor: pointer; transition: background 0.2s;" onclick="showSecurityDetail('sensitive', 'Sensitive Info')">
+          <span class="stat-label">Sensitive Info</span>
+          <span class="stat-val" id="cnt-sensitive">0</span>
+      </div>
+      <div class="stat-row" style="cursor: pointer; transition: background 0.2s;" onclick="showSecurityDetail('normal', 'Normal Inbox')">
+          <span class="stat-label">Normal Inbox</span>
+          <span class="stat-val" id="cnt-normal">0</span>
+      </div>
+      <hr style="border: 0; border-top: 1px dashed var(--border); margin: 8px 0;" />
+      <div class="stat-row" style="cursor: pointer; transition: background 0.2s;" onclick="showSecurityDetail('imm', 'Immediate Needed')">
+          <span class="stat-label">Immediate Needed</span>
+          <span class="stat-val" id="cnt-imm">0</span>
+      </div>
+      <div class="stat-row" style="cursor: pointer; transition: background 0.2s;" onclick="showSecurityDetail('tech', 'Technical Query')">
+          <span class="stat-label">Technical Query</span>
+          <span class="stat-val" id="cnt-tech">0</span>
+      </div>
+      
+      <!-- Detail Display Area -->
+      <div id="sec-details" style="margin-top: 12px; display: none; border-top: 1px solid var(--border); padding-top: 10px; animation: fadeUp 0.3s ease;">
+          <h4 id="sec-details-title" style="font-size: 0.7rem; color: var(--accent2); margin-bottom: 6px; text-transform: uppercase;"></h4>
+          <div id="sec-details-content" class="list-container" style="max-height: 150px; overflow-y: auto;"></div>
+          <button onclick="document.getElementById('sec-details').style.display='none'" style="background: transparent; border: none; color: var(--txt-mute); font-size: 0.65rem; margin-top: 6px; cursor: pointer; text-decoration: underline;">Close</button>
+      </div>
+    </div>
+    
+    <!-- Polarity & Feedback -->
+    <div class="panel-card">
+      <h3>📊 Feedback Polarity</h3>
+      <div id="polarity-body" class="list-container">
+          <p class="empty-state">No feedback data</p>
+      </div>
+    </div>
+
+    <!-- Memory -->
+    <div class="panel-card">
+      <h3>🧠 Conversation Memory</h3>
+      <div class="stat-row">
+          <span class="stat-label">Total Messages</span>
+          <span class="stat-val" id="cnt-mem">0</span>
+      </div>
+      <div class="stat-row">
+          <span class="stat-label">Unique Users</span>
+          <span class="stat-val" id="cnt-users">0</span>
+      </div>
+    </div>
+
+    <button id="clear-btn">🗑 Clear Backend State</button>
+  </div>
+</main>
+
+<script>
+  const API = "http://127.0.0.1:44081";
+  const chatWindow = document.getElementById("chat-window");
+  const msgInput   = document.getElementById("msg-input");
+  const sendBtn    = document.getElementById("send-btn");
+  
+  let currentBackendData = {};
+
+  // Health
+  async function checkHealth() {
+    try {
+      const r = await fetch(`${API}/`);
+      const dot = document.getElementById("api-dot");
+      if (r.ok) {
+        dot.className = "dot online";
+        document.getElementById("api-status").textContent = "Online";
+        refreshState(); // pull latest state periodically
+      } else throw new Error();
+    } catch {
+      document.getElementById("api-dot").className = "dot offline";
+      document.getElementById("api-status").textContent = "Offline";
+    }
+  }
+  checkHealth();
+  setInterval(checkHealth, 20000);
+
+  function now() { return new Date().toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"}); }
+
+  function addBubble(text, who, isJsonStr = false) {
+    const b = document.createElement("div");
+    b.className = `bubble ${who}`;
+    
+    let content = text;
+    if(isJsonStr) {
+        try {
+            // Try to parse stringified JSON array strings if returned from agent
+            let parsed = text;
+            if(typeof text === 'string' && (text.startsWith('[') || text.startsWith('{'))) {
+                parsed = JSON.parse(text);
+            }
+            content = "Task Completed:<br><div class='agent-result'>" + JSON.stringify(parsed, null, 2) + "</div>";
+        } catch(e) {
+            content = text;
+        }
+    }
+    
+    b.innerHTML = `${content}<div class="meta">${who === "user" ? "You" : "Agent"} · ${now()}</div>`;
+    chatWindow.appendChild(b);
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+  }
+
+  function showTyping() {
+    const t = document.createElement("div");
+    t.className = "typing";
+    t.id = "typing-indicator";
+    t.innerHTML = `
+        <div class="typing-dots"><span></span><span></span><span></span></div>
+        <div class="typing-text">Crew AI is analyzing (this may take 1-3 mins)...</div>
+    `;
+    chatWindow.appendChild(t);
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+  }
+  function hideTyping() {
+    const t = document.getElementById("typing-indicator");
+    if (t) t.remove();
+  }
+
+  async function refreshState() {
+      try {
+          const res = await fetch(`${API}/state`);
+          if(res.ok) {
+              const data = await res.json();
+              currentBackendData = data;
+              updatePanels(data);
+          }
+      } catch(e) {}
+  }
+
+  function showSecurityDetail(type, title) {
+      const detailArea = document.getElementById("sec-details");
+      const titleEl = document.getElementById("sec-details-title");
+      const contentEl = document.getElementById("sec-details-content");
+      
+      detailArea.style.display = "block";
+      titleEl.textContent = title;
+      
+      let items = [];
+      if (type === 'fraud') items = currentBackendData.fraud_msg || [];
+      else if (type === 'sensitive') items = currentBackendData.sensitive_info || [];
+      else if (type === 'normal') items = currentBackendData.normal_inbox || [];
+      else if (type === 'imm') items = currentBackendData.immeadiate_responses || [];
+      else if (type === 'tech') items = currentBackendData.technical_response || [];
+      
+      if (items.length === 0) {
+          contentEl.innerHTML = `<p class="empty-state">No items found</p>`;
+      } else {
+          contentEl.innerHTML = items.map(item => `
+              <div class="list-item" style="border-left: 2px solid var(--accent); padding-left: 10px;">
+                  ${item}
+              </div>
+          `).join('');
+      }
+  }
+
+  function updatePanels(data) {
+      // Tickets
+      let tHTML = "";
+      if(data.ticket && data.ticket.id) {
+          tHTML += `<div class="list-item">
+            <strong>${data.ticket.id}</strong> <span class="badge resolved">Resolved</span>
+            <div style="color:var(--txt-mute); margin-top:4px;">${data.ticket.issue || ''}</div>
+          </div>`;
+      }
+      if(data.escalated_tickets && data.escalated_tickets.length > 0) {
+          data.escalated_tickets.forEach(e => {
+             tHTML += `<div class="list-item">
+                <strong>${e.Ticket_id}</strong> <span class="badge escalated">Escalated</span>
+                <div style="color:var(--txt-mute); margin-top:4px;">${e.resolution_status}</div>
+             </div>`;
+          });
+      }
+      if(!tHTML) tHTML = `<p class="empty-state">No tickets</p>`;
+      document.getElementById("ticket-body").innerHTML = tHTML;
+      
+      // Counters
+      document.getElementById("cnt-fraud").textContent = (data.fraud_msg || []).length;
+      document.getElementById("cnt-sensitive").textContent = (data.sensitive_info || []).length;
+      document.getElementById("cnt-normal").textContent = (data.normal_inbox || []).length;
+      document.getElementById("cnt-imm").textContent = (data.immeadiate_responses || []).length;
+      document.getElementById("cnt-tech").textContent = (data.technical_response || []).length;
+      
+      // Memory
+      document.getElementById("cnt-mem").textContent = (data.conversation_memory || []).length;
+      document.getElementById("cnt-users").textContent = Object.keys(data.past_users || {}).length;
+      
+      // Polarity
+      let pHTML = "";
+      if(data.polarity_msg && Object.keys(data.polarity_msg).length > 0) {
+          for(let [k, v] of Object.entries(data.polarity_msg)) {
+              pHTML += `<div class="stat-row">
+                  <span class="stat-label">"${k}"</span>
+                  <span class="stat-val">${v}</span>
+              </div>`;
+          }
+      } else {
+          pHTML = `<p class="empty-state">No feedback data</p>`;
+      }
+      document.getElementById("polarity-body").innerHTML = pHTML;
+  }
+
+  async function sendMessage() {
+    const message = msgInput.value.trim();
+    if (!message) return;
+
+    addBubble(message, "user");
+    msgInput.value = "";
+    sendBtn.disabled = true;
+    showTyping();
+
+    try {
+      const res = await fetch(`${API}/support`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+            message, 
+            user_name: document.getElementById("user-name").value || "Guest", 
+            user_id: document.getElementById("user-id").value || "1" 
+        })
+      });
+
+      hideTyping();
+      if (!res.ok) throw new Error("Backend error");
+      const data = await res.json();
+      
+      addBubble(data.result, "agent", true);
+      currentBackendData = data;
+      updatePanels(data);
+    } catch (err) {
+      hideTyping();
+      addBubble("⚠️ Error connecting to AI Crew.", "agent");
+    } finally {
+      sendBtn.disabled = false;
+    }
+  }
+
+  sendBtn.addEventListener("click", sendMessage);
+  msgInput.addEventListener("keydown", e => {
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  });
+
+  document.getElementById("clear-btn").addEventListener("click", async () => {
+    try {
+      await fetch(`${API}/memory`, { method: "DELETE" });
+      refreshState();
+      addBubble("Backend memory has been cleared.", "agent");
+    } catch {}
+  });
+</script>
+</body>
+</html>

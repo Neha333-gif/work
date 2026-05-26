@@ -1,0 +1,10 @@
+Demand Forecasting - Model Evaluation Report
+=================================================
+R² Score : 0.6471   (64.71%)
+MAE      : 20.4167
+MSE      : 792.1160
+RMSE     : 28.1446
+
+Model    : RandomForestRegressor (n_estimators=150, max_depth=12)
+Features : ['Store ID', 'Product ID', 'Category', 'Region', 'Inventory Level', 'Price', 'Discount', 'Weather Condition', 'Promotion', 'Competitor Pricing', 'Seasonality', 'Epidemic']
+Samples  : 20000 (training: 16000, test: 4000)

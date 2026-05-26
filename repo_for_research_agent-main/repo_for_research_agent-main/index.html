@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Research Assistant</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+    <!-- Auth Overlay -->
+    <div id="authOverlay" class="overlay">
+        <div class="auth-card">
+            <h2 id="authTitle">Welcome Back</h2>
+            <p id="authSubtitle">Please login to access the research lab</p>
+            
+            <div class="auth-inputs">
+                <input type="text" id="username" placeholder="Username">
+                <input type="password" id="password" placeholder="Password">
+            </div>
+            
+            <button id="authBtn">Login</button>
+            <p class="auth-toggle">Don't have an account? <span id="toggleAuth">Register</span></p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container main-content" id="mainContent" style="display: none;">
+        <header>
+            <div class="user-info">
+                <span id="currentUser"></span>
+                <button id="logoutBtn" class="link-btn">Logout</button>
+            </div>
+            <h1>AI Research <span>Assistant</span></h1>
+            <p>Empowering discovery through autonomous reasoning</p>
+        </header>
+
+        <main>
+            <div class="input-section">
+                <input type="text" id="topicInput" placeholder="Enter research topic (e.g., Quantum Computing in Biology)...">
+                <button id="runBtn">Start Research</button>
+            </div>
+
+            <div class="display-grid">
+                <div class="card logs-card">
+                    <h2>Live Progress</h2>
+                    <div id="logs" class="log-container">
+                        <div class="status-msg">System idle. Ready to begin.</div>
+                    </div>
+                </div>
+
+                <div class="card result-card">
+                    <div class="card-header">
+                        <h2>Final Insights</h2>
+                        <button id="downloadBtn" class="secondary-btn" style="display: none;">Download PDF</button>
+                    </div>
+                    <div id="result" class="result-container">
+                        <div class="placeholder-text">Complete the research process to generate insights.</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>

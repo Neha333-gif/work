@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TRUTH SHIELD | AI Fake News Detector</title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #070a13;
+      --bg-card: rgba(15, 23, 42, 0.6);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      
+      --color-primary: #8b5cf6;
+      --color-primary-glow: rgba(139, 92, 246, 0.3);
+      --color-fake: #ef4444;
+      --color-fake-glow: rgba(239, 68, 68, 0.3);
+      --color-true: #10b981;
+      --color-true-glow: rgba(16, 185, 129, 0.3);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(139, 92, 246, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(239, 68, 68, 0.04) 0%, transparent 60%);
+      background-attachment: fixed;
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+      overflow-x: hidden;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1100px;
+      z-index: 10;
+    }
+
+    /* Glow Header */
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+      position: relative;
+    }
+
+    .header h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 42px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #ffffff 30%, #8b5cf6 70%, #06b6d4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 12px;
+      text-shadow: 0 0 40px rgba(139, 92, 246, 0.15);
+    }
+
+    .header p {
+      font-size: 16px;
+      color: var(--text-muted);
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+
+    /* Glassmorphic Card */
+    .card {
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      padding: 40px;
+      margin-bottom: 30px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+    }
+
+    /* API connection banner */
+    .api-banner {
+      background: rgba(139, 92, 246, 0.1);
+      border: 1px solid rgba(139, 92, 246, 0.2);
+      border-radius: 12px;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+
+    .api-banner input {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: var(--text-main);
+      font-family: inherit;
+      width: 250px;
+      transition: all 0.3s;
+    }
+
+    .api-banner input:focus {
+      border-color: var(--color-primary);
+      outline: none;
+      box-shadow: 0 0 0 2px var(--color-primary-glow);
+    }
+
+    .api-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      background-color: #e2e8f0;
+      border-radius: 50%;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    }
+
+    .status-dot.connected {
+      background-color: var(--color-true);
+      box-shadow: 0 0 10px var(--color-true-glow);
+    }
+
+    .status-dot.disconnected {
+      background-color: var(--color-fake);
+      box-shadow: 0 0 10px var(--color-fake-glow);
+    }
+
+    /* Navigation Tabs */
+    .tab-container {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 35px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 2px;
+    }
+
+    .tab-btn {
+      padding: 12px 24px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-radius: 12px 12px 0 0;
+      position: relative;
+      transition: all 0.3s;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .tab-btn.active {
+      color: var(--color-primary);
+    }
+
+    .tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -3px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--color-primary);
+      border-radius: 3px;
+      box-shadow: 0 0 12px var(--color-primary);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.4s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Inputs */
+    .field {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 24px;
+    }
+
+    .field label {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    input[type="text"], textarea {
+      padding: 16px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 15px;
+      outline: none;
+      transition: all 0.3s;
+      width: 100%;
+    }
+
+    input:focus, textarea:focus {
+      border-color: var(--color-primary);
+      background: rgba(0, 0, 0, 0.4);
+      box-shadow: 0 0 0 3px var(--color-primary-glow);
+    }
+
+    textarea {
+      min-height: 180px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    .btn {
+      padding: 16px 30px;
+      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 20px rgba(139, 92, 246, 0.25);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(139, 92, 246, 0.4);
+    }
+
+    .btn:active {
+      transform: none;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Results layout */
+    .results-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 30px;
+      margin-top: 40px;
+      display: none;
+    }
+
+    .results-grid.show {
+      display: grid;
+    }
+
+    @media (min-width: 800px) {
+      .results-grid {
+        grid-template-columns: 350px 1fr;
+      }
+    }
+
+    /* Circular Authenticity Dial */
+    .dial-card {
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .svg-gauge {
+      width: 200px;
+      height: 200px;
+      transform: rotate(-90deg);
+    }
+
+    .gauge-bg {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.05);
+      stroke-width: 14px;
+    }
+
+    .gauge-fill {
+      fill: none;
+      stroke-width: 14px;
+      stroke-linecap: round;
+      stroke-dasharray: 565.48; /* 2 * pi * 90 */
+      stroke-dashoffset: 565.48;
+      transition: stroke-dashoffset 1.5s ease-out, stroke 1.5s ease-out;
+    }
+
+    .dial-value {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 36px;
+      font-weight: 700;
+      margin-top: -125px;
+      margin-bottom: 80px;
+      z-index: 2;
+    }
+
+    .verdict-badge {
+      display: inline-block;
+      padding: 8px 18px;
+      border-radius: 30px;
+      font-weight: 700;
+      font-size: 15px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-top: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+    }
+
+    .verdict-description {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-top: 14px;
+      line-height: 1.4;
+    }
+
+    /* Word Highlight Display (Explainable AI) */
+    .highlight-card {
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .highlight-card h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .highlight-legend {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 20px;
+      font-size: 13px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend-box {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+    }
+
+    .text-container {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      border-radius: 12px;
+      padding: 20px;
+      font-size: 15px;
+      line-height: 1.8;
+      max-height: 350px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      color: #cbd5e1;
+    }
+
+    /* Highlight styling */
+    .hl-fake {
+      background-color: rgba(239, 68, 68, 0.18);
+      border-bottom: 2px dashed rgba(239, 68, 68, 0.7);
+      color: #fca5a5;
+      padding: 2px 4px;
+      border-radius: 4px;
+      cursor: help;
+      position: relative;
+    }
+
+    .hl-true {
+      background-color: rgba(16, 185, 129, 0.18);
+      border-bottom: 2px dashed rgba(16, 185, 129, 0.7);
+      color: #6ee7b7;
+      padding: 2px 4px;
+      border-radius: 4px;
+      cursor: help;
+      position: relative;
+    }
+
+    /* Tooltips */
+    .hl-tooltip {
+      visibility: hidden;
+      position: absolute;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #0f172a;
+      color: #fff;
+      text-align: center;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+      z-index: 100;
+      opacity: 0;
+      transition: opacity 0.2s, visibility 0.2s;
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    }
+
+    .hl-fake:hover .hl-tooltip, .hl-true:hover .hl-tooltip {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    /* Top Words found lists */
+    .top-words-lists {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      margin-top: 24px;
+    }
+
+    @media (min-width: 600px) {
+      .top-words-lists {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .word-list-box {
+      background: rgba(0, 0, 0, 0.15);
+      border-radius: 12px;
+      padding: 16px 20px;
+    }
+
+    .word-list-box h4 {
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+      color: var(--text-muted);
+    }
+
+    .list-item-word {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      font-size: 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+    }
+
+    .list-item-word:last-child {
+      border-bottom: none;
+    }
+
+    .bar-container {
+      width: 100px;
+      height: 8px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-left: 10px;
+    }
+
+    .word-bar {
+      height: 100%;
+      border-radius: 4px;
+    }
+
+    /* Error Messages */
+    .error-box {
+      background: rgba(239, 68, 68, 0.1);
+      border-left: 4px solid var(--color-fake);
+      color: #fca5a5;
+      padding: 16px;
+      border-radius: 8px;
+      margin-top: 20px;
+      display: none;
+      font-size: 14px;
+    }
+
+    .loading-spinner {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 20px;
+      color: var(--color-primary);
+      font-weight: 600;
+    }
+
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid rgba(139, 92, 246, 0.2);
+      border-top-color: var(--color-primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Batch Uploader Style */
+    .upload-zone {
+      border: 2px dashed rgba(255, 255, 255, 0.15);
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 18px;
+      padding: 40px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-bottom: 30px;
+    }
+
+    .upload-zone:hover {
+      border-color: var(--color-primary);
+      background: rgba(139, 92, 246, 0.05);
+    }
+
+    .upload-zone svg {
+      width: 48px;
+      height: 48px;
+      fill: var(--text-muted);
+      margin-bottom: 16px;
+      transition: fill 0.3s;
+    }
+
+    .upload-zone:hover svg {
+      fill: var(--color-primary);
+    }
+
+    .upload-zone p {
+      font-size: 15px;
+      color: var(--text-muted);
+    }
+
+    .upload-zone strong {
+      color: var(--text-main);
+    }
+
+    .batch-progress {
+      display: none;
+      margin-top: 20px;
+    }
+
+    .progress-bar-bg {
+      height: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .progress-bar-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--color-primary), #06b6d4);
+      transition: width 0.3s;
+    }
+
+    .progress-text {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* Batch Results Table */
+    .table-container {
+      overflow-x: auto;
+      margin-top: 30px;
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      background: rgba(0,0,0,0.2);
+      display: none;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th {
+      padding: 14px 20px;
+      background: rgba(0,0,0,0.3);
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    td {
+      padding: 14px 20px;
+      font-size: 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+      color: #cbd5e1;
+    }
+
+    tr:hover td {
+      background-color: rgba(255, 255, 255, 0.02);
+    }
+
+    .row-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .badge-fake {
+      background-color: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
+    }
+
+    .badge-true {
+      background-color: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #6ee7b7;
+    }
+
+    /* Diagnostics Dashboard Tab */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 45px;
+    }
+
+    .stat-card {
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      position: relative;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 32px;
+      font-weight: 700;
+      color: white;
+    }
+
+    /* HTML CSS Confusion Matrix */
+    .insights-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 30px;
+    }
+
+    @media (min-width: 800px) {
+      .insights-layout {
+        grid-template-columns: 400px 1fr;
+      }
+    }
+
+    .matrix-box {
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .matrix-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 24px;
+      align-self: flex-start;
+      border-left: 3px solid var(--color-primary);
+      padding-left: 10px;
+    }
+
+    .matrix-table {
+      display: grid;
+      grid-template-columns: 60px 1fr 1fr;
+      gap: 10px;
+      width: 100%;
+      max-width: 320px;
+    }
+
+    .matrix-cell {
+      height: 90px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .matrix-label-vert {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      writing-mode: vertical-lr;
+      transform: rotate(180deg);
+      color: var(--text-muted);
+    }
+
+    .matrix-label-horiz {
+      grid-column: span 3;
+      display: flex;
+      justify-content: space-around;
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+      padding-left: 60px;
+    }
+
+    .matrix-data {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.05);
+      color: var(--text-main);
+    }
+
+    .matrix-data.hit-fake {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
+    }
+
+    .matrix-data.hit-true {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #6ee7b7;
+    }
+
+    .matrix-val {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .matrix-sub {
+      font-size: 10px;
+      opacity: 0.7;
+      margin-top: 4px;
+    }
+
+    .signals-box {
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 30px;
+    }
+
+    .signals-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+      margin-top: 20px;
+    }
+
+    @media (min-width: 600px) {
+      .signals-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .signal-list {
+      background: rgba(0,0,0,0.15);
+      border-radius: 12px;
+      padding: 18px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .signal-title-header {
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .signal-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 13px;
+    }
+
+    .signal-bar-fill {
+      height: 6px;
+      border-radius: 3px;
+      margin-top: 4px;
+    }
+
+    /* Training Hub Layout */
+    .retrain-box {
+      background: rgba(139, 92, 246, 0.05);
+      border: 1px solid rgba(139, 92, 246, 0.15);
+      border-radius: 20px;
+      padding: 30px;
+      margin-top: 40px;
+    }
+
+    .retrain-header {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    @media (min-width: 600px) {
+      .retrain-header {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
+    }
+
+    .retrain-console {
+      background: #000;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 13px;
+      color: #34d399;
+      padding: 20px;
+      height: 180px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.8);
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header -->
+  <header class="header">
+    <h1>🛡️ TRUTH SHIELD</h1>
+    <p>Explainable Real-Time Fake News Detection System powered by NLP and Advanced Machine Learning Models</p>
+  </header>
+
+  <div class="card">
+    <!-- API connection Configuration Banner -->
+    <div class="api-banner">
+      <div class="api-status">
+        <span class="status-dot disconnected" id="apiStatusDot"></span>
+        <span id="apiStatusText">Checking API...</span>
+      </div>
+      <div>
+        <label style="font-size: 12px; color: var(--text-muted); font-weight: 600; margin-right: 10px; text-transform: uppercase;">API Server URL</label>
+        <input type="text" id="apiUrl" value="http://localhost:8000" onchange="checkApiConnection()">
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="tab-container">
+      <button class="tab-btn active" id="tabBtnSingle" onclick="switchTab('single')">Single Article Scanner</button>
+      <button class="tab-btn" id="tabBtnStats" onclick="switchTab('stats')">Model Insights & Training Hub</button>
+    </div>
+
+    <!-- TAB 1: Single Article Analyzer -->
+    <div class="tab-content active" id="tabContentSingle">
+      <h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 8px;">Scan Custom Article</h2>
+      <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 30px;">Paste the news title and body text below to analyze its truthfulness and identify suspicious phrases.</p>
+
+      <div class="field">
+        <label>News Article Title</label>
+        <input type="text" id="newsTitle" placeholder="Enter the headline/title of the article here...">
+      </div>
+
+      <div class="field">
+        <label>News Article Body Content</label>
+        <textarea id="newsText" placeholder="Paste the full body text/content of the news article here... (At least 20 words recommended)"></textarea>
+      </div>
+
+      <button class="btn" id="btnScan" onclick="scanNews()">
+        <svg style="width: 20px; height: 20px; fill: white;" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+        Execute Deep Scan
+      </button>
+
+      <div class="loading-spinner" id="scanLoading">
+        <div class="spinner"></div>
+        Neural parsing in progress...
+      </div>
+      
+      <div class="error-box" id="scanError"></div>
+
+      <!-- Scan Result Panels -->
+      <div class="results-grid" id="scanResults">
+        <!-- SVG Gauge dial -->
+        <div class="dial-card">
+          <h3 style="font-size: 15px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 24px;">Authenticity Verdict</h3>
+          
+          <svg class="svg-gauge">
+            <circle class="gauge-bg" cx="100" cy="100" r="90"></circle>
+            <circle class="gauge-fill" id="gaugeCircle" cx="100" cy="100" r="90"></circle>
+          </svg>
+          
+          <div class="dial-value" id="dialValue">0%</div>
+          
+          <div class="verdict-badge" id="verdictBadge">Fake</div>
+          <div class="verdict-description" id="verdictDesc">Analysis is ready.</div>
+        </div>
+
+        <!-- Word Highlighter view -->
+        <div class="highlight-card">
+          <h3>
+            <svg style="width: 20px; height: 20px; fill: var(--color-primary);" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+            Explainable AI Spotlight
+          </h3>
+          <div class="highlight-legend">
+            <div class="legend-item">
+              <div class="legend-box" style="background-color: rgba(239, 68, 68, 0.2); border-bottom: 2px dashed rgba(239, 68, 68, 0.7);"></div>
+              <span>Suspicious Signals (Fake)</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-box" style="background-color: rgba(16, 185, 129, 0.2); border-bottom: 2px dashed rgba(16, 185, 129, 0.7);"></div>
+              <span>Trustworthy Signals (True)</span>
+            </div>
+          </div>
+
+          <div class="text-container" id="annotatedText">
+            Highlights will appear here after the scan is complete.
+          </div>
+
+          <!-- Highlight lists -->
+          <div class="top-words-lists">
+            <div class="word-list-box">
+              <h4>Top Suspect Terms Found</h4>
+              <div id="foundFakeWords">No suspicious terms captured.</div>
+            </div>
+            <div class="word-list-box">
+              <h4>Top Verified Terms Found</h4>
+              <div id="foundTrueWords">No verified terms captured.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: Model Insights & Training Hub -->
+    <div class="tab-content" id="tabContentStats">
+      <h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 8px;">Model Diagnostics & Controls</h2>
+      <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 30px;">Overview of the current model architecture, validation performance metrics, and tools to initiate active model retraining on local datasets.</p>
+
+      <div class="loading-spinner" id="statsLoading" style="display: flex;">
+        <div class="spinner"></div>
+        Fetching neural statistics...
+      </div>
+      <div class="error-box" id="statsError"></div>
+
+      <!-- Stats Cards -->
+      <div id="statsMainContent" style="display: none;">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Model Type</div>
+            <div class="stat-value" style="font-size: 20px; margin-top: 8px;" id="statModelType">TF-IDF Classifier</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Model Accuracy</div>
+            <div class="stat-value" id="statAccuracy">0.0%</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Precision Metric</div>
+            <div class="stat-value" id="statPrecision">0.00</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">F1 Quality Score</div>
+            <div class="stat-value" id="statF1">0.00</div>
+          </div>
+        </div>
+
+        <div class="insights-layout">
+          <!-- Confusion Matrix -->
+          <div class="matrix-box">
+            <div class="matrix-title">Confusion Matrix (Validation)</div>
+            
+            <div class="matrix-table">
+              <div class="matrix-label-horiz">
+                <span>Predicted Fake</span>
+                <span>Predicted True</span>
+              </div>
+              
+              <div class="matrix-label-vert">Actual News</div>
+              
+              <div class="matrix-cell matrix-data hit-fake">
+                <div class="matrix-val" id="cmFF">0</div>
+                <div class="matrix-sub">True Fake</div>
+              </div>
+              <div class="matrix-cell matrix-data">
+                <div class="matrix-val" id="cmFT">0</div>
+                <div class="matrix-sub">False True</div>
+              </div>
+              
+              <div></div> <!-- offset for vertical label row 2 -->
+              <div class="matrix-cell matrix-data">
+                <div class="matrix-val" id="cmTF">0</div>
+                <div class="matrix-sub">False Fake</div>
+              </div>
+              <div class="matrix-cell matrix-data hit-true">
+                <div class="matrix-val" id="cmTT">0</div>
+                <div class="matrix-sub">True True</div>
+              </div>
+            </div>
+            
+            <div style="font-size: 12px; color: var(--text-muted); margin-top: 24px; text-align: center; line-height: 1.4;">
+              Values represent model classifications on a hold-out validation dataset. High values in top-left and bottom-right corners indicate a highly accurate model.
+            </div>
+          </div>
+
+          <!-- Vocabulary Signals -->
+          <div class="signals-box">
+            <div class="matrix-title">Global Vocabulary Signals</div>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.4;">
+              Below are the top 10 strongest textual patterns parsed by the model during training. Words with strong negative coefficients signify robust indicators of <strong>Fake News</strong>, while positive coefficients signify <strong>True News</strong>.
+            </p>
+            
+            <div class="signals-grid">
+              <div class="signal-list">
+                <div class="signal-title-header" style="color: var(--color-fake);">Top Fake News Indicators</div>
+                <div id="globalFakeSignals"></div>
+              </div>
+              <div class="signal-list">
+                <div class="signal-title-header" style="color: var(--color-true);">Top True News Indicators</div>
+                <div id="globalTrueSignals"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Model Retraining Console Hub -->
+        <div class="retrain-box">
+          <div class="retrain-header">
+            <div>
+              <h3 style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 4px;">Retrain Neural Network</h3>
+              <p style="font-size: 13px; color: var(--text-muted);">Retrain the TF-IDF vectorizer and logistic regression classifier using current local datasets `fake.csv` and `true.csv`.</p>
+            </div>
+            <button class="btn" style="background: linear-gradient(135deg, #a855f7 0%, #8b5cf6 100%); box-shadow: 0 4px 15px rgba(168,85,247,0.25);" id="btnRetrain" onclick="triggerRetraining()">
+              Trigger Model Retraining
+            </button>
+          </div>
+
+          <div class="loading-spinner" id="retrainLoading" style="justify-content: flex-start;">
+            <div class="spinner"></div>
+            Retraining is running in the background. Check logs below...
+          </div>
+          
+          <div class="retrain-console" id="retrainConsole"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let activeTab = 'single';
+  let processedCsvData = null; // Store CSV content in memory for download
+  let refreshTimer = null;
+
+  // Initialize
+  document.addEventListener('DOMContentLoaded', () => {
+    checkApiConnection();
+    // Periodically check API
+    setInterval(checkApiConnection, 10000);
+  });
+
+  function switchTab(tabId) {
+    activeTab = tabId;
+    
+    // Manage tab buttons
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    if (tabId === 'single') document.getElementById('tabBtnSingle').classList.add('active');
+    if (tabId === 'stats') document.getElementById('tabBtnStats').classList.add('active');
+
+    // Manage content views
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+    if (tabId === 'single') document.getElementById('tabContentSingle').classList.add('active');
+    if (tabId === 'stats') {
+      document.getElementById('tabContentStats').classList.add('active');
+      loadStats();
+    }
+  }
+
+  async function checkApiConnection() {
+    const apiUrl = document.getElementById('apiUrl').value;
+    const dot = document.getElementById('apiStatusDot');
+    const label = document.getElementById('apiStatusText');
+    
+    try {
+      const response = await fetch(`${apiUrl}/health`, { method: 'GET' });
+      if (response.ok) {
+        dot.className = 'status-dot connected';
+        label.textContent = 'API Connected';
+      } else {
+        dot.className = 'status-dot disconnected';
+        label.textContent = 'API Error';
+      }
+    } catch (e) {
+      dot.className = 'status-dot disconnected';
+      label.textContent = 'API Disconnected';
+    }
+  }
+
+  // TAB 1: Single Scan
+  async function scanNews() {
+    const title = document.getElementById('newsTitle').value.trim();
+    const text = document.getElementById('newsText').value.trim();
+    const scanError = document.getElementById('scanError');
+    const scanResults = document.getElementById('scanResults');
+    const loading = document.getElementById('scanLoading');
+    
+    scanError.style.display = 'none';
+    scanResults.classList.remove('show');
+    
+    if (!title || !text) {
+      scanError.textContent = 'Please enter both a news title and body text.';
+      scanError.style.display = 'block';
+      return;
+    }
+
+    loading.style.display = 'flex';
+    const apiUrl = document.getElementById('apiUrl').value;
+    
+    try {
+      const response = await fetch(`${apiUrl}/predict`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, text })
+      });
+      
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.detail || 'Prediction failed');
+      }
+      
+      const result = await response.json();
+      displayScanResult(result, title, text);
+      
+    } catch (e) {
+      scanError.textContent = `Error: ${e.message}. Make sure the backend server is running.`;
+      scanError.style.display = 'block';
+    } finally {
+      loading.style.display = 'none';
+    }
+  }
+
+  function displayScanResult(res, title, text) {
+    const isTrue = res.prediction === 'True';
+    const confPercent = Math.round(res.confidence * 100);
+    
+    // Verdict elements
+    const badge = document.getElementById('verdictBadge');
+    badge.textContent = res.prediction;
+    badge.style.background = isTrue ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)';
+    badge.style.border = isTrue ? '1px solid rgba(16, 185, 129, 0.4)' : '1px solid rgba(239, 68, 68, 0.4)';
+    badge.style.color = isTrue ? '#6ee7b7' : '#fca5a5';
+    badge.style.boxShadow = isTrue ? '0 4px 15px var(--color-true-glow)' : '0 4px 15px var(--color-fake-glow)';
+    
+    const dial = document.getElementById('dialValue');
+    dial.textContent = `${confPercent}%`;
+    dial.style.color = isTrue ? '#6ee7b7' : '#fca5a5';
+    
+    const desc = document.getElementById('verdictDesc');
+    desc.textContent = isTrue 
+      ? `Our model is ${confPercent}% confident that this article is structurally authentic and factual.`
+      : `Our model is ${confPercent}% confident that this article is a fabricated report/opinion piece.`;
+
+    // SVG Gauge circle draw
+    const circle = document.getElementById('gaugeCircle');
+    circle.style.stroke = isTrue ? '#10b981' : '#ef4444';
+    
+    // Circular bounds formula: stroke-dashoffset = 565.48 - (565.48 * percentage) / 100
+    const percentage = isTrue ? res.probability_true : res.probability_fake;
+    const offset = 565.48 - (565.48 * percentage);
+    circle.style.strokeDashoffset = offset;
+
+    // Highlight scanned content
+    annotateTextDisplay(res.explanation, title, text);
+    
+    // Show results panel
+    document.getElementById('scanResults').classList.add('show');
+  }
+
+  function annotateTextDisplay(explanation, title, text) {
+    const fullText = `${title}\n\n${text}`;
+    
+    // Map words to scores for efficient lookup
+    const wordScores = {};
+    explanation.suspicious_words.forEach(w => wordScores[w.word] = w.score);
+    explanation.trustworthy_words.forEach(w => wordScores[w.word] = w.score);
+    
+    // Match words and format them
+    const container = document.getElementById('annotatedText');
+    
+    // Tokenize text while retaining spaces and punctuation
+    const tokens = fullText.split(/(\b\w+\b)/);
+    
+    const formattedHtml = tokens.map(token => {
+      const clean = token.toLowerCase().trim();
+      if (clean && clean in wordScores) {
+        const coef = wordScores[clean];
+        const isTrue = coef > 0;
+        const coefFixed = coef.toFixed(2);
+        
+        const className = isTrue ? 'hl-true' : 'hl-fake';
+        const label = isTrue ? 'Authenticity impact' : 'Suspicion weight';
+        
+        return `<span class="${className}">${token}<span class="hl-tooltip">${label}: ${coefFixed}</span></span>`;
+      }
+      return token;
+    }).join('');
+    
+    container.innerHTML = formattedHtml;
+
+    // Render lists under text
+    const foundFakeContainer = document.getElementById('foundFakeWords');
+    if (explanation.suspicious_words.length > 0) {
+      foundFakeContainer.innerHTML = explanation.suspicious_words.map(w => {
+        const magnitude = Math.min(Math.abs(w.score) / 3, 1) * 100;
+        return `
+          <div class="list-item-word">
+            <span>${w.word}</span>
+            <div style="display: flex; align-items: center;">
+              <span style="font-size: 12px; color: #fca5a5;">${w.score.toFixed(2)}</span>
+              <div class="bar-container"><div class="word-bar" style="width: ${magnitude}%; background-color: var(--color-fake);"></div></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    } else {
+      foundFakeContainer.textContent = 'No strong suspicious terms captured.';
+    }
+
+    const foundTrueContainer = document.getElementById('foundTrueWords');
+    if (explanation.trustworthy_words.length > 0) {
+      foundTrueContainer.innerHTML = explanation.trustworthy_words.map(w => {
+        const magnitude = Math.min(Math.abs(w.score) / 3, 1) * 100;
+        return `
+          <div class="list-item-word">
+            <span>${w.word}</span>
+            <div style="display: flex; align-items: center;">
+              <span style="font-size: 12px; color: #6ee7b7;">+${w.score.toFixed(2)}</span>
+              <div class="bar-container"><div class="word-bar" style="width: ${magnitude}%; background-color: var(--color-true);"></div></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    } else {
+      foundTrueContainer.textContent = 'No strong verified terms captured.';
+    }
+  }
+
+
+
+  // TAB 3: Model Diagnostics & Controls
+  async function loadStats() {
+    const errorBox = document.getElementById('statsError');
+    const loading = document.getElementById('statsLoading');
+    const mainContent = document.getElementById('statsMainContent');
+    
+    errorBox.style.display = 'none';
+    loading.style.display = 'flex';
+    mainContent.style.display = 'none';
+    
+    const apiUrl = document.getElementById('apiUrl').value;
+    
+    try {
+      const response = await fetch(`${apiUrl}/info`);
+      if (!response.ok) throw new Error('Failed to retrieve validation stats');
+      
+      const info = await response.json();
+      displayStats(info);
+      
+    } catch (e) {
+      errorBox.textContent = `Error loading model stats: ${e.message}. Please make sure you have trained a model (python train_model.py) and started the API server.`;
+      errorBox.style.display = 'block';
+    } finally {
+      loading.style.display = 'none';
+    }
+  }
+
+  function displayStats(info) {
+    document.getElementById('statModelType').textContent = info.model_type || 'TF-IDF + Logistic Regression';
+    document.getElementById('statAccuracy').textContent = `${(info.accuracy * 100).toFixed(1)}%`;
+    document.getElementById('statPrecision').textContent = info.precision.toFixed(3);
+    document.getElementById('statF1').textContent = info.f1_score.toFixed(3);
+
+    // Confusion Matrix cells
+    const cm = info.confusion_matrix;
+    if (cm && cm.length === 2) {
+      document.getElementById('cmFF').textContent = cm[0][0]; // True Fake
+      document.getElementById('cmFT').textContent = cm[0][1]; // False True
+      document.getElementById('cmTF').textContent = cm[1][0]; // False Fake
+      document.getElementById('cmTT').textContent = cm[1][1]; // True True
+    }
+
+    // Signals Rendering
+    const globalFake = document.getElementById('globalFakeSignals');
+    globalFake.innerHTML = info.top_fake_words.map(w => {
+      const absCoef = Math.abs(w.coef);
+      // Map to visual percent of strongest word
+      const percentage = Math.min(absCoef / 3.0, 1.0) * 100;
+      return `
+        <div style="margin-bottom: 12px;">
+          <div class="signal-item">
+            <span>${w.word}</span>
+            <span style="color: #fca5a5; font-family: 'Space Grotesk', sans-serif;">${w.coef.toFixed(2)}</span>
+          </div>
+          <div class="bar-container" style="width: 100%; margin-left: 0; height: 6px;">
+            <div class="signal-bar-fill" style="width: ${percentage}%; background-color: var(--color-fake);"></div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    const globalTrue = document.getElementById('globalTrueSignals');
+    globalTrue.innerHTML = info.top_true_words.map(w => {
+      const percentage = Math.min(w.coef / 3.0, 1.0) * 100;
+      return `
+        <div style="margin-bottom: 12px;">
+          <div class="signal-item">
+            <span>${w.word}</span>
+            <span style="color: #6ee7b7; font-family: 'Space Grotesk', sans-serif;">+${w.coef.toFixed(2)}</span>
+          </div>
+          <div class="bar-container" style="width: 100%; margin-left: 0; height: 6px;">
+            <div class="signal-bar-fill" style="width: ${percentage}%; background-color: var(--color-true);"></div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    document.getElementById('statsMainContent').style.display = 'block';
+  }
+
+  // Model Retraining Logic
+  async function triggerRetraining() {
+    const btn = document.getElementById('btnRetrain');
+    const loading = document.getElementById('retrainLoading');
+    const consoleBox = document.getElementById('retrainConsole');
+    
+    btn.disabled = true;
+    loading.style.display = 'flex';
+    consoleBox.textContent = `[INFO] Retraining command dispatched...\n`;
+    consoleBox.style.display = 'block';
+    
+    const apiUrl = document.getElementById('apiUrl').value;
+    
+    try {
+      const response = await fetch(`${apiUrl}/retrain`, { method: 'POST' });
+      if (!response.ok) throw new Error('Retraining request rejected by server');
+      
+      consoleBox.textContent += `[SERVER] Retraining started successfully. Logs will refresh momentarily...\n`;
+      
+      // Start a polling sequence to load metrics after 10-15 seconds
+      if (refreshTimer) clearInterval(refreshTimer);
+      
+      let timerCounts = 0;
+      refreshTimer = setInterval(async () => {
+        timerCounts++;
+        consoleBox.textContent += `[POLL] Checking retraining status (Attempt ${timerCounts})...\n`;
+        
+        try {
+          const checkRes = await fetch(`${apiUrl}/health`);
+          const checkData = await checkRes.json();
+          
+          if (checkRes.ok && checkData.status === 'ok') {
+            consoleBox.textContent += `[SERVER] RETRAINING COMPLETED SUCCESSFULLY!\n`;
+            consoleBox.textContent += `[SERVER] New pipeline re-loaded and verified.\n`;
+            clearInterval(refreshTimer);
+            loading.style.display = 'none';
+            btn.disabled = false;
+            // Reload stats tab
+            loadStats();
+          }
+        } catch (pollErr) {
+          consoleBox.textContent += `[WARNING] API temporary lock during retraining.\n`;
+        }
+        
+        if (timerCounts >= 20) {
+          clearInterval(refreshTimer);
+          consoleBox.textContent += `[INFO] Retrain checking timed out. Please check manual server logs.\n`;
+          loading.style.display = 'none';
+          btn.disabled = false;
+        }
+      }, 3000);
+      
+    } catch (e) {
+      consoleBox.textContent += `[ERROR] Trigger failed: ${e.message}\n`;
+      loading.style.display = 'none';
+      btn.disabled = false;
+    }
+  }
+</script>
+
+</body>
+</html>

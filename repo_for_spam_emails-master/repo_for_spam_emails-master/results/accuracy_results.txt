@@ -1,0 +1,17 @@
+Email Spam Prediction - Model Evaluation Report
+=================================================
+Accuracy  : 0.9659  (96.59%)
+Precision : 1.0000
+Recall    : 0.7450
+F1-Score  : 0.8538
+
+Classification Report:
+              precision    recall  f1-score   support
+
+         ham       0.96      1.00      0.98       966
+        spam       1.00      0.74      0.85       149
+
+    accuracy                           0.97      1115
+   macro avg       0.98      0.87      0.92      1115
+weighted avg       0.97      0.97      0.96      1115
+

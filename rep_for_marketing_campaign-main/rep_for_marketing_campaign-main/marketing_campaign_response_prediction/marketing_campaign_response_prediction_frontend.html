@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Marketing Campaign Response Prediction</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #050816;
+      --surface: rgba(14, 23, 45, 0.95);
+      --surface-strong: rgba(255, 255, 255, 0.08);
+      --text: #eef2ff;
+      --muted: #94a3b8;
+      --primary: #4f46e5;
+      --accent: #22c55e;
+      --shadow: 0 24px 60px rgba(0,0,0,0.35);
+      --radius: 28px;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh; background: radial-gradient(circle at 20% 20%, rgba(79, 70, 229, 0.28), transparent 30%), radial-gradient(circle at 85% 10%, rgba(34, 197, 94, 0.16), transparent 25%), linear-gradient(180deg, #09101f 0%, #050816 100%); color: var(--text); }
+    .container { width: min(1120px, 100%); margin: 0 auto; padding: 36px 20px 60px; }
+    header { text-align: center; margin-bottom: 28px; }
+    .headline { font-size: clamp(2.4rem, 3vw, 3.8rem); line-height: 1.05; letter-spacing: -0.04em; margin-bottom: 14px; }
+    .subhead { color: var(--muted); max-width: 720px; margin: 0 auto; font-size: 1rem; }
+    .grid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 24px; }
+    @media (max-width: 940px) { .grid { grid-template-columns: 1fr; } }
+    .card { background: var(--surface); border: 1px solid var(--surface-strong); border-radius: var(--radius); box-shadow: var(--shadow); padding: 28px; backdrop-filter: blur(18px); }
+    .card-title { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; font-size: 1.2rem; }
+    .card-title span { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background: rgba(79, 70, 229, 0.18); color: var(--primary); font-weight: 700; }
+    label { display: block; margin-bottom: 10px; color: var(--text); font-size: 0.95rem; }
+    .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    @media (max-width: 640px) { .form-grid { grid-template-columns: 1fr; } }
+    input, select { width: 100%; border: 1px solid rgba(255,255,255,0.12); border-radius: 16px; padding: 14px 16px; background: rgba(255,255,255,0.04); color: var(--text); font-size: 0.95rem; outline: none; transition: transform 0.25s ease, border-color 0.25s ease; }
+    input:focus, select:focus { border-color: var(--primary); transform: translateY(-1px); }
+    .button { width: 100%; border: none; padding: 16px 20px; border-radius: 18px; background: linear-gradient(135deg, var(--primary), var(--accent)); color: #fff; font-weight: 700; cursor: pointer; transition: transform 0.25s ease, opacity 0.25s ease; }
+    .button:hover { transform: translateY(-2px); opacity: 0.95; }
+    .result-box { margin-top: 24px; padding: 20px; border-radius: 20px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); }
+    .result-value { font-size: 2rem; margin: 8px 0; }
+    .note { color: var(--muted); font-size: 0.95rem; line-height: 1.6; }
+    .upload-area { display: grid; gap: 16px; }
+    .upload-file { display: none; }
+    .file-label { display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 14px 18px; border-radius: 18px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text); cursor: pointer; }
+    .status { padding: 14px 18px; border-radius: 18px; background: rgba(79, 70, 229, 0.12); border: 1px solid rgba(79, 70, 229, 0.18); color: #dbeafe; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <p class="headline">Marketing Campaign Response Prediction</p>
+      <p class="subhead">Estimate which customers are likely to respond to your campaign using a lightweight classification model.</p>
+    </header>
+
+    <div class="grid">
+      <article class="card">
+        <div class="card-title"><span>01</span> Single Customer Prediction</div>
+        <div class="form-grid">
+          <div>
+            <label for="age">Age</label>
+            <input id="age" type="number" min="18" max="100" placeholder="e.g. 35" />
+          </div>
+          <div>
+            <label for="income">Annual Income</label>
+            <input id="income" type="number" min="0" placeholder="e.g. 65000" />
+          </div>
+          <div>
+            <label for="credit_score">Credit Score</label>
+            <input id="credit_score" type="number" min="300" max="850" placeholder="e.g. 720" />
+          </div>
+          <div>
+            <label for="children">No. of Children</label>
+            <input id="children" type="number" min="0" max="10" placeholder="e.g. 2" />
+          </div>
+          <div>
+            <label for="gender">Gender</label>
+            <select id="gender">
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div>
+            <label for="employment">Employment Status</label>
+            <select id="employment">
+              <option value="Yes">Employed</option>
+              <option value="No">Unemployed</option>
+            </select>
+          </div>
+          <div style="grid-column: span 2;">
+            <label for="marital_status">Marital Status</label>
+            <select id="marital_status">
+              <option value="Single">Single</option>
+              <option value="Married">Married</option>
+              <option value="Divorced">Divorced</option>
+              <option value="Widowed">Widowed</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="button" id="predictBtn">Predict Campaign Response</button>
+
+        <div class="result-box" id="singleResult" style="display:none;">
+          <div class="note">Prediction result for the current customer profile.</div>
+          <p class="result-value" id="predictionText"></p>
+          <p class="note" id="predictionProbability"></p>
+        </div>
+      </article>
+
+      <article class="card upload-area">
+        <div class="card-title"><span>02</span> Batch CSV Prediction</div>
+        <div>
+          <p class="note">Upload a CSV with these columns: <strong>gender, employed, marital_status, age, annual_income, credit_score, no_of_children</strong>.</p>
+          <label class="file-label" for="csvFile">Select CSV file</label>
+          <input id="csvFile" class="upload-file" type="file" accept=".csv" />
+        </div>
+        <button class="button" id="uploadBtn">Upload and Predict</button>
+        <div class="status" id="uploadStatus" style="display:none;"></div>
+      </article>
+    </div>
+  </div>
+
+  <script>
+    const predictBtn = document.getElementById('predictBtn');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const csvFile = document.getElementById('csvFile');
+    const singleResult = document.getElementById('singleResult');
+    const predictionText = document.getElementById('predictionText');
+    const predictionProbability = document.getElementById('predictionProbability');
+    const uploadStatus = document.getElementById('uploadStatus');
+
+    function validateInput(value, field) {
+      if (value === '' || value === null || value === undefined) {
+        throw new Error(field + ' is required.');
+      }
+      return value;
+    }
+
+    async function predictSingle() {
+      try {
+        const payload = {
+          age: Number(validateInput(document.getElementById('age').value, 'Age')),
+          annual_income: Number(validateInput(document.getElementById('income').value, 'Annual Income')),
+          credit_score: Number(validateInput(document.getElementById('credit_score').value, 'Credit Score')),
+          no_of_children: Number(validateInput(document.getElementById('children').value, 'No. of Children')),
+          gender: validateInput(document.getElementById('gender').value, 'Gender'),
+          employed: validateInput(document.getElementById('employment').value, 'Employment Status'),
+          marital_status: validateInput(document.getElementById('marital_status').value, 'Marital Status')
+        };
+
+        const response = await fetch('/predict', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ features: payload })
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.detail || 'Prediction failed.');
+        }
+
+        const data = await response.json();
+        predictionText.innerText = data.predicted_response || 'Unknown';
+        predictionProbability.innerText = data.conversion_probability !== undefined
+          ? `Conversion likelihood: ${(data.conversion_probability * 100).toFixed(1)}%`
+          : 'Conversion probability unavailable.';
+        singleResult.style.display = 'block';
+      } catch (error) {
+        singleResult.style.display = 'block';
+        predictionText.innerText = 'Error';
+        predictionProbability.innerText = error.message;
+      }
+    }
+
+    async function uploadCsv() {
+      try {
+        if (!csvFile.files.length) {
+          throw new Error('No CSV file selected.');
+        }
+        const formData = new FormData();
+        formData.append('file', csvFile.files[0]);
+
+        const response = await fetch('/predict/upload', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.detail || 'Batch prediction upload failed.');
+        }
+
+        const blob = await response.blob();
+        const downloadLink = document.createElement('a');
+        downloadLink.href = URL.createObjectURL(blob);
+        downloadLink.download = 'marketing_campaign_response_prediction_results.csv';
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        downloadLink.remove();
+
+        uploadStatus.style.display = 'block';
+        uploadStatus.textContent = 'CSV prediction completed successfully. Download should start automatically.';
+      } catch (error) {
+        uploadStatus.style.display = 'block';
+        uploadStatus.textContent = `Upload failed: ${error.message}`;
+      }
+    }
+
+    predictBtn.addEventListener('click', predictSingle);
+    uploadBtn.addEventListener('click', uploadCsv);
+  </script>
+</body>
+</html>
