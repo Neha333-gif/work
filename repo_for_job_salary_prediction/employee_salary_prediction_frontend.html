@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Job Salary Prediction</title>
+  <style>
+    body { margin: 0; font-family: Inter, sans-serif; background: #0b1220; color: #e2e8f0; }
+    .page { max-width: 1040px; margin: 0 auto; padding: 28px; }
+    h1 { font-size: 2.2rem; margin-bottom: 0.4em; color: #7dd3fc; }
+    .grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 24px; }
+    .card { background: rgba(15, 23, 42, 0.94); border: 1px solid rgba(96, 165, 250, 0.18); border-radius: 24px; padding: 24px; }
+    label { display: block; margin-bottom: 0.55rem; font-size: 0.95rem; color: #94a3b8; }
+    input, select { width: 100%; padding: 12px 14px; border-radius: 14px; background: #111827; border: 1px solid rgba(148, 163, 184, 0.18); color: #e2e8f0; }
+    button { border: none; border-radius: 14px; padding: 14px 22px; font-size: 1rem; cursor: pointer; background: linear-gradient(135deg, #7dd3fc, #38bdf8); color: #0f172a; font-weight: 700; }
+    .btn-secondary { background: transparent; border: 1px solid rgba(148, 163, 184, 0.3); color: #cbd5e1; }
+    .result { display: grid; gap: 18px; }
+    .metric { background: #111827; border-radius: 20px; padding: 20px; }
+    .metric h3 { margin: 0 0 8px; font-size: 0.95rem; color: #94a3b8; }
+    .metric p { margin: 0; font-size: 1.7rem; font-weight: 700; }
+    .plots { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-top: 18px; }
+    .plot img { width: 100%; border-radius: 18px; border: 1px solid rgba(148, 163, 184, 0.12); }
+    pre { background: #0f172a; padding: 18px; border-radius: 18px; overflow-x: auto; color: #cbd5e1; }
+    @media (max-width: 900px) { .grid, .plots { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <h1>Job Salary Prediction</h1>
+    <div class="grid">
+      <div class="card">
+        <h2>Predict salary from job features</h2>
+        <div class="form-group">
+          <label for="job_title">Job title</label>
+          <input id="job_title" value="Data Analyst" />
+        </div>
+        <div class="form-group">
+          <label for="experience_years">Experience years</label>
+          <input id="experience_years" type="number" min="0" max="50" value="5" />
+        </div>
+        <div class="form-group">
+          <label for="education_level">Education level</label>
+          <select id="education_level">
+            <option>Bachelor</option>
+            <option>Master</option>
+            <option>PhD</option>
+            <option>High School</option>
+            <option>Diploma</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="skills_count">Skills count</label>
+          <input id="skills_count" type="number" min="0" max="50" value="10" />
+        </div>
+        <div class="form-group">
+          <label for="industry">Industry</label>
+          <input id="industry" value="Technology" />
+        </div>
+        <div class="form-group">
+          <label for="company_size">Company size</label>
+          <select id="company_size">
+            <option>Small</option>
+            <option>Medium</option>
+            <option>Large</option>
+            <option>Enterprise</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="location">Location</label>
+          <input id="location" value="USA" />
+        </div>
+        <div class="form-group">
+          <label for="remote_work">Remote work</label>
+          <select id="remote_work">
+            <option>No</option>
+            <option>Yes</option>
+            <option>Hybrid</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="certifications">Certifications</label>
+          <input id="certifications" type="number" min="0" max="20" value="1" />
+        </div>
+        <div style="margin-top:18px; display:flex; gap:12px; flex-wrap:wrap;">
+          <button onclick="predictSalary()">Predict Salary</button>
+          <button class="btn-secondary" onclick="loadMetrics()">Load Metrics</button>
+        </div>
+      </div>
+      <div class="card result">
+        <div class="metric"><h3>Predicted salary</h3><p id="salaryValue">–</p></div>
+        <div class="metric"><h3>Prediction status</h3><p id="statusValue">Waiting</p></div>
+        <div class="metric"><h3>Reported metrics</h3><pre id="metricsReport">Press Load Metrics</pre></div>
+      </div>
+    </div>
+    <div class="plots">
+      <div class="plot"><img id="plot1" src="/results/image/salary_distribution.png" alt="Salary distribution" /></div>
+      <div class="plot"><img id="plot2" src="/results/image/actual_vs_predicted.png" alt="Actual vs predicted" /></div>
+      <div class="plot"><img id="plot3" src="/results/image/feature_importance.png" alt="Feature importance" /></div>
+      <div class="plot"><img id="plot4" src="/results/image/experience_vs_salary.png" alt="Experience vs salary" /></div>
+    </div>
+  </div>
+  <script>
+    async function predictSalary() {
+      const payload = {
+        job_title: document.getElementById('job_title').value,
+        experience_years: Number(document.getElementById('experience_years').value),
+        education_level: document.getElementById('education_level').value,
+        skills_count: Number(document.getElementById('skills_count').value),
+        industry: document.getElementById('industry').value,
+        company_size: document.getElementById('company_size').value,
+        location: document.getElementById('location').value,
+        remote_work: document.getElementById('remote_work').value,
+        certifications: Number(document.getElementById('certifications').value),
+      };
+      const result = await fetch('/predict', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await result.json();
+      if (!result.ok) {
+        alert(data.detail || 'Prediction failed.');
+        return;
+      }
+      document.getElementById('salaryValue').textContent = '$' + data.predicted_salary.toLocaleString();
+      document.getElementById('statusValue').textContent = 'Ready';
+    }
+    async function loadMetrics() {
+      const result = await fetch('/results/metrics');
+      if (!result.ok) {
+        document.getElementById('metricsReport').textContent = 'Unable to load metrics';
+        return;
+      }
+      const data = await result.json();
+      document.getElementById('metricsReport').textContent = data.report;
+      ['plot1','plot2','plot3','plot4'].forEach(id => {
+        const img = document.getElementById(id);
+        img.src = img.src.split('?')[0] + '?v=' + Date.now();
+      });
+    }
+    window.onload = loadMetrics;
+  </script>
+</body>
+</html>
