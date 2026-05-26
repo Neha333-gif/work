@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Taxi Trip Fare Prediction</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #050816;
+      --surface: rgba(14, 23, 45, 0.95);
+      --surface-strong: rgba(255, 255, 255, 0.08);
+      --text: #eef2ff;
+      --muted: #94a3b8;
+      --primary: #4f46e5;
+      --accent: #22c55e;
+      --shadow: 0 24px 60px rgba(0,0,0,0.35);
+      --radius: 28px;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh; background: radial-gradient(circle at 20% 20%, rgba(79, 70, 229, 0.28), transparent 30%), radial-gradient(circle at 85% 10%, rgba(34, 197, 94, 0.16), transparent 25%), linear-gradient(180deg, #09101f 0%, #050816 100%); color: var(--text); }
+    .container { width: min(1120px, 100%); margin: 0 auto; padding: 36px 20px 60px; }
+    header { text-align: center; margin-bottom: 28px; }
+    .headline { font-size: clamp(2.4rem, 3vw, 3.8rem); line-height: 1.05; letter-spacing: -0.04em; margin-bottom: 14px; }
+    .subhead { color: var(--muted); max-width: 720px; margin: 0 auto; font-size: 1rem; }
+    .grid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 24px; }
+    @media (max-width: 940px) { .grid { grid-template-columns: 1fr; } }
+    .card { background: var(--surface); border: 1px solid var(--surface-strong); border-radius: var(--radius); box-shadow: var(--shadow); padding: 28px; backdrop-filter: blur(18px); }
+    .card-title { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; font-size: 1.2rem; }
+    .card-title span { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background: rgba(79, 70, 229, 0.18); color: var(--primary); font-weight: 700; }
+    label { display: block; margin-bottom: 10px; color: var(--text); font-size: 0.95rem; }
+    .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    @media (max-width: 640px) { .form-grid { grid-template-columns: 1fr; } }
+    input, select { width: 100%; border: 1px solid rgba(255,255,255,0.12); border-radius: 16px; padding: 14px 16px; background: rgba(255,255,255,0.04); color: var(--text); font-size: 0.95rem; outline: none; transition: transform 0.25s ease, border-color 0.25s ease; }
+    input:focus, select:focus { border-color: var(--primary); transform: translateY(-1px); }
+    .button { width: 100%; border: none; padding: 16px 20px; border-radius: 18px; background: linear-gradient(135deg, var(--primary), var(--accent)); color: #fff; font-weight: 700; cursor: pointer; transition: transform 0.25s ease, opacity 0.25s ease; }
+    .button:hover { transform: translateY(-2px); opacity: 0.95; }
+    .result-box { margin-top: 24px; padding: 20px; border-radius: 20px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); }
+    .result-value { font-size: 2rem; margin: 8px 0; }
+    .note { color: var(--muted); font-size: 0.95rem; line-height: 1.6; }
+    .upload-area { display: grid; gap: 16px; }
+    .upload-file { display: none; }
+    .file-label { display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 14px 18px; border-radius: 18px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text); cursor: pointer; }
+    .status { padding: 14px 18px; border-radius: 18px; background: rgba(79, 70, 229, 0.12); border: 1px solid rgba(79, 70, 229, 0.18); color: #dbeafe; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <p class="headline">Taxi Trip Fare Prediction</p>
+      <p class="subhead">Estimate the total taxi fare using trip duration, distance, passenger count, base fare, and traffic surge.</p>
+    </header>
+
+    <div class="grid">
+      <article class="card">
+        <div class="card-title"><span>01</span> Single Trip Fare Estimate</div>
+        <div class="form-grid">
+          <div>
+            <label for="tripDuration">Trip Duration (seconds)</label>
+            <input id="tripDuration" type="number" min="0" step="1" placeholder="e.g. 480" />
+          </div>
+          <div>
+            <label for="distanceTraveled">Distance Traveled</label>
+            <input id="distanceTraveled" type="number" min="0" step="0.01" placeholder="e.g. 3.2" />
+          </div>
+          <div>
+            <label for="passengerCount">Passenger Count</label>
+            <input id="passengerCount" type="number" min="1" max="10" placeholder="e.g. 2" />
+          </div>
+          <div style="grid-column: span 2;">
+            <label for="baseFare">Base Fare</label>
+            <input id="baseFare" type="number" min="0" step="0.01" placeholder="e.g. 45.00" />
+          </div>
+          <div style="grid-column: span 2;">
+            <label for="surgeApplied">Traffic Surge Applied</label>
+            <select id="surgeApplied">
+              <option value="0">No surge</option>
+              <option value="1">Surge active</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="button" id="predictBtn">Predict Taxi Fare</button>
+
+        <div class="result-box" id="singleResult" style="display:none;">
+          <div class="note">Prediction result for the current taxi trip details.</div>
+          <p class="result-value" id="predictionText"></p>
+          <p class="note" id="predictionHint"></p>
+        </div>
+      </article>
+
+      <article class="card upload-area">
+        <div class="card-title"><span>02</span> Batch CSV Prediction</div>
+        <div>
+          <p class="note">Upload a CSV with these columns: <strong>trip_duration, distance_traveled, num_of_passengers, fare, surge_applied</strong>.</p>
+          <label class="file-label" for="csvFile">Select CSV file</label>
+          <input id="csvFile" class="upload-file" type="file" accept=".csv" />
+        </div>
+        <button class="button" id="uploadBtn">Upload and Predict</button>
+        <div class="status" id="uploadStatus" style="display:none;"></div>
+      </article>
+    </div>
+  </div>
+
+  <script>
+    const predictBtn = document.getElementById('predictBtn');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const csvFile = document.getElementById('csvFile');
+    const singleResult = document.getElementById('singleResult');
+    const predictionText = document.getElementById('predictionText');
+    const predictionHint = document.getElementById('predictionHint');
+    const uploadStatus = document.getElementById('uploadStatus');
+
+    function validateInput(value, field) {
+      if (value === '' || value === null || value === undefined) {
+        throw new Error(`${field} is required.`);
+      }
+      return value;
+    }
+
+    async function predictSingle() {
+      try {
+        const payload = {
+          trip_duration: Number(validateInput(document.getElementById('tripDuration').value, 'Trip duration')),
+          distance_traveled: Number(validateInput(document.getElementById('distanceTraveled').value, 'Distance travelled')),
+          num_of_passengers: Number(validateInput(document.getElementById('passengerCount').value, 'Passenger count')),
+          fare: Number(validateInput(document.getElementById('baseFare').value, 'Base fare')),
+          surge_applied: Number(validateInput(document.getElementById('surgeApplied').value, 'Traffic surge')),
+        };
+
+        const response = await fetch('/predict', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ features: payload })
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.detail || 'Prediction failed.');
+        }
+
+        const data = await response.json();
+        predictionText.innerText = `Predicted Total Fare: $${Number(data.predicted_total_fare).toFixed(2)}`;
+        predictionHint.innerText = 'Use this estimate to understand expected taxi trip cost.';
+        singleResult.style.display = 'block';
+      } catch (error) {
+        singleResult.style.display = 'block';
+        predictionText.innerText = 'Error';
+        predictionHint.innerText = error.message;
+      }
+    }
+
+    async function uploadCsv() {
+      try {
+        if (!csvFile.files.length) {
+          throw new Error('No CSV file selected.');
+        }
+        const formData = new FormData();
+        formData.append('file', csvFile.files[0]);
+
+        const response = await fetch('/predict/upload', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.detail || 'Batch prediction upload failed.');
+        }
+
+        const blob = await response.blob();
+        const downloadLink = document.createElement('a');
+        downloadLink.href = URL.createObjectURL(blob);
+        downloadLink.download = 'taxi_trip_fare_prediction_results.csv';
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        downloadLink.remove();
+
+        uploadStatus.style.display = 'block';
+        uploadStatus.textContent = 'CSV prediction completed successfully. The download should start automatically.';
+      } catch (error) {
+        uploadStatus.style.display = 'block';
+        uploadStatus.textContent = `Upload failed: ${error.message}`;
+      }
+    }
+
+    predictBtn.addEventListener('click', predictSingle);
+    uploadBtn.addEventListener('click', uploadCsv);
+  </script>
+</body>
+</html>

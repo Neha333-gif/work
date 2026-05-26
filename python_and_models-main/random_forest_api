@@ -1,0 +1,117 @@
+import pandas as pd 
+import numpy as np 
+import mlflow 
+import mlflow.sklearn 
+from sklearn.model_selection import train_test_split 
+from sklearn.preprocessing import StandardScaler, OneHotEncoder 
+from sklearn.compose import ColumnTransformer 
+from sklearn.pipeline import Pipeline 
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score 
+
+
+#mlflow.set_tracking_uri("http://127.0.0.1:5000")
+
+# load data
+
+df = pd.read_csv(r'C:\Users\peepl\Downloads\tele_churn_prediction_api\WA_Fn-UseC_-Telco-Customer-Churn.csv')
+df['TotalCharges'] = pd.to_numeric(df['TotalCharges'], errors = 'coerce')
+df.dropna(inplace = True)
+df.drop('customerID', axis = 1, inplace = True)
+
+# target encoding 
+df['Churn'] = df['Churn'].map({'Yes': 1, 'No': 0})
+
+# features and target 
+x = df.drop('Churn', axis = 1)
+y = df['Churn']
+
+categorical_cols = x.select_dtypes(include = 'object').columns.to_list()
+numerical_cols = x.select_dtypes(include = 'number').columns.to_list()
+
+preprocessor = ColumnTransformer([
+    ('num', StandardScaler(), numerical_cols),
+    ('cat', OneHotEncoder(), categorical_cols)
+])
+
+model = RandomForestClassifier(n_estimators = 200, random_state = 42)
+
+pipeline = Pipeline([
+    ('preprocessor', preprocessor),
+    ('classifier', model)
+])
+
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.2, stratify = y)
+
+with mlflow.start_run(run_name = "randomflow_classifier"):
+    pipeline.fit(x_train, y_train)
+    y_pred = pipeline.predict(x_test)
+    
+    accuracy = accuracy_score(y_test, y_pred)
+
+    mlflow.log_metric("accuracy", accuracy)
+    mlflow.sklearn.log_model(pipeline, 'model')
+
+    print("mlflow run logged succesfully ")
+
+## api 
+
+from flask import Flask, request, jsonify 
+import mlflow.sklearn # sklearn has previously trained, logged models 
+import pandas as pd 
+import numpy as np 
+
+
+app = Flask(__name__) ## creates an instance of flask web application 
+
+# load the logged random forest model from mlflow 
+# when we replace runId then it loads the model 
+
+model = mlflow.sklearn.load_model("runs:/63fa87f888184c9b892060ed56aacd36/model")
+
+@app.route('/api/prediction', methods=['POST']) # defines a endpoint to access
+def predict():
+    data = request.json
+    df = pd.DataFrame([data])
+
+
+    #model.predict_proba return array like [[proba_no], [proba_yes]]
+
+    prob = model.predict_proba(df)[0][1]
+
+    pred = "Yes" if prob > 0.5 else "No"
+
+    # returns json response containing churn probablities 
+
+    return jsonify({
+        "churn_probablity" : round(prob, 4),
+        "churn_prediction" : pred
+    })
+
+
+@app.route('/app/bulkprediction', methods = ["POST"]) # bulk inputs 
+def bulk_predict():
+    data = request.json['data'] # accepts list of records 
+
+    df = pd.DataFrame(data)
+
+    # gets probablity for positive class and negative class 
+
+    probs = model.predict_proba(df)[:, 1]
+
+    preds = ["Yes" if p > 0.5 else "No" for p in probs]
+
+    # returns json with two lists 
+
+    return jsonify ({
+        "churn_probablities" : [round(p, 4) for p in probs],
+        "churn_predictions" : preds
+    })
+
+@app.route('/ping', methods = ["GET"]) # simple health check 
+def ping():
+    return "randomForest ApI is alive!", 200 
+
+if __name__ == '__main__':
+    app.run(port = 5001, debug = True)
+

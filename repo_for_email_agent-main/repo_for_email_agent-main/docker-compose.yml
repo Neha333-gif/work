@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  email-agent:
+    build: .
+    ports:
+      - "5050:5050"
+    environment:
+      - FLASK_ENV=development
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: python app.py

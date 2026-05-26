@@ -1,0 +1,38 @@
+Credit Risk Analysis Model Evaluation Report
+=============================================
+
+Dataset shape: (700, 9)
+Best model: Logistic Regression
+
+Best model metrics:
+  Accuracy : 0.8143
+  Precision: 0.6571
+  Recall   : 0.6216
+  F1-Score : 0.6389
+  ROC-AUC  : 0.8670
+
+Detailed model comparison:
+
+Logistic Regression:
+  Accuracy : 0.8143
+  Precision: 0.6571
+  Recall   : 0.6216
+  F1-Score : 0.6389
+  ROC-AUC  : 0.8670
+
+Decision Tree:
+  Accuracy : 0.7643
+  Precision: 0.5556
+  Recall   : 0.5405
+  F1-Score : 0.5479
+  ROC-AUC  : 0.6614
+
+Random Forest:
+  Accuracy : 0.8357
+  Precision: 0.7692
+  Recall   : 0.5405
+  F1-Score : 0.6349
+  ROC-AUC  : 0.8334
+
+Feature columns:
+age, ed, employ, address, income, debtinc, creddebt, othdebt

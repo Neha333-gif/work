@@ -1,0 +1,2311 @@
+# ASSIGNMENT QUESTIONS
+# ===================
+
+# Question 1: Calculate the product of first 10 natural numbers
+# Your code here
+
+nat_numbers = list(range(1,11))
+product = 1
+for nat_num in nat_numbers 
+product = product * nat_num
+print(f"products of natural_numbers is {product}")
+
+
+# Question 2: Find the remainder when 156 is divided by 7
+# Your code here
+
+remainder = 156 % 7 
+print(f"the remainder is {remainder}")
+
+
+# Question 3: Calculate the square of 25
+# Your code here
+
+square_of_25 = 25**2
+print(f"square of 25 is {square_of_25}")
+
+
+# Question 4: Find the cube root of 125
+# Your code here
+
+cube_root_125 = 125**(1/3)
+print(f"cube_root of 125 is {cube_root_125}")
+
+
+# Question 5: Calculate the sum of digits in number 12345
+# Your code here
+
+number = 12345
+sum_of_digits = sum(int(digit) for digit in str(number))
+sum_of_digits
+
+# Question 6: Check if 97 is a prime number
+# Your code here
+
+num = 97
+is_prime = all (num%i!=0 for i in range (2 , int(num**0.5)+1))
+print(f"{num} is {''if is_prime else 'not'} a prime_number")
+
+# or 
+
+# Question 6: Check if 97 is a prime number
+# Your code here
+
+def is_prime(n):
+    for i in range(1,n-1):
+          if(n%i == 0):
+               return False
+          return True
+   
+
+is_prime(97)
+
+
+# Question 7: Find the factorial of 8
+# Your code here
+
+def factorial(n):
+    if n == 0 or n == 1:
+        return 1
+    return n * factorial(n -1)
+
+fact = factorial(8)
+fact
+
+# or 
+
+def factorial_of_num(n):
+    fact = 1
+    for i in range(1,n):
+        fact = fact * i
+        print(f"factorial of n is : {fact}")
+
+factorial_of_num(8)
+
+# Question 8: Calculate the average of numbers: 15, 23, 31, 42, 56
+# Your code here
+
+numbers = [15, 23, 31, 42, 56]
+avg_of_numbers = sum(numbers)/len(numbers)
+avg_of_numbers
+
+
+# Question 9: Find the greatest common divisor (GCD) of 48 and 36
+# Your code here
+
+def gcd(a,b):
+    while b:
+        a, b = b, a%b 
+    return a
+
+gcd_a = gcd(36,48)
+gcd_a
+
+# or 
+
+gcd_num = [ max(i for i in range(1, min(36,48)) if 48 % i == 0 and 36 % i == 0)]
+gcd_num
+
+
+# Question 10: Calculate the sum of first 20 odd numbers
+# Your code here 
+
+
+def sum_of_odd(num):
+   sum_odds = 0
+   for n in range (1, num + 1):
+      if n%2!=0:
+         sum_odds+= num
+   return sum_odds
+
+result = sum_of_odd(20)
+print("Sum of odd numbers up to 20 =", result)
+
+# or 
+
+odd_num = [num for num in range(1, 20) if num%2 != 0]
+odd_num
+-----------------
+float
+----------------
+
+# FLOAT DATATYPE ASSIGNMENT
+# =========================
+
+# SOLVED EXAMPLE
+# --------------
+# Question: Calculate the area of a circle with radius 5.5
+print("SOLVED EXAMPLE:")
+print("Calculate the area of a circle with radius 5.5")
+import math
+radius = 5.5
+area = math.pi * radius ** 2
+print(f"Radius: {radius}")
+print(f"Area: {area:.2f}")
+print("-" * 50)
+
+# ASSIGNMENT QUESTIONS
+# ===================
+
+
+# Question 1: Calculate the average of 3.14, 2.718, 1.618, 0.577
+# Your code here
+
+numbers = [3.14, 2.718, 1.618, 0.577]
+avg_of_numbers = sum(numbers)/len(numbers)
+print(f"avg of numbers : {avg_of_numbers:.2f}")
+
+
+# Question 2: Convert 98.6 Fahrenheit to Celsius (F = C * 9/5 + 32)
+# Your code here
+
+def convert_to_celcius(num):
+    celcius = (num - 32)*(5/9)
+    print(f"the value of celcius is: {celcius:.2f}")
+
+result = convert_to_celcius(98.6)
+result 
+
+
+# Question 3: Calculate the compound interest on $1000 at 5.5% for 3 years
+# Your code here
+
+def com_int(principal, rate, time):
+    amount = principal * (1 + rate) ** time 
+    compound_interest = amount - principal
+    print("compound interest is {compound_interest:.2f}")
+
+result = com_int(1000, 5.5, 3)
+    
+
+
+# Question 4: Find the hypotenuse of a right triangle with sides 3.5 and 4.2
+# Your code here
+
+def find_hyp(side_1, side_2):
+    hyp = (side_1**2 + side_2**2) ** (1/2)
+    print(f"hypotenuese is : {hyp:.2f}")
+
+result = find_hyp(3.5, 4.2)
+
+
+
+# Question 5: Calculate the volume of a sphere with radius 7.8
+# Your code here
+import math
+def volume_cube(radius):
+    volume = ((4/3)*math.pi*(radius**3))
+    print(f"volume of cube is: {volume:.2f}")
+
+result = volume_cube(7.8)
+result
+    
+
+# Question 6: Round 3.14159 to 3 decimal places
+# Your code here
+
+def round_of(num):
+    print(f"number is : {num:.3f}")
+
+result = round_of(3.14159)
+result
+
+
+# Question 7: Calculate the percentage: 45 out of 67
+# Your code here
+
+def calc_percentage(num1, num2):
+    
+    percent = (num1/num2)*100
+    print(f"percentage is : {percent:.2f} %")
+
+result = calc_percentage(45, 67)
+result
+
+# Question 8: Find the square root of 23.456
+# Your code here
+
+def square_root(num1):
+    
+    square_root = (num1)**(1/2)
+    print(f"square root is : {square_root:.2f}")
+
+result = square_root(23.456)
+result
+
+# Question 9: Calculate the simple interest: Principal=2500, Rate=6.5%, Time=2.5 years
+# Your code here
+
+def simp_int(principal, rate, time):
+    
+    simple_interest = principal*rate*time
+    print(f"simple interest is : {simple_interest:.2f}")
+
+result = simp_int(2500, 6.5, 2.5)
+result
+
+# Question 10: Convert 45.7 degrees to radians
+# Your code here 
+
+import math 
+
+def convert_to_radians(degrees):
+    
+    radian_value = math.radians(degrees)
+    print(f"the {degrees} converted to radian gives value : {radian_value:.2f}")
+
+result = convert_to_radians(45.7) 
+result
+
+----------------------
+strings
+----------------------
+
+# STRING DATATYPE ASSIGNMENT - 50 QUESTIONS
+# ========================================
+
+# SOLVED EXAMPLE
+# --------------
+# Question: Count vowels in the string "Hello World"
+print("SOLVED EXAMPLE:")
+print("Count vowels in the string 'Hello World'")
+text = "Hello World"
+vowels = "aeiouAEIOU"
+count = sum(1 for char in text if char in vowels)
+print(f"String: {text}")
+print(f"Number of vowels: {count}")
+print("-" * 50)
+
+# or 
+
+str_name = "Hello World"
+vowels = "aeiou"
+is_there_vowel = [sum(1 for i in str_name.lower() if i in vowels)]
+is_there_vowel
+
+
+# STRING DATATYPE ASSIGNMENT - 50 QUESTIONS
+# ========================================
+
+# SOLVED EXAMPLE
+# --------------
+# Question: Count vowels in the string "Hello World"
+print("SOLVED EXAMPLE:")
+print("Count vowels in the string 'Hello World'")
+text = "Hello World"
+vowels = "aeiouAEIOU"
+count = sum(1 for char in text if char in vowels)
+print(f"String: {text}")
+print(f"Number of vowels: {count}")
+print("-" * 50)
+
+# ASSIGNMENT QUESTIONS (50 QUESTIONS)
+# ==================================
+
+# Question 1: Reverse the string "Python Programming"
+# Your code here
+
+def reverse_string(string_a):
+    string_b = string_a[::-1]
+    return string_b 
+
+result = reverse_string("Python Programming")
+result
+
+
+# Question 2: Check if "racecar" is a palindrome
+# Your code here
+
+def is_palindrome(string_a):
+    string_b = string_a[::-1]
+    print(f"{string_a} is {''if (string_a == string_b) else 'not'} a palindrome")
+
+result = is_palindrome("racecar")
+result
+
+
+# Question 3: Count the number of words in "Python is a great programming language"
+# Your code here
+
+def count_words(text):
+    words = text.split()
+    return len(words)
+
+result = count_words("Python is a great programming language")
+result
+
+
+# Question 4: Convert "hello world" to title case
+# Your code here
+
+def convert_to_title(text):
+    words = text.title()
+    return words 
+
+result = convert_to_title("hello world")
+result
+
+
+# Question 5: Find the length of string "Data Science"
+# Your code here
+
+def find_length(text):
+    return len(text)
+
+result = find_length("Data Science")
+result
+
+
+
+# Question 6: Replace all spaces with underscores in "Machine Learning"
+# Your code here
+
+def under_scores(text):
+    return text.replace(" ","_")
+
+result = under_scores("Machine Learning")
+result
+
+
+# Question 7: Check if "python" is in "Python Programming Language"
+# Your code here
+
+substring = "python"
+string = "Python Programming Language"
+max = [(f"{substring } is present" if substring.lower() in string.lower() else f"not present")]
+max
+
+
+# Question 8: Extract the first 5 characters from "Artificial Intelligence"
+# Your code here
+
+def find_sub_part(text):
+    part = text[0:4:1]
+    return part 
+
+result = find_sub_part("Artificial Intelligence")
+result
+
+
+# Question 9: Convert "UPPERCASE" to lowercase
+# Your code here
+
+def lower_case(text):
+    lower = text.lower()
+    return lower 
+
+result = lower_case("UPPERCASE")
+result
+
+
+# Question 10: Remove all vowels from "Computer Science"
+# Your code here
+
+def rem_vowel(text):
+    vowel = "aeiou"
+    text1 = text.lower()
+    return ''.join(char for char in text1 if char not in vowel)
+
+result = rem_vowel("Computer Science")
+result
+
+
+# Question 11: Find the most frequent character in "mississippi"
+# Your code here
+
+def freq(text):
+    freq_char = max(set(text), key = text.count)
+    return freq_char 
+
+result = freq("mississippi")
+result
+
+
+# Question 12: Check if two strings are anagrams: "listen" and "silent"
+# Your code here
+
+from collections import Counter
+def ana_grams(text1, text2):
+    print (f" {text1} and {text2} are {''if (Counter(text1) == Counter(text2)) else 'not'} anagrams")
+
+result = ana_grams("listen", "silent")
+result
+
+
+# Question 13: Capitalize first letter of each word in "python programming language"
+# Your code here
+
+def capt(text):
+    return text.title()
+
+result = capt("python programming language")
+result
+
+# Question 14: Count consonants in "Hello World"
+# Your code here
+
+def count_consonant (text):
+    vowel = "aeiou "
+    text1 = text.lower()
+    consonant_count = sum(1 for char in text1 if char not in vowel)
+    return consonant_count
+
+result = count_consonant("Hello World")
+result
+
+# Question 15: Find the longest word in "Python is a programming language"
+# Your code here
+
+def find_max(text):
+    max_value = max(text.split(), key = len)
+    return max_value 
+
+result = find_max("Python is a programming language")
+result
+
+## or else 
+
+def longest_word(text):
+    words = text.split()
+    longest = words[0] 
+    for word in words:
+        if len(word) > len(longest):
+            longest = word
+    return longest
+
+
+result = longest_word("Python is a programming language")
+result
+
+
+# Question 16: Remove all punctuation from "Hello, World! How are you?"
+# Your code here
+
+import re 
+
+def punct(text):
+    return re.sub(r'[^\w\s]','',text)
+
+result = punct("Hello, World! How are you?")
+result
+
+
+# Question 17: Check if string starts with "Python"
+# Your code here
+
+
+def start(text):
+    words = text.split()
+    print(f"the string {'' if words[0].lower() == "python" else 
+    'does not'} starts with python")
+
+result = start("python is a language")
+result
+
+
+# Question 18: Find the index of first occurrence of 'o' in "Hello World"
+# Your code here
+
+def index(text):
+    return text.find("o")
+
+result = index("Hello World")
+result
+
+# Question 19: Split string "apple,banana,orange" by comma
+# Your code here
+
+def split_words(text):
+    return text.split(",")
+
+result = split_words("apple,banana,orange")
+result
+    
+
+# Question 20: Join list ['Python', 'is', 'awesome'] with spaces
+# Your code here
+
+result = ['Python', 'is', 'awesome'] 
+text = " ".join(result)
+text
+
+
+# Question 21: Check if string contains only digits: "12345"
+# Your code here
+
+def is_digits(num):
+    return num.isdigit()
+
+result = is_digits("12345")
+result 
+
+# Question 22: Check if string contains only letters: "HelloWorld"
+# Your code here
+
+def is_alpha(num):
+    return num.isalpha()
+
+result = is_alpha("HelloWorld")
+result
+
+# Question 23: Convert "hello world" to "hElLo WoRlD" (alternating case)
+# Your code here
+
+def alter(text):
+    words = text.split()
+    result = []
+    for word in words:
+        altered_word = ''
+        for i in range(len(word)):
+            if i%2 == 0 :
+                altered_word += word[i].lower()
+            else:
+                altered_word += word[i].upper()
+        result.append(altered_word)
+    return ' '.join(result)
+
+
+
+result = alter("hello world")
+result
+
+
+# Question 24: Find all positions of 'a' in "banana"
+# Your code here
+
+def find_a(text):
+    positions = [i for i,char in enumerate(text) if char == 'a']
+    print(positions)
+
+result = find_a("banana")
+result
+
+
+
+# Question 25: Remove leading and trailing whitespace from "  Hello World  "
+# Your code here
+
+def remove_space(text):
+    return text.strip()
+
+result = remove_space("  Hello World  ")
+result
+
+
+# Question 26: Check if string ends with "ing": "programming"
+# Your code here
+
+def end_ing(text):
+    x = len(text)
+    part = text[(x-3):(x-0):1]
+    if(part == "ing"):
+        print("It ends with ing")
+    else:
+        print("does not end with ing")
+
+result = end_ing("programming")
+result
+
+
+# Question 27: Replace first occurrence of 'o' with '0' in "Hello World"
+# Your code here
+
+def rep_lace(text):
+    part = text.replace('o','0',1)
+    return part 
+
+result = rep_lace("Hello World")
+result
+
+
+
+# Question 28: Find the shortest word in "Python is a programming language"
+# Your code here
+
+def shortest_word(text):
+    part = min(text.split(), key = len)
+    return part
+
+result = shortest_word("Python is a programming language")
+result
+
+
+# Question 29: Count words that start with 'p' in "Python programming is powerful"
+# Your code here
+
+
+def words_start(text):
+    words = text.split()
+    count = 0
+    for word in words :
+        if(word[0].lower() == 'p'):
+            count+=1
+    return count
+
+result = words_start("Python programming is powerful")
+result
+
+
+# Question 30: Reverse words in "Hello World Python"
+# Your code here
+
+
+def rev_erse(text):
+    words = text.split()[::-1]
+    return ' '.join(words)
+
+
+result = rev_erse("Hello World Python")
+result
+
+
+# Question 31: Check if string is a valid email format: "user@example.com"
+# Your code here
+
+import re 
+
+def valid_email(text):
+      is_valid_email = bool(re.match(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", text))
+      return is_valid_email
+
+result = valid_email("user@example.com")
+result
+
+
+
+# Question 32: Extract domain from "https://www.example.com/path"
+# Your code here
+
+
+import re 
+def domain_name(email):
+    parts = email.split("//")[1].split("/")
+    valid_tld = ['org', 'com', 'uk']
+    domain_pattern = r'^[a-zA-Z0-9-]+\.([a-zA-Z]{2,})$'
+     
+    domain = []
+    for part in parts: 
+        clean_part = part.replace("www.","")
+        match = re.match(domain_pattern,clean_part)
+        if match and match.group(1) in valid_tld:
+            domain.append(clean_part)
+    
+    return domain
+
+result = domain_name("https://www.example.com/path")
+result
+
+
+
+# Question 33: Count lines in multi-line string
+# Your code here
+
+def count_lines(text):
+    lines_count = len(text.splitlines())
+    return lines_count
+ 
+result = count_lines("""there are 
+                     3 lines in 
+                     this text""")
+result
+
+
+
+# Question 34: Find common characters between "hello" and "world"
+# Your code here
+
+def common_char(text1, text2):
+    set1 = set(text1)
+    set2 = set(text2)
+    chars = set1&set2
+
+    for char in chars:
+        print(char)
+
+reuslt = common_char("hello","world")
+result
+
+
+# Question 35: Check if string is a valid phone number: "+1-555-123-4567"
+# Your code here
+
+import re
+
+def phone_number(num):
+    is_valid_phone = bool(re.match(r"^\+\d{1,3}-\d{3}-\d{3}-\d{4}$", num))
+    return is_valid_phone 
+
+result = phone_number("+1-555-123-4567")
+result
+
+# Question 36: Extract numbers from "abc123def456ghi789"
+# Your code here
+
+import re 
+
+def match_num(num):
+    numbers = "".join(char for char in num if char.isdigit())
+    return numbers 
+
+result = match_num("abc123def456ghi789")    
+result
+
+    
+
+# Question 37: Convert "snake_case" to "camelCase"
+# Your code here
+
+def con_vert(text):
+    return "".join(word.capitalize() for word in text.split("_"))
+
+result = con_vert("snake_case")
+result
+
+
+# Question 38: Check if string is a valid palindrome ignoring case: "A man a plan a canal Panama"
+# Your code here
+
+def palin_drome(text):
+    
+    text1 = "".join(text.lower().replace(" ",""))
+    text_a = text[::-1]
+    text2 = text_a.lower().replace(" ","")
+    if(text1 == text2):
+        print("It is a palindorme")
+        print(text2)
+    else: 
+        print("It is not a palindrome")
+        print(text2)
+
+
+result = palin_drome("A man a plan a canal Panama")
+
+
+# Question 39: Find the most common word in "the quick brown fox jumps over the lazy dog"
+# Your code here
+
+def freq_uency(text):
+    words = text.split()
+    most_common = max(set(words), key = words.count)
+    return most_common 
+
+result = freq_uency("the quick brown fox jumps over the lazy dog")
+result
+    
+# Question 40: Generate acronym from "National Aeronautics and Space Administration"
+# Your code here
+
+def acronym(text):
+    text1 = text.replace(" ","")
+    return "".join(char for char in text1 if (char == char.upper()))
+
+result = acronym("National Aeronautics and Space Administration")
+result
+
+
+# Question 41: Check if string contains balanced parentheses: "((()))"
+# Your code here
+
+def count_paranthesis(text):
+    count1 = 0
+    for char in text: 
+        if char == "(":
+            count1 = count1 + 1
+            print(f"count for paranthesis is {count1}")
+        elif  char == ")" :
+            count1 = count1 - 1
+            print(f"count for paranthesis is {count1}")
+        if (count1 == 0):
+            print(f"count for paranthesis is equal")
+            break 
+
+result = count_paranthesis("((()))")
+result
+
+
+# Question 42: Convert "hello world" to Morse code
+# Your code here
+
+def morse_code(text):
+    morse_dict = { 'A':'.-', 'B':'-.', 'C':'- -', 'D':'-.-', 'E':'.--', 'F':'.-.-',
+                   'G':'-..', 'H':'---', 'I':'-.-.', 'J':'.---',  'K':'._._-',
+                   'L': '.-..', 'M': '--', 'N': '-.',  'O': '---', 'P': '.--.', 
+                   'Q': '--.-', 'R': '.-.', 'S': '...', 'T': '-', 'U': '..-', 
+                   'V': '...-', 'W': '.--', 'X': '-..-', 'Y': '-.--', 'Z': '--..'}
+    morse = " ".join(morse_dict.get(char.upper(), '') for char in text if char.isalpha())
+    return morse 
+
+result = morse_code("hello world")
+result    
+    
+
+# Question 43: Find the longest common substring between "programming" and "grammar"
+print("\nQuestion 43: Find the longest common substring between 'programming' and 'grammar'")
+# Your code here
+
+
+# Question 44: Check if string is a valid URL: "https://www.google.com"
+# Your code here
+
+import re 
+
+def valid_url(text):
+    is_valid = bool(re.match(r"^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?$", url))
+    return is_valid 
+
+result = valid_url("https://www.google.com")
+result
+
+# Question 45: Extract all words with length > 5 from "Python programming is amazing and powerful"
+print("\nQuestion 45: Extract all words with length > 5 from 'Python programming is amazing and powerful'")
+# Your code here
+
+def extract_words (text):
+    long_words = [word for word in text.split() if len(word)>5]
+    return long_words
+
+result = extract_words("Python programming is amazing and powerful")
+result
+
+# Question 46: Convert "hello world" to Pig Latin
+print("\nQuestion 46: Convert 'hello world' to Pig Latin")
+# Your code here
+
+# Question 47: Check if string is a valid IPv4 address: "192.168.1.1"
+print("\nQuestion 47: Check if string is a valid IPv4 address: '192.168.1.1'")
+# Your code here
+
+# Question 48: Find all substrings of "abc"
+print("\nQuestion 48: Find all substrings of 'abc'")
+# Your code here
+
+# Question 49: Convert "hello world" to ROT13 encoding
+print("\nQuestion 49: Convert 'hello world' to ROT13 encoding")
+# Your code here
+
+# Question 50: Check if string is a valid credit card number: "4532015112830366"
+print("\nQuestion 50: Check if string is a valid credit card number: '4532015112830366'")
+# Your code here 
+
+
+# LIST DATATYPE ASSIGNMENT - 50 QUESTIONS
+# ======================================
+
+# SOLVED EXAMPLE
+# --------------
+# Question: Find the maximum and minimum values in a list
+print("SOLVED EXAMPLE:")
+print("Find the maximum and minimum values in a list")
+numbers = [23, 45, 12, 67, 34, 89, 56]
+max_val = max(numbers)
+min_val = min(numbers)
+print(f"List: {numbers}")
+print(f"Maximum: {max_val}")
+print(f"Minimum: {min_val}")
+print("-" * 50)
+
+# ASSIGNMENT QUESTIONS (50 QUESTIONS)
+# ==================================
+
+# Question 1: Create a list of first 10 square numbers
+print("Question 1: Create a list of first 10 square numbers")
+# Your code here
+
+squares = [i**2 for i in range(1,11)]
+print(f"list:{squares}")
+
+# Question 2: Find the sum of all even numbers in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+print("\nQuestion 2: Find the sum of all even numbers in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]")
+# Your code here
+
+sum_of_square = sum(num for num in numbers if num%2==0)
+print(f"the sum of numbers are :{sum_of_square}")
+
+
+# Question 3: Remove duplicates from [1, 2, 2, 3, 4, 4, 5, 6, 6, 7]
+print("\nQuestion 3: Remove duplicates from [1, 2, 2, 3, 4, 4, 5, 6, 6, 7]")
+# Your code here
+
+num = [1, 2, 2, 3, 4, 4, 5, 6, 6, 7]
+rem_dup = list(set(num))
+rem_dup
+
+or 
+
+
+def ret_un(num):
+    unique = []
+    for number in num:
+        if number  not in unique:
+             unique.append(number)
+    return unique
+    
+result = ret_un([1, 2, 2, 3, 4, 4, 5, 6, 6, 7])
+result
+   
+
+
+
+# Question 4: Sort the list [64, 34, 25, 12, 22, 11, 90] in descending order
+print("\nQuestion 4: Sort the list [64, 34, 25, 12, 22, 11, 90] in descending order")
+# Your code here
+
+list_a = [64, 34, 25, 12, 22, 11, 90]
+list_a.sort(reverse = 'True')
+list_a
+
+# Question 5: Find the average of numbers in [15, 23, 31, 42, 56, 78, 91]
+print("\nQuestion 5: Find the average of numbers in [15, 23, 31, 42, 56, 78, 91]")
+# Your code here
+
+numbers = [15, 23, 31, 42, 56, 78, 91]
+avera_ge = sum(numbers)/len(numbers)
+avera_ge
+
+# Question 6: Create a list of first 15 Fibonacci numbers
+print("\nQuestion 6: Create a list of first 15 Fibonacci numbers")
+# Your code here
+
+fib = [0, 1]
+for i in range(2,15):
+    fib .append(fib[i-1] + fib[i-2])
+    return fib 
+
+
+
+# Question 7: Find the second largest number in [45, 67, 23, 89, 12, 34, 78]
+print("\nQuestion 7: Find the second largest number in [45, 67, 23, 89, 12, 34, 78]")
+# Your code here
+
+number =  [45, 67, 23, 89, 12, 34, 78]
+sorted_num = sorted(number, reverse = 'false')
+second_largest = sorted_num[1]
+second_largest
+
+# Question 8: Reverse the list [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+print("\nQuestion 8: Reverse the list [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]")
+# Your code here
+
+list_a = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+part_a = list_a[::-1]
+part_a
+
+# Question 9: Count how many times 5 appears in [1, 5, 2, 5, 3, 5, 4, 5, 6]
+print("\nQuestion 9: Count how many times 5 appears in [1, 5, 2, 5, 3, 5, 4, 5, 6]")
+# Your code here
+
+num = [1, 5, 2, 5, 3, 5, 4, 5, 6]
+count = 0
+for i in num:
+    if(i == 5):
+        count = count + 1
+print(f"{count}")
+
+
+
+
+# Question 10: Create a list of prime numbers between 1 and 50
+print("\nQuestion 10: Create a list of prime numbers between 1 and 50")
+# Your code here
+
+def is_prime(n):
+    count = 0
+    if n<2 :
+        print('{n}')
+        return False
+    for i in range(2,50):
+        if n%i == 0:
+            count = count + 1
+    if count < 2:
+        print(f"{n}")
+        return True
+    return False
+
+prime_numbers = [n for n in range(1,51) if is_prime(n)]
+prime_numbers
+
+
+    
+
+# Question 11: Flatten nested list [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+print("\nQuestion 11: Flatten nested list [[1, 2, 3], [4, 5, 6], [7, 8, 9]]")
+# Your code here
+
+nested = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+flattened = [num for sublist in nested for num in sublist]
+flattened
+
+# or 
+
+nested = [[1, 5, 3], [4, 5, 6], [7, 8, 9]]
+for sublist in nested:
+    for num in sublist:
+        flattened.append(num)
+print(f"{flattened}")
+
+
+# Question 12: Find common elements between [1, 2, 3, 4, 5] and [4, 5, 6, 7, 8]
+print("\nQuestion 12: Find common elements between [1, 2, 3, 4, 5] and [4, 5, 6, 7, 8]")
+# Your code here
+
+nest_a = [1, 2, 3, 4, 5]
+nest_b = [4, 5, 6, 7, 8]
+
+common_elements = []
+
+for i in nest_a:
+    for j in nest_b:
+        if i == j:
+            common_elements.append(i)
+print(f"{common_elements}")
+
+#or 
+
+nest_a = [1, 2, 3, 4, 5]
+nest_b = [4, 5, 6, 7, 8]
+
+nest_c = []
+
+nest_c = set(nest_a) & set(nest_b)
+
+print(f"{nest_c}")
+
+
+# Question 13: Create a list of lists: [[1, 2], [3, 4], [5, 6]]
+print("\nQuestion 13: Create a list of lists: [[1, 2], [3, 4], [5, 6]]")
+# Your code here
+
+list_a = [1, 2]
+list_b = [3, 4]
+list_c = [5, 6]
+list_d = []
+list_d.append(list_a)
+list_d.append(list_b)
+list_d.append(list_c)
+list_d
+
+# Question 14: Find the sum of each sublist in [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+print("\nQuestion 14: Find the sum of each sublist in [[1, 2, 3], [4, 5, 6], [7, 8, 9]]")
+# Your code here
+
+nested = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+for sublist in nested:
+    print(f"{sum(sublist)}")
+
+
+# Question 15: Transpose the matrix [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+print("\nQuestion 15: Transpose the matrix [[1, 2, 3], [4, 5, 6], [7, 8, 9]]")
+# Your code here
+
+matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+transposed = []
+for i in range(len(matrix[0])):
+    new_row = []
+    for j in range(len(matrix)):
+        new_row.append(matrix[j][i])
+    transposed.append(new_row)
+print(f"Transposed matrix: {transposed}")
+print("-" * 50)
+
+
+# Question 16: Find the maximum value in each sublist of [[1, 5, 3], [9, 2, 7], [4, 8, 6]]
+print("\nQuestion 16: Find the maximum value in each sublist of [[1, 5, 3], [9, 2, 7], [4, 8, 6]]")
+# Your code here
+
+nested = [[1, 5, 3], [9, 2, 7], [4, 8, 6]]
+max_value = []
+for sublist in nested:
+    new_max = max(sublist)
+    max_value.append(new_max)
+print(max_value)
+
+
+
+# Question 17: Create a 3D list: [[[1, 2], [3, 4]], [[5, 6], [7, 8]]]
+print("\nQuestion 17: Create a 3D list: [[[1, 2], [3, 4]], [[5, 6], [7, 8]]]")
+# Your code here
+
+
+list_a = [[[1, 2], [3, 4]], [[5, 6], [7, 8]]]
+print(f"{list_a}")
+
+
+# Question 18: Find the sum of all elements in 3D list [[[1, 2], [3, 4]], [[5, 6], [7, 8]]]
+print("\nQuestion 18: Find the sum of all elements in 3D list [[[1, 2], [3, 4]], [[5, 6], [7, 8]]]")
+# Your code here
+
+nested = [[[1, 2], [3, 4]], [[5, 6], [7, 8]]]
+total_sum = 0
+for sublist in nested:
+    for list_s in sublist:
+        for num in list_s:
+            total_sum += num
+print(f"{total_sum}")
+
+
+# Question 19: Extract all even numbers from nested list [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+print("\nQuestion 19: Extract all even numbers from nested list [[1, 2, 3], [4, 5, 6], [7, 8, 9]]")
+# Your code here
+
+nested = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+even_nums = []
+for sublist in nested:
+    for num in sublist:
+        if(num % 2 == 0):
+            even_nums.append(num)
+print(f"{even_nums}")
+
+
+# Question 20: Create a list of mixed data types: [1, "hello", 3.14, True, [1, 2, 3]]
+print("\nQuestion 20: Create a list of mixed data types: [1, 'hello', 3.14, True, [1, 2, 3]]")
+# Your code here
+
+list = []
+list.append(1)
+list.append("hello")
+list.append(3.14)
+list.append(True)
+list.append([1,2,3])
+list
+
+# Question 21: Find the length of each string in ["apple", "banana", "cherry", "date"]
+print("\nQuestion 21: Find the length of each string in ['apple', 'banana', 'cherry', 'date']")
+# Your code here
+
+string_group = ["apple", "banana", "cherry", "date"]
+for word in string_group:
+    print(f"{word}_length = {len(word)}")
+
+
+# Question 22: Create a list of tuples: [(1, 'a'), (2, 'b'), (3, 'c')]
+print("\nQuestion 22: Create a list of tuples: [(1, 'a'), (2, 'b'), (3, 'c')]")
+# Your code here
+
+tuple_list = []
+tuple_list.append((1,'a'))
+tuple_list.append((2,'b'))
+tuple_list.append((3,'c'))
+tuple_list
+
+# Question 23: Extract first element from each tuple in [(1, 'a'), (2, 'b'), (3, 'c')]
+print("\nQuestion 23: Extract first element from each tuple in [(1, 'a'), (2, 'b'), (3, 'c')]")
+# Your code here
+
+t_tuple = [(1, 'a'), (2, 'b'), (3, 'c')]
+first_element = [t[0] for t in t_tuple ]
+first_element
+
+# Question 24: Create a list of dictionaries: [{'name': 'Alice', 'age': 25}, {'name': 'Bob', 'age': 30}]
+print("\nQuestion 24: Create a list of dictionaries: [{'name': 'Alice', 'age': 25}, {'name': 'Bob', 'age': 30}]")
+# Your code here
+
+dicts = [{'name': 'Alice', 'age': 25}, {'name': 'Bob', 'age': 30}]
+dicts
+
+
+# Question 25: Extract all 'name' values from list of dictionaries
+print("\nQuestion 25: Extract all 'name' values from list of dictionaries")
+# Your code here
+
+dicts = [{'name': 'Alice', 'age': 25}, {'name': 'Bob', 'age': 30}]
+name = [d['name'] for d in dicts]
+name
+
+
+# Question 26: Find the person with maximum age in list of dictionaries
+print("\nQuestion 26: Find the person with maximum age in list of dictionaries")
+# Your code here
+
+dicts = [{'name': 'Alice', 'age': 25}, {'name': 'Bob', 'age': 30}]
+age = [max(d['age'] for d in dicts)]
+age
+
+# Question 27: Create a 4D list: [[[[1, 2], [3, 4]], [[5, 6], [7, 8]]], [[[9, 10], [11, 12]], [[13, 14], [15, 16]]]]
+print("\nQuestion 27: Create a 4D list: [[[[1, 2], [3, 4]], [[5, 6], [7, 8]]], [[[9, 10], [11, 12]], [[13, 14], [15, 16]]]]")
+# Your code here
+
+list_4d = [[[[1, 2], [3, 4]], [[5, 6], [7, 8]]], [[[9, 10], [11, 12]], [[13, 14], [15, 16]]]]
+list_4d
+
+# Question 28: Find the maximum value in 4D list
+print("\nQuestion 28: Find the maximum value in 4D list")
+# Your code here
+
+list_4d = [[[[1, 2], [3, 4]], [[5, 6], [7, 8]]], [[[9, 10], [11, 12]], [[13, 14], [15, 16]]]]
+max_value = max(num for layer_1 in list_4d for layer_2 in layer_1 
+                for layer_3 in layer_2 for layer_4 in layer_2 for num in layer_4)
+max_value
+
+
+# Question 29: Create a list of sets: [{1, 2, 3}, {4, 5, 6}, {7, 8, 9}]
+print("\nQuestion 29: Create a list of sets: [{1, 2, 3}, {4, 5, 6}, {7, 8, 9}]")
+# Your code here
+
+set_1 = [{1, 2, 3}, {4, 5, 6}, {7, 8, 9}]
+set_1
+
+# Question 30: Find the union of all sets in list of sets
+print("\nQuestion 30: Find the union of all sets in list of sets")
+# Your code here
+
+set_1 = [{1, 2, 3}, {4, 5, 6}, {7, 8, 9}]
+union_set = set().union(*sets)
+union_set
+
+
+# Question 31: Create a list of complex numbers: [1+2j, 3+4j, 5+6j]
+print("\nQuestion 31: Create a list of complex numbers: [1+2j, 3+4j, 5+6j]")
+# Your code here
+
+complex_list = [1+2j, 3+4j, 5+6j]
+complex_list
+
+# Question 32: Find the magnitude of each complex number in list
+print("\nQuestion 32: Find the magnitude of each complex number in list")
+# Your code here
+
+complex_list = [1+2j, 3+4j, 5+6j]
+magnitude = [abs(c) for c in complex_list]
+magnitude
+
+# Question 33: Create a nested list with different levels: [1, [2, 3], [4, [5, 6]], 7]
+print("\nQuestion 33: Create a nested list with different levels: [1, [2, 3], [4, [5, 6]], 7]")
+# Your code here
+
+nested_list = [1, [2, 3], [4, [5, 6]], 7]
+nested_list
+
+
+# Question 34: Count the depth of nesting in [1, [2, 3], [4, [5, 6]], 7]
+print("\nQuestion 34: Count the depth of nesting in [1, [2, 3], [4, [5, 6]], 7]")
+# Your code here
+
+def max_depth(lst):
+    if not is_list(lst, list):
+        return 0
+        return 1
+    return 1 + (max_depth(item) for item in lst)
+
+nested_list = [1, [2, 3], [4, [5, 6]], 7]
+check_depth = max_depth(nested_list)
+check_depth
+
+# Question 35: Create a list of functions: [len, str, int, float]
+print("\nQuestion 35: Create a list of functions: [len, str, int, float]")
+# Your code here
+
+list_of_func = [len, str, int, float]
+list_of_func
+
+
+# Question 36: Apply each function in list to string "123"
+print("\nQuestion 36: Apply each function in list to string '123'")
+# Your code here
+
+list_of_func = [len, str, int, float]
+apply_func = [f("123") for f in list_of_func]
+apply_func
+
+# Question 37: Create a list of lambda functions: [lambda x: x*2, lambda x: x**2, lambda x: x+1]
+print("\nQuestion 37: Create a list of lambda functions: [lambda x: x*2, lambda x: x**2, lambda x: x+1]")
+# Your code here
+
+lambdas =  [lambda x: x*2, lambda x: x**2, lambda x: x+1]
+lambdas 
+
+
+# Question 38: Apply each lambda function to 5
+print("\nQuestion 38: Apply each lambda function to 5")
+# Your code here
+
+lambdas =  [lambda x: x*2, lambda x: x**2, lambda x: x+1]
+apply_func = [f(5) for f in lambdas]
+apply_func
+
+# Question 39: Create a list of classes: [list, dict, set, tuple]
+print("\nQuestion 39: Create a list of classes: [list, dict, set, tuple]")
+# Your code here
+
+list_of_classes = [list, dict, set, tuple]
+list_of_classes
+
+
+# Question 40: Create instances of each class in list
+print("\nQuestion 40: Create instances of each class in list")
+# Your code here
+
+list_of_classes = [list, dict, set, tuple]
+create_instance = [l() for l in list_of_classes]
+create_instance
+
+# Question 41: Create a list of None values: [None, None, None, None]
+print("\nQuestion 41: Create a list of None values: [None, None, None, None]")
+# Your code here
+
+my_list = [None]*4
+my_list
+
+# Question 42: Replace all None values with 0 in list
+print("\nQuestion 42: Replace all None values with 0 in list")
+# Your code here
+
+my_list = [None, None, None, None]
+return_zero = [0 if x is None else x for x in my_list]
+my_list
+
+# Question 43: Create a list of boolean values: [True, False, True, False]
+print("\nQuestion 43: Create a list of boolean values: [True, False, True, False]")
+# Your code here
+
+bools = [True, False, True, False]
+bools
+
+# Question 44: Count True values in boolean list
+print("\nQuestion 44: Count True values in boolean list")
+# Your code here
+
+bools = [True, False, True, False]
+count = 0
+for i in bools:
+    if(i == True):
+        count = count + 1
+print(f"count is : {count}")
+
+
+# Question 45: Create a list of ranges: [range(3), range(5), range(2)]
+print("\nQuestion 45: Create a list of ranges: [range(3), range(5), range(2)]")
+# Your code here
+
+ranges = [range(3), range(5), range(2)]
+ranges
+
+# Question 46: Convert each range to list
+print("\nQuestion 46: Convert each range to list")
+# Your code here
+
+ranges = [range(3), range(5), range(2)]
+print_range = [list(i) for i in ranges]
+print_range
+
+# Question 47: Create a list of generators: [(x for x in range(3)), (x for x in range(5))]
+print("\nQuestion 47: Create a list of generators: [(x for x in range(3)), (x for x in range(5))]")
+# Your code here
+
+generators = [(x for x in range(3)), (x for x in range(5))]
+generators
+
+# Question 48: Convert each generator to list
+print("\nQuestion 48: Convert each generator to list")
+# Your code here
+
+generators = [(x for x in range(3)), (x for x in range(5))]
+gen = [list(generator) for generator in generators]
+gen 
+
+# Question 49: Create a list of iterators: [iter([1, 2, 3]), iter([4, 5, 6])]
+print("\nQuestion 49: Create a list of iterators: [iter([1, 2, 3]), iter([4, 5, 6])]")
+# Your code here
+
+iterators = [iter([1, 2, 3]), iter([4, 5, 6])]
+iterators
+
+# Question 50: Extract all elements from each iterator
+print("\nQuestion 50: Extract all elements from each iterator")
+# Your code here 
+
+iterators = [iter([1, 2, 3]), iter([4, 5, 6])]
+iter = [[x for x in it] for it in iterators]
+iter
+
+# TUPLE DATATYPE ASSIGNMENT
+# ========================
+
+# SOLVED EXAMPLE
+# --------------
+# Question: Find the sum and product of all elements in a tuple
+print("SOLVED EXAMPLE:")
+print("Find the sum and product of all elements in a tuple")
+numbers = (2, 4, 6, 8, 10)
+sum_tuple = sum(numbers)
+product = 1
+for num in numbers:
+    product *= num
+print(f"Tuple: {numbers}")
+print(f"Sum: {sum_tuple}")
+print(f"Product: {product}")
+print("-" * 50)
+
+# ASSIGNMENT QUESTIONS
+# ===================
+
+# Question 1: Create a tuple of first 10 natural numbers
+print("Question 1: Create a tuple of first 10 natural numbers")
+# Your code here
+
+tuple_a = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+tuple_a
+
+# Question 2: Find the length of tuple (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+print("\nQuestion 2: Find the length of tuple (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)")
+# Your code here
+
+tuple_a = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+len(tuple_a)
+
+# Question 3: Access the 3rd element from tuple ('a', 'b', 'c', 'd', 'e')
+print("\nQuestion 3: Access the 3rd element from tuple ('a', 'b', 'c', 'd', 'e')")
+# Your code here
+
+tuple_element = ('a', 'b', 'c', 'd', 'e')
+tuple_element[2]
+
+# Question 4: Find the maximum value in tuple (23, 45, 12, 67, 34, 89, 56)
+print("\nQuestion 4: Find the maximum value in tuple (23, 45, 12, 67, 34, 89, 56)")
+# Your code here
+
+tuple_a = (23, 45, 12, 67, 34, 89, 56)
+tuple_b = [max(i for i in tuple_a)]
+tuple_b
+
+# Question 5: Count how many times 5 appears in (1, 5, 2, 5, 3, 5, 4, 5, 6)
+print("\nQuestion 5: Count how many times 5 appears in (1, 5, 2, 5, 3, 5, 4, 5, 6)")
+# Your code here
+
+tuple_a = (1, 5, 2, 5, 3, 5, 4, 5, 6)
+tuple_a.count(5)
+
+# Question 6: Create a tuple of mixed data types (integer, float, string, boolean)
+print("\nQuestion 6: Create a tuple of mixed data types (integer, float, string, boolean)")
+# Your code here
+
+tuple_a = (1, 2.4, "name", True)
+tuple_a
+
+# Question 7: Find the index of element 'python' in ('java', 'python', 'c++', 'javascript')
+print("\nQuestion 7: Find the index of element 'python' in ('java', 'python', 'c++', 'javascript')")
+# Your code here
+
+tuple_a = ('java', 'python', 'c++', 'javascript')
+tuple_a.index('python')
+
+# Question 8: Check if 25 exists in tuple (10, 20, 30, 40, 50)
+print("\nQuestion 8: Check if 25 exists in tuple (10, 20, 30, 40, 50)")
+# Your code here
+
+tuple_a = (10, 20, 30, 40, 50)
+tuple_a.index(25)
+
+ValueError                                
+Cell In[180], line 2
+      1 tuple_a = (10, 20, 30, 40, 50)
+----> 2 tuple_a.index(25)
+
+ValueError: tuple.index(x): x not in tuple
+
+
+# Question 9: Create a tuple of first 5 even numbers
+print("\nQuestion 9: Create a tuple of first 5 even numbers")
+# Your code here
+
+tuple_a = ()
+for i in range(1,10):
+    if i%2 == 0:
+        tuple_a = tuple_a + (i,)
+print(tuple_a)
+
+
+# Question 10: Find the average of numbers in tuple (15, 23, 31, 42, 56, 78)
+print("\nQuestion 10: Find the average of numbers in tuple (15, 23, 31, 42, 56, 78)")
+# Your code here 
+
+tuple_a = (15, 23, 31, 42, 56, 78)
+sum = 0
+for tup in tuple_a:
+    sum = sum + tup 
+print(f"sum of tuple is : {sum}")
+
+avg_tuple = sum/len(tuple_a)
+print(f"average is : {avg_tuple}")
+
+# DICTIONARY DATATYPE ASSIGNMENT - 50 QUESTIONS
+# ============================================
+
+# SOLVED EXAMPLE
+# --------------
+# Question: Find the key with maximum value in a dictionary
+print("SOLVED EXAMPLE:")
+print("Find the key with maximum value in a dictionary")
+scores = {'Alice': 85, 'Bob': 92, 'Charlie': 78, 'Diana': 95, 'Eve': 88}
+max_key = max(scores, key=scores.get)
+max_value = scores[max_key]
+print(f"Dictionary: {scores}")
+print(f"Key with maximum value: {max_key}")
+print(f"Maximum value: {max_value}")
+print("-" * 50)
+
+# ASSIGNMENT QUESTIONS (50 QUESTIONS)
+# ==================================
+
+# Question 1: Create a dictionary of student names and their ages
+print("Question 1: Create a dictionary of student names and their ages")
+# Your code here
+
+students = {'alice':20, 'bob':15, 'charlie':14, 'diana':21}
+print(students)
+
+# Question 2: Add a new key-value pair to dictionary {'a': 1, 'b': 2, 'c': 3}
+print("\nQuestion 2: Add a new key-value pair to dictionary {'a': 1, 'b': 2, 'c': 3}")
+# Your code here
+
+d = {'a': 1, 'b': 2, 'c': 3}
+d['d'] = 4
+print(d)
+
+# Question 3: Get all keys from dictionary {'name': 'John', 'age': 25, 'city': 'New York'}
+print("\nQuestion 3: Get all keys from dictionary {'name': 'John', 'age': 25, 'city': 'New York'}")
+# Your code here
+
+d = {'name': 'John', 'age': 25, 'city': 'New York'}
+
+d_k = d.keys()
+print(d_k)
+
+# Question 4: Get all values from dictionary {'python': 3, 'java': 2, 'c++': 1}
+print("\nQuestion 4: Get all values from dictionary {'python': 3, 'java': 2, 'c++': 1}")
+# Your code here
+
+d = {'python': 3, 'java': 2, 'c++': 1}
+value = d.values()
+print(list(value))
+
+# Question 5: Check if key 'age' exists in {'name': 'Alice', 'age': 30, 'city': 'London'}
+print("\nQuestion 5: Check if key 'age' exists in {'name': 'Alice', 'age': 30, 'city': 'London'}")
+# Your code here
+
+d = {'name': 'Alice', 'age': 30, 'city': 'London'}
+exists = 'age' in d
+exists
+
+# Question 6: Remove key 'temp' from {'a': 1, 'b': 2, 'temp': 3, 'c': 4}
+print("\nQuestion 6: Remove key 'temp' from {'a': 1, 'b': 2, 'temp': 3, 'c': 4}")
+# Your code here
+
+d = {'a': 1, 'b': 2, 'temp': 3, 'c': 4}
+d.pop('temp')
+d
+
+# Question 7: Find the sum of all values in {'math': 85, 'science': 92, 'english': 78}
+print("\nQuestion 7: Find the sum of all values in {'math': 85, 'science': 92, 'english': 78}")
+# Your code here
+
+d = {'math': 85, 'science': 92, 'english': 78}
+sum = sum(d.values())
+sum
+
+# Question 8: Create a dictionary with squares of numbers 1 to 5
+print("\nQuestion 8: Create a dictionary with squares of numbers 1 to 5")
+# Your code here
+
+dict = {}
+for i in range(1,6):
+    dict[i] = i*i
+print(dict)
+
+
+# Question 9: Count frequency of each character in string "hello"
+print("\nQuestion 9: Count frequency of each character in string 'hello'")
+# Your code here
+
+text = "hello"
+unique = {}
+
+for i in text:
+    if i in unique:
+        unique[i] += 1
+    else:
+        unique[i] = 1
+print(unique)
+
+# Question 10: Merge two dictionaries {'a': 1, 'b': 2} and {'c': 3, 'd': 4}
+print("\nQuestion 10: Merge two dictionaries {'a': 1, 'b': 2} and {'c': 3, 'd': 4}")
+# Your code here
+
+d1 = {'a': 1, 'b': 2}
+d2 = {'c': 3, 'd': 4}
+print(d1|d2)
+
+# Question 11: Create a nested dictionary: {'person': {'name': 'Alice', 'age': 25}}
+print("\nQuestion 11: Create a nested dictionary: {'person': {'name': 'Alice', 'age': 25}}")
+# Your code here
+
+nested_dict = {'person' : {'name':'alice', 'age': 25}}
+nested_dict
+
+# Question 12: Access nested value 'name' from {'person': {'name': 'Alice', 'age': 25}}
+print("\nQuestion 12: Access nested value 'name' from {'person': {'name': 'Alice', 'age': 25}}")
+# Your code here
+
+nested_dict = {'person' : {'name':'alice', 'age':25}}
+nested_dict['person']['name']
+
+# Question 13: Create a dictionary with list values: {'fruits': ['apple', 'banana'], 'colors': ['red', 'blue']}
+print("\nQuestion 13: Create a dictionary with list values: {'fruits': ['apple', 'banana'], 'colors': ['red', 'blue']}")
+# Your code here
+
+dict = {'fruits' : ['apple', 'banana'], 'colors' : ['red', 'blue']}
+dict
+
+# Question 14: Add 'orange' to the 'fruits' list in nested dictionary
+print("\nQuestion 14: Add 'orange' to the 'fruits' list in nested dictionary")
+# Your code here
+
+dict['fruits'].append('orange')
+dict
+
+# Question 15: Create a dictionary with tuple values: {'coordinates': (10, 20), 'rgb': (255, 0, 0)}
+print("\nQuestion 15: Create a dictionary with tuple values: {'coordinates': (10, 20), 'rgb': (255, 0, 0)}")
+# Your code here
+
+coords = {'coordinates': (10,20), 'rgb' : (255,0,0)}
+coords
+
+# Question 16: Extract first coordinate from nested tuple
+print("\nQuestion 16: Extract first coordinate from nested tuple")
+# Your code here
+
+coords['coordinates'][0]
+
+# Question 17: Create a dictionary with set values: {'vowels': {'a', 'e', 'i'}, 'consonants': {'b', 'c', 'd'}}
+print("\nQuestion 17: Create a dictionary with set values: {'vowels': {'a', 'e', 'i'}, 'consonants': {'b', 'c', 'd'}}")
+# Your code here
+
+letters = {'vowels' : {'a','e','i'}, 'consonants' : {'b','c','d'}}
+letters
+
+# Question 18: Add 'o' to vowels set in nested dictionary
+print("\nQuestion 18: Add 'o' to vowels set in nested dictionary")
+# Your code here
+
+letters['vowels'].update('o')
+
+# Question 19: Create a 3-level nested dictionary: {'company': {'department': {'employee': {'name': 'John', 'id': 123}}}}
+print("\nQuestion 19: Create a 3-level nested dictionary: {'company': {'department': {'employee': {'name': 'John', 'id': 123}}}}")
+# Your code here
+
+three_dict = {'company':{'department':{'employee':{'name':'john','id': 123}}}}
+three_dict
+
+# Question 20: Access employee name from 3-level nested dictionary
+print("\nQuestion 20: Access employee name from 3-level nested dictionary")
+# Your code here
+
+three_dict['company']['department']['employee']['name']
+
+# Question 21: Create a dictionary with mixed data types: {'int': 42, 'float': 3.14, 'str': 'hello', 'bool': True}
+print("\nQuestion 21: Create a dictionary with mixed data types: {'int': 42, 'float': 3.14, 'str': 'hello', 'bool': True}")
+# Your code here
+
+mix_dict = {'int':42, 'float':3.14, 'str':'hello', 'bool':True}
+mix_dict
+
+# Question 22: Check data type of each value in mixed dictionary
+print("\nQuestion 22: Check data type of each value in mixed dictionary")
+# Your code here
+
+for key,value in mix_dict.items():
+    print(f"{key}:{type(value)}")
+
+# Question 23: Create a dictionary with function values: {'len': len, 'str': str, 'int': int}
+print("\nQuestion 23: Create a dictionary with function values: {'len': len, 'str': str, 'int': int}")
+# Your code here
+
+func_dict = {'len':len, 'str':str, 'int':int}
+func_dict
+
+# Question 24: Apply each function to "123" using dictionary
+print("\nQuestion 24: Apply each function to '123' using dictionary")
+# Your code here
+
+s = "123"
+result = {name : func(s) for name, func in func_dict.items()}
+result
+
+# Question 25: Create a dictionary with lambda functions: {'double': lambda x: x*2, 'square': lambda x: x**2}
+print("\nQuestion 25: Create a dictionary with lambda functions: {'double': lambda x: x*2, 'square': lambda x: x**2}")
+# Your code here
+
+lambda_func = {'double': lambda x:x*2, 'square': lambda x : x**2}
+lambda_func
+
+# Question 26: Apply each lambda function to 5
+print("\nQuestion 26: Apply each lambda function to 5")
+# Your code here
+
+s = 5
+result = {name : func(s) for name, func in lambda_func.items()}
+result
+
+
+# Question 27: Create a dictionary with class values: {'list': list, 'dict': dict, 'set': set}
+print("\nQuestion 27: Create a dictionary with class values: {'list': list, 'dict': dict, 'set': set}")
+# Your code here
+
+class_dict = {'list':list, 'dict':dict, 'set':set}
+class_dict
+
+# Question 28: Create instances using class dictionary
+print("\nQuestion 28: Create instances using class dictionary")
+# Your code here
+
+result = {name:func() for name, func in class_dict.items()}
+result
+
+# Question 29: Create a dictionary with None values: {'a': None, 'b': None, 'c': None}
+print("\nQuestion 29: Create a dictionary with None values: {'a': None, 'b': None, 'c': None}")
+# Your code here
+
+none_dict = {'a': None, 'b':None, 'c':None}
+none_dict
+
+# Question 30: Replace all None values with 0
+print("\nQuestion 30: Replace all None values with 0")
+# Your code here
+
+for key,values in none_dict.items():
+        none_dict[key] = 0
+none_dict
+
+# Question 31: Create a dictionary with boolean values: {'is_active': True, 'is_admin': False}
+print("\nQuestion 31: Create a dictionary with boolean values: {'is_active': True, 'is_admin': False}")
+# Your code here
+
+dict_val = {'is_active': True, 'is_admin': False}
+dict_val
+
+# Question 32: Count True values in boolean dictionary
+print("\nQuestion 32: Count True values in boolean dictionary")
+# Your code here
+
+dict_val = {'is_active': True, 'is_admin': False}
+count = 0
+
+for key,val in dict_val.items():
+    if dict_val[key] == True:
+        count += 1
+print(count)
+
+# Question 33: Create a dictionary with complex numbers: {'z1': 3+4j, 'z2': 1+2j}
+print("\nQuestion 33: Create a dictionary with complex numbers: {'z1': 3+4j, 'z2': 1+2j}")
+# Your code here
+
+comp_dict = {'z1': 3+4j, 'z2': 1+2j}
+comp_dict
+
+# Question 34: Find magnitude of each complex number
+print("\nQuestion 34: Find magnitude of each complex number")
+# Your code here
+
+for key,val in comp_dict.items():
+     print(abs(comp_dict[key]))
+
+# Question 35: Create a 4-level nested dictionary
+print("\nQuestion 35: Create a 4-level nested dictionary")
+# Your code here
+
+deep = {
+     'level1': {
+          'level2':{
+               'level3':{
+                    'level4': 'deepest_value!'
+               }
+          }
+     }
+}
+
+deep
+
+# Question 36: Access deepest value in 4-level nested dictionary
+print("\nQuestion 36: Access deepest value in 4-level nested dictionary")
+# Your code here
+
+print(deep['level1']['level2']['level3']['level4'])
+
+# Question 37: Create a dictionary with range values: {'r1': range(3), 'r2': range(5)}
+print("\nQuestion 37: Create a dictionary with range values: {'r1': range(3), 'r2': range(5)}")
+# Your code here
+
+range_dict = {'r1': range(3), 'r2': range(5)}
+range_dict
+
+# Question 38: Convert each range to list
+print("\nQuestion 38: Convert each range to list")
+# Your code here
+
+
+for key,val in range_dict.items():
+     print(f"{key} : {list(range_dict[key])}")
+
+# Question 39: Create a dictionary with generator values
+print("\nQuestion 39: Create a dictionary with generator values")
+# Your code here
+
+generators = {
+     'squares' : (x**2 for x in range(5)),
+     'cubes': (x**3 for x in range(1,4))
+}
+
+print(generators)
+
+# Question 40: Convert each generator to list
+print("\nQuestion 40: Convert each generator to list")
+# Your code here
+
+for key,val in generators.items():
+     print(list(generators[key]))
+
+# Question 41: Create a dictionary with iterator values
+print("\nQuestion 41: Create a dictionary with iterator values")
+# Your code here
+
+iterators = {
+    'list_iter' : iter([1,2,3]),
+    'str_iter' : iter("hello")
+}
+print(iterators)
+
+# Question 42: Extract all elements from each iterator
+print("\nQuestion 42: Extract all elements from each iterator")
+# Your code here
+
+for key,val in iterators.items():
+    print(list(iterators[key]))
+
+# Question 43: Create a dictionary with nested lists: {'matrix': [[1, 2], [3, 4]], 'vector': [5, 6, 7]}
+print("\nQuestion 43: Create a dictionary with nested lists: {'matrix': [[1, 2], [3, 4]], 'vector': [5, 6, 7]}")
+# Your code here
+
+nest_list = {'matrix': [[1, 2], [3, 4]], 'vector': [5, 6, 7]}
+nest_list 
+
+# Question 44: Find sum of each nested list
+print("\nQuestion 44: Find sum of each nested list")
+# Your code here
+
+sum ={key : [sum(row) for row in val] if isinstance(val[1],list) else sum(val)
+      for key,val in nest_list.items()}
+print(sum)
+
+
+# Question 45: Create a dictionary with nested dictionaries: {'config': {'db': {'host': 'localhost', 'port': 5432}}}
+print("\nQuestion 45: Create a dictionary with nested dictionaries: {'config': {'db': {'host': 'localhost', 'port': 5432}}}")
+# Your code here
+
+nest_dict = {'config': {'db': {'host' : 'localhost', 'port': 5432}}}
+nest_dict
+
+# Question 46: Access database port from nested configuration
+print("\nQuestion 46: Access database port from nested configuration")
+# Your code here
+
+nest_dict['config']['db']['port']
+
+# Question 47: Create a dictionary with nested tuples: {'points': ((1, 2), (3, 4)), 'rgb': ((255, 0, 0), (0, 255, 0))}
+print("\nQuestion 47: Create a dictionary with nested tuples: {'points': ((1, 2), (3, 4)), 'rgb': ((255, 0, 0), (0, 255, 0))}")
+# Your code here
+
+tuple_dict = {'points': ((1,2), (3,4)), 'rgb' : ((255,0,0), (0,255,0))}
+tuple_dict
+
+
+# Question 48: Extract first point coordinates
+print("\nQuestion 48: Extract first point coordinates")
+# Your code here
+
+tuple_dict['points'][0]
+
+# Question 49: Create a dictionary with nested sets: {'groups': {{1, 2, 3}, {4, 5, 6}}, 'categories': {{'a', 'b'}, {'c', 'd'}}}
+print("\nQuestion 49: Create a dictionary with nested sets: {'groups': {{1, 2, 3}, {4, 5, 6}}, 'categories': {{'a', 'b'}, {'c', 'd'}}}")
+# Your code here
+
+nest_set = {'groups':{frozenset({1,2,3}),
+            frozenset({4,5,6})}, 'categories': {frozenset({'a','b'}),
+            frozenset({'c','d'})}}
+nest_set 
+
+# Question 50: Find union of all nested sets
+print("\nQuestion 50: Find union of all nested sets")
+# Your code here 
+
+nest_set = {'groups':{frozenset({1,2,3}),
+            frozenset({4,5,6})}, 'categories': {frozenset({'a','b'}),
+            frozenset({'c','d'})}}
+all_set = nest_set['groups'] | nest_set['categories']
+unique = set()
+for s in all_set:
+    unique.update(s)
+print(unique) 
+
+
+# ASSIGNMENT QUESTIONS
+# ===================
+
+# Question 1: Create a set of first 10 natural numbers
+print("Question 1: Create a set of first 10 natural numbers")
+# Your code here
+
+natural_numbers = {1,2,3,4,5,6,7,8,9,10}
+
+# Question 2: Add element 11 to set {1, 2, 3, 4, 5}
+print("\nQuestion 2: Add element 11 to set {1, 2, 3, 4, 5}")
+# Your code here
+
+my_set = {1,2,3,4,5}
+my_set.add(11)
+
+# Question 3: Remove element 3 from set {1, 2, 3, 4, 5, 6}
+print("\nQuestion 3: Remove element 3 from set {1, 2, 3, 4, 5, 6}")
+# Your code here
+
+my_set.remove(3)
+
+# Question 4: Find the intersection of {1, 2, 3, 4, 5} and {4, 5, 6, 7, 8}
+print("\nQuestion 4: Find the intersection of {1, 2, 3, 4, 5} and {4, 5, 6, 7, 8}")
+# Your code here
+
+set_a = {1, 2, 3, 4, 5}
+set_b = {4, 5, 6, 7, 8}
+intersection = set_a.intersection(set_b)
+intersection
+
+# Question 5: Find the difference between {1, 2, 3, 4, 5} and {4, 5, 6, 7, 8}
+print("\nQuestion 5: Find the difference between {1, 2, 3, 4, 5} and {4, 5, 6, 7, 8}")
+# Your code here
+
+set_a = {1, 2, 3, 4, 5}
+set_b = {4, 5, 6, 7, 8}
+diff = set_a - set_b
+diff
+
+
+# Question 6: Check if 5 is in set {1, 2, 3, 4, 6, 7, 8}
+print("\nQuestion 6: Check if 5 is in set {1, 2, 3, 4, 6, 7, 8}")
+# Your code here
+
+set_a = {1, 2, 3, 4, 6, 7, 8} 
+set_a_bool = 5 in set_a
+set_a_bool
+
+# Question 7: Find the length of set {'a', 'b', 'c', 'd', 'e'}
+print("\nQuestion 7: Find the length of set {'a', 'b', 'c', 'd', 'e'}")
+# Your code here
+
+set_a = {'a', 'b', 'c', 'd', 'e'}
+len_set = len(set_a)
+len_set
+
+# Question 8: Create a set of vowels from string "hello world"
+print("\nQuestion 8: Create a set of vowels from string 'hello world'")
+# Your code here
+
+text = "hello world"
+set_of_text = set()
+vowels = "aeiou"
+
+vow = {char for char in text if char in vowels}
+print(vow)
+
+# Question 9: Remove duplicates from list [1, 2, 2, 3, 4, 4, 5, 6, 6, 7] using set
+print("\nQuestion 9: Remove duplicates from list [1, 2, 2, 3, 4, 4, 5, 6, 6, 7] using set")
+# Your code here
+
+list_a = [1, 2, 2, 3, 4, 4, 5, 6, 6, 7]
+unique = set(list_a)
+print(unique)
+
+# Question 10: Check if {1, 2, 3} is a subset of {1, 2, 3, 4, 5, 6}
+print("\nQuestion 10: Check if {1, 2, 3} is a subset of {1, 2, 3, 4, 5, 6}")
+# Your code here # BOOLEAN DATATYPE ASSIGNMENT
+
+set_a = {1, 2, 3}.issubset({1, 2, 3, 4, 5, 6})
+print(set_a)
+
+# ==========================
+
+# SOLVED EXAMPLE
+# --------------
+# Question: Check if a number is both even and greater than 10
+print("SOLVED EXAMPLE:")
+print("Check if a number is both even and greater than 10")
+number = 16
+is_even = number % 2 == 0
+is_greater_than_10 = number > 10
+result = is_even and is_greater_than_10
+print(f"Number: {number}")
+print(f"Is even: {is_even}")
+print(f"Is greater than 10: {is_greater_than_10}")
+print(f"Both conditions: {result}")
+print("-" * 50)
+
+# BOOLEAN DATATYPE ASSIGNMENT
+# ==========================
+
+# SOLVED EXAMPLE
+# --------------
+# Question: Check if a number is both even and greater than 10
+print("SOLVED EXAMPLE:")
+print("Check if a number is both even and greater than 10")
+number = 16
+is_even = number % 2 == 0
+is_greater_than_10 = number > 10
+result = is_even and is_greater_than_10
+print(f"Number: {number}")
+print(f"Is even: {is_even}")
+print(f"Is greater than 10: {is_greater_than_10}")
+print(f"Both conditions: {result}")
+print("-" * 50)
+
+# ASSIGNMENT QUESTIONS
+# ===================
+
+# Question 1: Check if 25 is greater than 20 and less than 30
+print("Question 1: Check if 25 is greater than 20 and less than 30")
+# Your code here
+
+result = 25>20 and 25<30
+result
+
+# Question 2: Check if string "python" is equal to "Python" (case sensitive)
+print("\nQuestion 2: Check if string 'python' is equal to 'Python' (case sensitive)")
+# Your code here
+
+result2 = "python" == "Python" 
+result2
+
+# Question 3: Check if 15 is divisible by both 3 and 5
+print("\nQuestion 3: Check if 15 is divisible by both 3 and 5")
+# Your code here
+
+div = 15%3 and 15%5 
+div 
+
+# Question 4: Check if 7 is not equal to 8
+print("\nQuestion 4: Check if 7 is not equal to 8")
+# Your code here
+
+not_equal = 7!=8
+not_equal
+
+# Question 5: Check if 100 is greater than 50 or less than 25
+print("\nQuestion 5: Check if 100 is greater than 50 or less than 25")
+# Your code here
+
+is_great = 100>50 and 50<25
+is_great
+
+# Question 6: Check if 0 is falsy in Python
+print("\nQuestion 6: Check if 0 is falsy in Python")
+# Your code here
+
+result_6 = bool(0)
+
+# Question 7: Check if empty string "" is falsy in Python
+print("\nQuestion 7: Check if empty string '' is falsy in Python")
+# Your code here
+
+result_7 = bool("")
+result_7
+
+# Question 8: Check if 42 is truthy in Python
+print("\nQuestion 8: Check if 42 is truthy in Python")
+# Your code here
+
+result_8 = bool(42)
+result_8
+
+# Question 9: Check if 10 is between 5 and 15 (inclusive)
+print("\nQuestion 9: Check if 10 is between 5 and 15 (inclusive)")
+# Your code here
+
+result_9 = 5 <= 10 <= 15
+result_9
+
+
+# Question 10: Check if 3.14 is greater than 3 and less than 4
+print("\nQuestion 10: Check if 3.14 is greater than 3 and less than 4")
+# Your code here 
+
+result_10 = 4 >= 3.14 >= 3
+result_10
+
+# COMPLEX DATATYPE ASSIGNMENT
+# ==========================
+
+# SOLVED EXAMPLE
+# --------------
+# Question: Create a complex number and find its conjugate
+print("SOLVED EXAMPLE:")
+print("Create a complex number and find its conjugate")
+z = 3 + 4j
+conjugate = z.conjugate()
+magnitude = abs(z)
+print(f"Complex number: {z}")
+print(f"Conjugate: {conjugate}")
+print(f"Magnitude: {magnitude}")
+print("-" * 50)
+
+# ASSIGNMENT QUESTIONS
+# ===================
+
+# Question 1: Create complex number 5 + 3j
+print("Question 1: Create complex number 5 + 3j")
+# Your code here
+
+z1 = 5 + 3j
+
+# Question 2: Find the real part of complex number 7 - 2j
+print("\nQuestion 2: Find the real part of complex number 7 - 2j")
+# Your code here
+
+z1 = 7 - 2j
+print(z1.real)
+
+# Question 3: Find the imaginary part of complex number 4 + 6j
+print("\nQuestion 3: Find the imaginary part of complex number 4 + 6j")
+# Your code here
+
+z1 = 4 + 6j
+print(z1.imag)
+
+# Question 4: Add two complex numbers: (3 + 2j) and (1 + 4j)
+print("\nQuestion 4: Add two complex numbers: (3 + 2j) and (1 + 4j)")
+# Your code here
+
+z2 = (3 + 2j)
+z3 = (1 + 4j)
+sum = z2 + z3
+print(sum)
+
+# Question 5: Multiply two complex numbers: (2 + 3j) and (1 + 2j)
+print("\nQuestion 5: Multiply two complex numbers: (2 + 3j) and (1 + 2j)")
+# Your code here
+
+product = (2 + 3j) * (1 + 2j)
+product 
+
+
+# Question 6: Find the magnitude of complex number (2 + 3j) and (1 + 2j)
+print("\nQuestion 6: Find the magnitude of complex number 6 + 8j")
+# Your code here
+
+mag = abs(6 + 8j)
+mag 
+
+# Question 7: Find the conjugate of complex number 5 - 7j
+print("\nQuestion 7: Find the conjugate of complex number 5 - 7j")
+# Your code here
+
+con = (5 - 7j).conjugate()
+con
+
+# Question 8: Subtract complex numbers: (10 + 5j) - (3 + 2j)
+print("\nQuestion 8: Subtract complex numbers: (10 + 5j) - (3 + 2j)")
+# Your code here
+
+sub = (10 + 5j) - (3 + 2j)
+sub
+
+# Question 9: Divide complex numbers: (8 + 6j) / (2 + 1j)
+print("\nQuestion 9: Divide complex numbers: (8 + 6j) / (2 + 1j)")
+# Your code here
+
+div = (8 + 6j) / (2 + 1j)
+div 
+
+# Question 10: Find the phase angle of complex number 1 + 1j
+print("\nQuestion 10: Find the phase angle of complex number 1 + 1j")
+# Your code here 
+
+import cmath 
+phase = cmath.phase(1+1j) # degree = (phase*180/3.14)
+phase
+
+# NONE DATATYPE ASSIGNMENT
+# =======================
+
+# SOLVED EXAMPLE
+# --------------
+# Question: Check if a variable is None
+print("SOLVED EXAMPLE:")
+print("Check if a variable is None")
+variable = None
+is_none = variable is None
+print(f"Variable: {variable}")
+print(f"Is None: {is_none}")
+print("-" * 50)
+
+# ASSIGNMENT QUESTIONS
+# ===================
+
+# Question 1: Create a variable and assign None to it
+print("Question 1: Create a variable and assign None to it")
+# Your code here
+
+nothing = None 
+
+# Question 2: Check if None equals None
+print("\nQuestion 2: Check if None equals None")
+# Your code here
+
+print(None == None)
+
+# Question 3: Check if None is None
+print("\nQuestion 3: Check if None is None")
+# Your code here
+
+print(None is None)
+
+# Question 4: Check if 0 is None
+print("\nQuestion 4: Check if 0 is None")
+# Your code here
+
+print(0 is None)
+
+# Question 5: Check if empty string is None
+print("\nQuestion 5: Check if empty string is None")
+# Your code here
+
+print(" " == None)
+
+# Question 6: Check if False is None
+print("\nQuestion 6: Check if False is None")
+# Your code here
+
+print(False is None)
+
+# Question 7: Check if empty list is None
+print("\nQuestion 7: Check if empty list is None")
+# Your code here
+
+list_a = []
+print(list_a is None)
+
+# Question 8: Check if empty dictionary is None
+print("\nQuestion 8: Check if empty dictionary is None")
+# Your code here
+
+dict_a = {}
+print(dict_a is None)
+
+# Question 9: Check if empty tuple is None
+print("\nQuestion 9: Check if empty tuple is None")
+# Your code here
+
+tuple_a = ()
+print(tuple_a is None)
+
+# Question 10: Check if empty set is None
+print("\nQuestion 10: Check if empty set is None")
+# Your code here 
+
+set_a = ()
+print(set_a is None)

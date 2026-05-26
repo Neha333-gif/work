@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Details - AI Email Agent</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="nav-header">
+        <a href="{{ url_for('logout') }}" class="logout-link">
+            <i class="fas fa-user-circle"></i> {{ username }} &nbsp;|&nbsp;
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+    </nav>
+
+    <div class="container">
+        <header>
+            <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                <a href="{{ url_for('home') }}" class="btn-primary" style="padding: 0.6rem 1.2rem; font-size: 0.9rem; text-decoration: none;">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+                <h1 style="font-size: 2rem; margin: 0;">Email Archive</h1>
+            </div>
+            <p class="subtitle" style="margin-top: 1rem;">Processed on {{ email.processed_at.strftime('%B %d, %Y at %I:%M %p') }}</p>
+        </header>
+
+        <section class="glass-card result-card">
+            <h3><i class="fas fa-envelope"></i> Original Email</h3>
+            <div class="result-content" style="font-size: 0.95rem; color: var(--text-muted);">{{ email.email_text }}</div>
+        </section>
+
+        <section class="results-section" style="display: flex;">
+            <div class="glass-card result-card">
+                <h3><i class="fas fa-tags"></i> Classification</h3>
+                <div class="badges">
+                    <span class="badge badge-priority {{ email.priority.lower() }}">{{ email.priority.upper() }}</span>
+                    <span class="badge badge-category">{{ email.category.upper() }}</span>
+                </div>
+                <div class="result-content">{{ email.reason }}</div>
+            </div>
+
+            <div class="results-grid">
+                <div class="glass-card result-card">
+                    <h3><i class="fas fa-pen-fancy"></i> AI Drafted Reply</h3>
+                    <div class="result-content">{{ email.reply }}</div>
+                </div>
+
+                <div class="glass-card result-card">
+                    <h3><i class="fas fa-calendar-check"></i> Follow-up Actions</h3>
+                    <div class="result-content">{{ email.followup }}</div>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

@@ -1,0 +1,228 @@
+retail_inventory = {
+    "Electronics": {
+        "Laptop": [55000, 30, "Dell"],
+        "Mobile": [25000, 50, "Samsung"],
+        "Tablet": [18000, 20, "Lenovo"],
+        "Smart Watch": [7999, 40, "Noise"]
+    },
+    "Apparel": {
+        "T-Shirt": [499, 100, "H&M"],
+        "Jeans": [1199, 60, "Levi's"],
+        "Jacket": [2499, 25, "Puma"]
+    },
+    "Home Appliances": {
+        "Microwave": [8500, 15, "LG"],
+        "Vacuum Cleaner": [7000, 10, "Philips"],
+        "Refrigerator": [30000, 8, "Samsung"]
+    }
+}
+
+
+## 1. How do you get all the keys from a dictionary? `(Use .keys())`
+
+print(retail_inventory.keys())
+
+## 2. How do you get all the values from a dictionary? `(Use .values())`
+
+print(retail_inventory.values())
+
+## 3. How do you retrieve the value for a specific key safely? `(Use .get(key))`
+
+price = retail_inventory.get("Electronics")
+print(price)
+
+##4. How do you check if a key exists in a dictionary? `(Use in)`
+
+"Laptop" in retail_inventory["Electronics"]
+
+##5. How do you remove a key and return its value? `(Use .pop(key))`
+
+electronics = retail_inventory.pop("Electronics")
+electronics
+
+##6. How do you copy a dictionary? `(Use .copy())`
+
+backup = retail_inventory.copy()
+# or 
+backup = dict(retail_inventory)
+
+print(backup)
+
+##7. How do you remove all key-value pairs from a dictionary? `(Use .clear())`       
+
+temp = retail_inventory.copy()
+temp.clear()
+print(temp)
+
+
+## 8. How do you add or update a value for a key? `(Use .update({key: value}))`
+
+print("\n.8")
+retail_inventory["Electronics"].update({"Headphones" : [12999, 15, "Boat"]})
+retail_inventory.update({"footwear" : {}})
+print(retail_inventory)
+
+##9. How do you retrieve both keys and values? `(Use .items())`
+
+print("\n9.")
+for category, items in retail_inventory.items():
+    print(category, items)
+##10. How do you create an empty dictionary? `(Use {} or dict())`
+
+print("\n10.")
+empty1 = {}
+empty2 = dict()
+print(empty1)
+
+##11. Use `.setdefault()` to assign a default value to a missing key.  
+
+print("/n11.")
+electronics = retail_inventory.setdefault("Toys" , {})
+print(retail_inventory)
+
+##12. Use `.update()` to merge two dictionaries.  
+
+print("\n12.")
+extra = {"Stationary" : {"pen" : [25, 200, "cello"]}}
+retail_inventory.update(extra)
+print(retail_inventory)
+
+##13. Use `.get()` with a default return value if key is not found.  
+
+stock = retail_inventory["Electronics"].get('Jeans', [1199, 60, "Levi's"])
+print(stock)
+
+##14. What’s the difference between `.pop()` and `.popitem()`? Try both.  
+
+value = retail_inventory["Electronics"].pop('Laptop')
+print(value)
+
+##15. Use `del` to remove a key from a dictionary.  
+
+del retail_inventory["Stationary"]["pen"]
+print(retail_inventory)
+
+##16. Get the number of keys in a dictionary. `(Use len())` 
+
+print(len(retail_inventory))
+print(len(retail_inventory["Electronics"]))
+
+##17. Convert a list of tuples into a dictionary. `(Use dict() constructor)`
+
+pairs = [("Mouse", 899), ("keyboard", 1499)]
+mouse_kb = dict(pairs) 
+print(mouse_kb)
+
+##18. Create a dictionary from two lists: one of keys and one of values. `(Use zip() and dict())`  
+
+brands = ["Dell", "lenevo", "HP"]
+price = [65000, 55000, 32000]
+brand_prices = dict(zip(brands, price))
+print(brand_prices)
+
+##19. Check if two dictionaries have the same keys. `(Use .keys() and ==)`  
+
+dict1 = {"a" : 1, "b" : 2}
+dict2 = {"b" : 2, "a" : 1}
+print(dict1.keys() == dict2.keys())
+
+
+##20. Check if a dictionary is empty. `(Use not or len())`
+
+empty_dict = {}
+print(not empty_dict) # must return true 
+print(len(empty_dict) == 0)
+
+
+## 🔴 Complex (Level 3 — Still no loops)
+
+## 21. Get a list of all unique values using `set()` and `.values()`. 
+
+print("/n21.")
+print("using set() :")
+unique_categories = set(retail_inventory.values())
+print(unique_categories)
+print("\n using values(): ")
+
+
+
+## 22. Create a nested dictionary using dictionary literals.  
+
+store = {
+    "bangalore" :{
+        "Electronics" : {"laptop" : 45000},
+        "Apparel" : {"Tshirt" : 650}
+    },
+    "mumbai" : {}
+}
+
+print("\n 22.")
+print(store)
+
+
+## 23. Merge 3 dictionaries using chained `.update()`.
+
+print("\n 23.") 
+a = {"x" : 1}
+b = {"y" : 2}
+c = {"z" : 3}
+a.update(b)
+print(a)
+
+## 24. Use `.fromkeys()` to create a dictionary with default values.  
+
+
+categories = ["Books", "sports", "Furniture"]
+new_stock = dict.fromkeys(categories, 0)
+print("\n 24.")
+print(new_stock)
+
+
+## 25. Use `.get()` to avoid a `KeyError` while accessing a deeply nested dictionary.
+
+print("\n 25.") 
+price = retail_inventory.get("Electronics", {}).get("Laptop", [0])[0]
+
+## 26. Copy a dictionary and modify the copy (check original doesn’t change).
+
+original = {"a" : [1, 2, 3]}
+shallow = original.copy()
+shallow["a"].append(4)
+print("\n 26.")
+print(original["a"])  
+
+## 27. Extract only the keys from a dictionary where the value is a specific type (e.g., list).  
+
+d = {"a" : [1,2], "b" : 10, "c" : [3,4]}
+list_keys = [k for k,v in d.items() if isinstance(v, list)]
+print("\n 27.")
+print(list_keys)
+
+## 28. Convert a flat dictionary to a string using `str()` or `json.dumps()`. 
+
+print("\n 28.")
+import json 
+as_string = json.dumps(retail_inventory, indent = 2)
+print(as_string)
+
+# or 
+
+print(str(retail_inventory))
+
+## 29. Check if a dictionary has all keys from a given list using `all()` and `in`.  
+
+print("\n 29.")
+list_required = ["Electronics", "Apparel"]
+if_present = all(k in retail_inventory for k in list_required)
+print(if_present)
+
+## 30. Use `max()` and `min()` to find keys or values with highest/lowest value.
+
+electronics = retail_inventory["Electronics"]
+
+max_item = max(electronics , key = lambda name : electronics[name][0])
+min_item = min(electronics , key = lambda name : electronics[name][0])
+
+print("\n 30.")
+print(max_item , min_item)
+

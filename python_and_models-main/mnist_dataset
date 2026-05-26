@@ -1,0 +1,84 @@
+import tensorflow as tf 
+from tensorflow.keras import layers, models 
+from tensorflow.keras.datasets import mnist 
+from tensorflow.keras.utils import to_categorical 
+import mlflow 
+import mlflow.keras 
+
+(x_train, y_train), (x_test, y_test) = mnist.load_data()
+x_train = x_train.reshape(-1, 28, 28, 1)/255.0 
+x_test = x_test.reshape(-1, 28, 28, 1)/255.0 
+y_train_cat = to_categorical(y_train, 10)
+y_test_cat = to_categorical(y_test, 10)
+
+mlflow.set_experiment("MNIST_CNN_Comparison")
+
+# Model 1 : Simple CNN 
+
+def build_simple_cnn():
+    model = models.Sequential([
+        layers.Conv2D(32, (3,3), activation = 'relu', input_shape = (28, 28, 1)),
+        layers.MaxPooling2D(),
+        layers.Conv2D(64, (3,3), activation = 'relu'),
+        layers.MaxPooling2D(),
+        layers.Flatten(),
+        layers.Dense(128, activation = 'relu'),
+        layers.Dense(10, activation = 'softmax')
+    ])
+    
+    model.compile(optimizer = 'adam', loss = 'categorical_crossentropy', metrics=['accuracy'])
+    return model
+
+def build_deeper_cnn():
+    model = models.Sequential([
+        layers.Conv2D(32, (3,3), activation = 'relu', input_shape = (28, 28, 1)),
+        layers.Conv2D(32, (3,3), activation = 'relu'),
+        layers.MaxPooling2D(),
+        layers.Dropout(0.25),
+        layers.Conv2D(64, (3,3), activation = 'relu'),
+        layers.Conv2D(64, (3,3), activation = 'relu'),
+        layers.MaxPooling2D(),
+        layers.Dropout(0.25),
+        layers.Flatten(),
+        layers.Dense(128, activation = 'relu'),
+        layers.Dropout(0.5),
+        layers.Dense(10, activation = 'softmax')
+        ])
+    
+    model.compile(optimizer = 'adam', loss = 'categorical_crossentropy', metrics=['accuracy'])
+    return model
+
+# Train and log both models 
+models_list = [
+    ("simple_CNN", build_simple_cnn()),
+    ("Deeper_CNN_without_dropout", build_deeper_cnn())
+]
+
+for name, model in models_list:
+    with mlflow.start_run(run_name = name):
+        history = model.fit(x_train, y_train_cat, epochs = 10, batch_size = 128, 
+                            validation_split = 0.1, verbose = 1 )
+        
+        # Evaluate
+        eval_results = model.evaluate(x_test, y_test_cat, verbose = 1)
+        test_acc = eval_results[1]
+        test_loss = eval_results[0]
+
+        # log metric 
+        mlflow.log_metric("test_accuracy", test_acc)
+        mlflow.log_metric("test_loss", test_loss)
+
+        # save and log the model as .h5 artifact 
+
+        model_path = f"{name}.h5"
+        model.save(model_path)
+        mlflow.log_artifact(model_path)
+
+
+        # also log keras model directly 
+
+        mlflow.keras.log_model(model, "model")
+
+        print(f"{name} logges in mlflow with test accuracy : {test_acc}")
+
+print("both CNN trained and saved as .h5 + logged in mlflow")

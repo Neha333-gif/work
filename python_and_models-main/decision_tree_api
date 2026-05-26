@@ -1,0 +1,99 @@
+import pandas as pd 
+import numpy as np
+import mlflow 
+import mlflow.sklearn 
+from sklearn.model_selection import train_test_split 
+from sklearn.preprocessing import StandardScaler, OneHotEncoder 
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline 
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score 
+
+df = pd.read_csv(r"C:\Users\peepl\Downloads\tele_churn_prediction_api\WA_Fn-UseC_-Telco-Customer-Churn.csv")
+df['TotalCharges'] = pd.to_numeric(df['TotalCharges'], errors = 'coerce')
+df.dropna(inplace = True)
+df.drop('customerID', axis = 1, inplace = True)
+
+df['Churn'] = df['Churn'].map({'Yes':1, 'No':0})
+
+x = df.drop('Churn', axis = 1)
+y = df['Churn']
+
+categorical_cols = x.select_dtypes(include = 'object').columns.to_list()
+numerical_cols = x.select_dtypes(include = 'number').columns.to_list()
+
+model = DecisionTreeClassifier(max_depth = 14, random_state = 42, min_samples_leaf = 5)
+
+preprocessor = ColumnTransformer([
+    ('num', StandardScaler(), numerical_cols),
+    ('cat', OneHotEncoder(), categorical_cols)
+])
+
+pipeline = Pipeline([
+    ('preprocessor',preprocessor),
+    ('model', model)
+])
+
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.2, stratify = y, random_state = 42)
+
+with mlflow.start_run(run_name = "decisionTreeClassifier"):
+    pipeline.fit(x_train, y_train)
+    y_pred = pipeline.predict(x_test)
+
+    accuracy = accuracy_score(y_pred, y_test)
+
+    mlflow.log_metric('accuracy_score', accuracy)
+    mlflow.sklearn.log_model(pipeline, 'model')
+
+
+    print("mlflow run logged succesfully ")
+
+
+## from flask import Flask, request, jsonify 
+import mlflow.sklearn 
+import pandas as pd 
+import numpy as np 
+
+app = Flask(__name__)
+
+## just to create  instance of flask 
+
+model = mlflow.sklearn.load_model("runs:/205e786619784992a0a61d36c0d9b367/model")
+
+@app.route('/api/prediction', methods = ['POST'])
+def predict():
+    data = request.json 
+    df = pd.DataFrame([data])
+
+
+    prob = model.predict_proba(df)[0][1]
+    pred = ["Yes" if prob < 0.5 else "No"]
+
+    return jsonify ({
+        "churn_probablities" : (round(prob,4)),
+        "churn_predictions" : pred
+    })
+
+@app.route('/api/bulkprediction', methods = ["POST"])
+def bulk_predict():
+    data = request.json['data']
+    df = pd.DataFrame(data)
+
+    probs = model.predict_proba(df)[0][1]
+    preds = ["Yes" if p > 0.5 else "No" for p in probs]
+
+    return jsonify({
+        "churn_probablities" : [round(p, 4) for p in probs],
+        "churn_predictions" : preds
+    })
+
+
+@app.route('/ping', methods = ["GET"])
+def ping():
+    return "DecisionTreeClassifier is alive", 200
+
+
+if __name__ == '__main__':
+    app.run(port = 5001, debug = True)
+
+

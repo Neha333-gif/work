@@ -1,0 +1,10 @@
+*.csv
+*.joblib
+*.png
+*.jpeg
+*.jpg
+*.zip
+*.rar
+__pycache__/
+*.pyc
+.DS_Store

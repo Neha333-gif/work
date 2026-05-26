@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credit Risk Analysis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 900px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .form-section {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .predict-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .predict-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .reset-btn {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .reset-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .results-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 5px solid #667eea;
+        }
+
+        .result-card.high-risk {
+            background: linear-gradient(135deg, #fff5f5 0%, #ffe0e0 100%);
+            border-left-color: #d62728;
+        }
+
+        .result-card.medium-risk {
+            background: linear-gradient(135deg, #fffbf0 0%, #ffe8d6 100%);
+            border-left-color: #ff7f0e;
+        }
+
+        .result-card.low-risk {
+            background: linear-gradient(135deg, #f0fff4 0%, #d6f5d6 100%);
+            border-left-color: #2ca02c;
+        }
+
+        .result-title {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .result-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .risk-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .risk-badge.high {
+            background: #d62728;
+            color: white;
+        }
+
+        .risk-badge.medium {
+            background: #ff7f0e;
+            color: white;
+        }
+
+        .risk-badge.low {
+            background: #2ca02c;
+            color: white;
+        }
+
+        .message-box {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 14px;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid #e0e0e0;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #d62728;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .info-box {
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #333;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            .content {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💰 Credit Risk Analysis</h1>
+            <p>Assess applicant default risk using machine learning</p>
+        </div>
+
+        <div class="info-box">
+            <strong>ℹ️ Instructions:</strong> Fill in the applicant's financial information and click "Predict Risk" to get a default probability assessment.
+        </div>
+
+        <div class="content">
+            <div class="form-section">
+                <div class="form-group">
+                    <label>Age (years)</label>
+                    <input type="number" id="age" placeholder="20-65" min="18" max="100" value="35">
+                </div>
+                <div class="form-group">
+                    <label>Education (1-5)</label>
+                    <input type="number" id="ed" placeholder="1-5" min="1" max="5" value="3">
+                </div>
+                <div class="form-group">
+                    <label>Employment Years</label>
+                    <input type="number" id="employ" placeholder="0-50" min="0" max="70" value="10">
+                </div>
+                <div class="form-group">
+                    <label>Address (years)</label>
+                    <input type="number" id="address" placeholder="0-30" min="0" max="50" value="5">
+                </div>
+                <div class="form-group">
+                    <label>Income ($1000s)</label>
+                    <input type="number" id="income" placeholder="10-300" min="0" step="1" value="50">
+                </div>
+                <div class="form-group">
+                    <label>Debt-to-Income Ratio (%)</label>
+                    <input type="number" id="debtinc" placeholder="0-50" min="0" step="0.1" value="10">
+                </div>
+                <div class="form-group">
+                    <label>Credit Card Debt ($1000s)</label>
+                    <input type="number" id="creddebt" placeholder="0-50" min="0" step="0.1" value="5">
+                </div>
+                <div class="form-group">
+                    <label>Other Debt ($1000s)</label>
+                    <input type="number" id="othdebt" placeholder="0-30" min="0" step="0.1" value="2">
+                </div>
+
+                <div class="button-group">
+                    <button class="predict-btn" onclick="predictRisk()">🔮 Predict Risk</button>
+                    <button class="reset-btn" onclick="resetForm()">↻ Reset</button>
+                </div>
+
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Analyzing credit risk...</p>
+                </div>
+
+                <div class="error-message" id="errorMessage"></div>
+            </div>
+
+            <div class="results-section">
+                <div id="resultsContainer" style="display: none;">
+                    <div id="resultCard" class="result-card">
+                        <div class="result-title">Risk Assessment</div>
+                        <div class="result-value" id="riskLevel">—</div>
+                        <div id="riskBadge"></div>
+                        <div class="message-box" id="resultMessage">—</div>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-label">Default Probability</div>
+                            <div class="stat-value" id="probabilityValue">0%</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Model Confidence</div>
+                            <div class="stat-value" id="confidenceValue">0%</div>
+                        </div>
+                    </div>
+
+                    <div class="stats-grid" style="margin-top: 15px;">
+                        <div class="stat-item">
+                            <div class="stat-label">Prediction</div>
+                            <div class="stat-value" id="predictionValue">—</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Status</div>
+                            <div class="stat-value" id="statusValue">—</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="placeholderText" style="text-align: center; color: #999; padding: 40px 20px;">
+                    <p style="font-size: 48px; margin-bottom: 10px;">📊</p>
+                    <p>Fill in the form and click "Predict Risk" to see results here</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://127.0.0.1:8000';
+
+        async function predictRisk() {
+            const loading = document.getElementById('loading');
+            const errorMessage = document.getElementById('errorMessage');
+            const resultsContainer = document.getElementById('resultsContainer');
+            const placeholderText = document.getElementById('placeholderText');
+
+            // Hide error and show loading
+            errorMessage.style.display = 'none';
+            loading.style.display = 'block';
+
+            try {
+                // Collect form data (matching dataset schema)
+                const features = {
+                    age: parseFloat(document.getElementById('age').value),
+                    ed: parseFloat(document.getElementById('ed').value),
+                    employ: parseFloat(document.getElementById('employ').value),
+                    address: parseFloat(document.getElementById('address').value),
+                    income: parseFloat(document.getElementById('income').value),
+                    debtinc: parseFloat(document.getElementById('debtinc').value),
+                    creddebt: parseFloat(document.getElementById('creddebt').value),
+                    othdebt: parseFloat(document.getElementById('othdebt').value)
+                };
+
+                // Validate inputs (all numeric)
+                const numericValues = Object.values(features);
+                if (numericValues.some(v => isNaN(v))) {
+                    throw new Error('Please fill in all fields with valid numbers');
+                }
+
+                // Make API request
+                const response = await fetch(`${API_BASE}/predict`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ features })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+
+                // Display results
+                displayResults(data);
+                resultsContainer.style.display = 'block';
+                placeholderText.style.display = 'none';
+
+            } catch (error) {
+                console.error('Error:', error);
+                errorMessage.textContent = error.message;
+                errorMessage.style.display = 'block';
+                resultsContainer.style.display = 'none';
+                placeholderText.style.display = 'block';
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        function displayResults(data) {
+            const resultCard = document.getElementById('resultCard');
+            const riskLevel = document.getElementById('riskLevel');
+            const riskBadge = document.getElementById('riskBadge');
+            const resultMessage = document.getElementById('resultMessage');
+            const probabilityValue = document.getElementById('probabilityValue');
+            const confidenceValue = document.getElementById('confidenceValue');
+            const predictionValue = document.getElementById('predictionValue');
+            const statusValue = document.getElementById('statusValue');
+
+            // Update risk level and styling
+            riskLevel.textContent = data.risk_level;
+            resultCard.className = 'result-card';
+
+            let badgeClass = '';
+            if (data.risk_level.includes('HIGH')) {
+                resultCard.classList.add('high-risk');
+                badgeClass = 'high';
+            } else if (data.risk_level.includes('MEDIUM')) {
+                resultCard.classList.add('medium-risk');
+                badgeClass = 'medium';
+            } else {
+                resultCard.classList.add('low-risk');
+                badgeClass = 'low';
+            }
+
+            riskBadge.innerHTML = `<div class="risk-badge ${badgeClass}">${data.risk_level}</div>`;
+            resultMessage.textContent = data.message;
+
+            probabilityValue.textContent = (data.probability * 100).toFixed(1) + '%';
+            confidenceValue.textContent = (Math.abs(data.probability - 0.5) * 2 * 100).toFixed(1) + '%';
+            predictionValue.textContent = data.prediction === 1 ? 'DEFAULT' : 'NO DEFAULT';
+            statusValue.textContent = data.prediction === 1 ? '⚠️ At Risk' : '✓ Safe';
+        }
+
+        function resetForm() {
+            document.getElementById('age').value = '35';
+            document.getElementById('ed').value = '3';
+            document.getElementById('employ').value = '10';
+            document.getElementById('address').value = '5';
+            document.getElementById('income').value = '50';
+            document.getElementById('debtinc').value = '10';
+            document.getElementById('creddebt').value = '5';
+            document.getElementById('othdebt').value = '2';
+
+            document.getElementById('resultsContainer').style.display = 'none';
+            document.getElementById('placeholderText').style.display = 'block';
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+
+        // Allow prediction on Enter key
+        document.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                predictRisk();
+            }
+        });
+    </script>
+</body>
+</html>
