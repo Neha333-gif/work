@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>METEOR IQ – AI-Powered Weather Forecasting Engine</title>
+  <meta name="description" content="State-of-the-art AI weather forecasting system powered by Random Forest ML. Predict climate conditions and suitability in real-time." />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #070f1e;
+      --surface:   #0d1b2e;
+      --surface2:  #122040;
+      --border:    #1e3a5f;
+      --primary:   #3b82f6;
+      --primary-g: #2563eb;
+      --accent:    #10b981;
+      --warn:      #f59e0b;
+      --danger:    #f43f5e;
+      --text:      #f8fafc;
+      --muted:     #94a3b8;
+      --card-bg:   rgba(13,27,46,0.85);
+      --glow-p:    rgba(59,130,246,0.18);
+      --glow-a:    rgba(16,185,129,0.15);
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Animated background orbs ──────────────────────────── */
+    .bg-orbs {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    }
+    .bg-orbs span {
+      position: absolute; border-radius: 50%;
+      filter: blur(120px); animation: drift 18s ease-in-out infinite;
+    }
+    .bg-orbs span:nth-child(1) {
+      width: 600px; height: 600px;
+      top: -180px; left: -180px;
+      background: radial-gradient(circle, rgba(59,130,246,0.22), transparent 70%);
+    }
+    .bg-orbs span:nth-child(2) {
+      width: 500px; height: 500px;
+      bottom: -150px; right: -150px;
+      background: radial-gradient(circle, rgba(16,185,129,0.18), transparent 70%);
+      animation-delay: -9s;
+    }
+    .bg-orbs span:nth-child(3) {
+      width: 350px; height: 350px;
+      top: 40%; left: 55%;
+      background: radial-gradient(circle, rgba(245,158,11,0.12), transparent 70%);
+      animation-delay: -5s;
+    }
+    @keyframes drift {
+      0%,100% { transform: translate(0,0) scale(1); }
+      50%      { transform: translate(40px,30px) scale(1.08); }
+    }
+
+    /* ── Layout wrapper ─────────────────────────────────────── */
+    .wrapper { position: relative; z-index: 1; min-height: 100vh; }
+
+    /* ── Header ─────────────────────────────────────────────── */
+    header {
+      padding: 24px 40px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(16px);
+      background: rgba(7,15,30,0.7);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .logo {
+      display: flex; align-items: center; gap: 14px;
+    }
+    .logo-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; box-shadow: 0 0 20px rgba(59,130,246,0.4);
+    }
+    .logo-text { line-height: 1.15; }
+    .logo-text h1 { font-size: 22px; font-weight: 800; letter-spacing: 1px;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .logo-text p { font-size: 11px; color: var(--muted); font-weight: 400; letter-spacing: 0.5px; }
+
+    .header-status {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--surface); border: 1px solid var(--border);
+      padding: 8px 18px; border-radius: 50px; font-size: 13px;
+    }
+    .status-dot {
+      width: 9px; height: 9px; border-radius: 50%;
+      background: var(--accent); box-shadow: 0 0 8px var(--accent);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+    /* ── API banner ─────────────────────────────────────────── */
+    .api-banner {
+      margin: 18px 40px 0;
+      padding: 12px 22px;
+      background: rgba(59,130,246,0.08);
+      border: 1px solid rgba(59,130,246,0.3);
+      border-radius: 12px;
+      display: flex; align-items: center; gap: 10px;
+      font-size: 13px; color: var(--muted);
+    }
+    .api-banner span.label { color: var(--text); font-weight: 600; }
+    .api-banner code { color: var(--primary); font-family: 'Inter', monospace; font-size: 13px; }
+
+    /* ── Tabs ───────────────────────────────────────────────── */
+    .tabs-bar {
+      padding: 24px 40px 0;
+      display: flex; gap: 4px;
+      border-bottom: 1px solid var(--border);
+    }
+    .tab-btn {
+      padding: 12px 26px; border-radius: 10px 10px 0 0;
+      border: none; background: transparent; color: var(--muted);
+      font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 500;
+      cursor: pointer; transition: all 0.25s;
+      border: 1px solid transparent;
+    }
+    .tab-btn:hover { color: var(--text); background: var(--surface); }
+    .tab-btn.active {
+      color: var(--primary); background: var(--surface);
+      border-color: var(--border) var(--border) var(--surface);
+      font-weight: 700;
+    }
+
+    /* ── Main content ───────────────────────────────────────── */
+    .main { padding: 32px 40px; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── Section Headings ───────────────────────────────────── */
+    .section-title {
+      font-size: 13px; font-weight: 600; letter-spacing: 2px;
+      color: var(--primary); text-transform: uppercase; margin-bottom: 22px;
+    }
+
+    /* ── Card ───────────────────────────────────────────────── */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 18px; padding: 28px;
+      backdrop-filter: blur(12px);
+      transition: box-shadow 0.3s;
+    }
+    .card:hover { box-shadow: 0 0 28px rgba(59,130,246,0.12); }
+
+    /* ── Grid layouts ───────────────────────────────────────── */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 18px; }
+
+    /* ── Form ───────────────────────────────────────────────── */
+    .form-grid {
+      display: grid; grid-template-columns: repeat(3,1fr); gap: 18px;
+    }
+    .form-group { display: flex; flex-direction: column; gap: 7px; }
+    .form-group label {
+      font-size: 12px; font-weight: 600; color: var(--muted);
+      letter-spacing: 0.5px; text-transform: uppercase;
+    }
+    .form-group input, .form-group select {
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--text); padding: 12px 16px; border-radius: 10px;
+      font-family: 'Outfit', sans-serif; font-size: 14px;
+      transition: border-color 0.25s, box-shadow 0.25s;
+      outline: none;
+    }
+    .form-group input:focus, .form-group select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.18);
+    }
+    .form-group select option { background: #122040; }
+
+    /* ── Buttons ────────────────────────────────────────────── */
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 14px 32px; border-radius: 12px; border: none; cursor: pointer;
+      font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 700;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: white; box-shadow: 0 4px 20px rgba(59,130,246,0.35);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(59,130,246,0.45); }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-secondary {
+      padding: 12px 22px; border-radius: 10px;
+      border: 1px solid var(--border); background: var(--surface);
+      color: var(--text); cursor: pointer; font-family: 'Outfit', sans-serif;
+      font-size: 14px; font-weight: 500; transition: all 0.25s;
+    }
+    .btn-secondary:hover { border-color: var(--primary); color: var(--primary); }
+
+    /* ── Actions row ────────────────────────────────────────── */
+    .form-actions {
+      margin-top: 26px; display: flex; align-items: center; gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    /* ── Prediction Result ──────────────────────────────────── */
+    #prediction-panel {
+      margin-top: 28px; display: none;
+    }
+
+    .result-hero {
+      background: linear-gradient(135deg, rgba(59,130,246,0.12), rgba(16,185,129,0.10));
+      border: 1px solid rgba(59,130,246,0.35);
+      border-radius: 18px; padding: 32px 36px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 24px;
+    }
+    .result-main h2 {
+      font-size: 13px; font-weight: 600; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px;
+    }
+    .result-value {
+      font-size: 64px; font-weight: 800; line-height: 1;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .result-unit { font-size: 18px; color: var(--muted); margin-top: 5px; }
+    .result-ci {
+      font-size: 13px; color: var(--muted); margin-top: 8px;
+    }
+    .result-ci span { color: var(--warn); font-weight: 600; }
+
+    .result-meta {
+      display: flex; flex-direction: column; gap: 16px; min-width: 240px;
+    }
+    .meta-row {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 24px; padding: 10px 16px;
+      background: rgba(7,15,30,0.5); border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+    .meta-label { font-size: 12px; color: var(--muted); font-weight: 500; }
+    .meta-value { font-size: 14px; font-weight: 700; color: var(--text); }
+
+    /* ── Stats Bar ──────────────────────────────────────────── */
+    .stat-card {
+      padding: 22px 24px; border-radius: 16px;
+      background: var(--card-bg); border: 1px solid var(--border);
+    }
+    .stat-label { font-size: 12px; color: var(--muted); font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+    .stat-value { font-size: 32px; font-weight: 800; line-height: 1; }
+    .stat-sub   { font-size: 12px; color: var(--muted); margin-top: 6px; }
+    .text-green  { color: var(--accent); }
+    .text-blue   { color: var(--primary); }
+    .text-purple { color: #8b5cf6; }
+    .text-yellow { color: var(--warn); }
+    .text-red    { color: var(--danger); }
+
+    /* ── Metrics card ───────────────────────────────────────── */
+    .metric-report {
+      white-space: pre-wrap; font-family: 'Inter', monospace; font-size: 13px;
+      color: var(--muted); line-height: 1.8; padding: 20px;
+      background: var(--surface); border-radius: 12px; border: 1px solid var(--border);
+    }
+    .metric-report .highlight { color: var(--accent); font-weight: 600; }
+
+    /* ── Image grid ─────────────────────────────────────────── */
+    .plot-grid {
+      display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; margin-top: 8px;
+    }
+    .plot-card {
+      border-radius: 14px; overflow: hidden;
+      border: 1px solid var(--border); cursor: pointer;
+      transition: transform 0.25s, box-shadow 0.25s;
+      background: var(--surface);
+    }
+    .plot-card:hover { transform: scale(1.03); box-shadow: 0 8px 32px rgba(59,130,246,0.3); }
+    .plot-card img { width: 100%; display: block; object-fit: cover; }
+    .plot-caption {
+      padding: 10px 14px; font-size: 12px; font-weight: 600;
+      color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px;
+    }
+
+    /* ── Lightbox ───────────────────────────────────────────── */
+    #lightbox {
+      display: none; position: fixed; inset: 0; z-index: 9999;
+      background: rgba(0,0,0,0.88); align-items: center; justify-content: center;
+      padding: 30px;
+    }
+    #lightbox.open { display: flex; }
+    #lightbox img {
+      max-width: 90vw; max-height: 85vh; border-radius: 16px;
+      box-shadow: 0 0 60px rgba(59,130,246,0.4);
+    }
+    #lightbox-close {
+      position: absolute; top: 20px; right: 28px;
+      font-size: 36px; cursor: pointer; color: #fff; background: none; border: none;
+    }
+
+    /* ── Spinner ────────────────────────────────────────────── */
+    .spinner {
+      display: inline-block; width: 18px; height: 18px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Error box ──────────────────────────────────────────── */
+    .error-box {
+      padding: 14px 20px; border-radius: 12px;
+      background: rgba(244,63,94,0.08); border: 1px solid rgba(244,63,94,0.3);
+      color: var(--danger); font-size: 14px; margin-top: 16px; display: none;
+    }
+
+    /* ── Divider ────────────────────────────────────────────── */
+    hr.divider { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+
+    /* ── Responsive ─────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      header { padding: 16px 20px; }
+      .main, .tabs-bar, .api-banner { padding-left: 20px; padding-right: 20px; margin-left: 0; }
+      .api-banner { margin: 12px 20px 0; }
+      .form-grid, .grid-2, .grid-3, .grid-4, .plot-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="bg-orbs">
+  <span></span><span></span><span></span>
+</div>
+
+<div class="wrapper">
+
+  <!-- Header -->
+  <header>
+    <div class="logo">
+      <div class="logo-icon">⛅</div>
+      <div class="logo-text">
+        <h1>METEOR IQ</h1>
+        <p>State-of-the-Art Weather &amp; Climate Forecasting Engine</p>
+      </div>
+    </div>
+    <div class="header-status" id="header-status">
+      <div class="status-dot"></div>
+      <span id="status-text">Connecting to API…</span>
+    </div>
+  </header>
+
+  <!-- API Banner -->
+  <div class="api-banner">
+    <span>⚡</span>
+    <span class="label">Connected to Weather API server (Ready)</span>
+    &nbsp;·&nbsp;
+    <span>API URL:</span>
+    <code id="api-url-display">http://127.0.0.1:8000</code>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs-bar">
+    <button class="tab-btn active" id="tab-btn-predictor" onclick="switchTab('predictor')">🌤️ Weather Predictor</button>
+    <button class="tab-btn" id="tab-btn-insights"  onclick="switchTab('insights')">🔬 Climate Insights</button>
+  </div>
+
+  <div class="main">
+
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <!-- TAB 1: WEATHER PREDICTOR                                     -->
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <div class="tab-panel active" id="tab-predictor">
+
+      <div class="card">
+        <div class="section-title">🌡️ Climate &amp; Weather Details</div>
+
+        <form id="weather-form" onsubmit="return false;">
+          <div class="form-grid">
+
+            <div class="form-group">
+              <label for="temperature">Temperature (°C)</label>
+              <input type="number" id="temperature" value="22.5" min="-30" max="60" step="0.1" placeholder="e.g. 22.5"/>
+            </div>
+
+            <div class="form-group">
+              <label for="humidity">Relative Humidity (%)</label>
+              <input type="number" id="humidity" value="60" min="0" max="100" placeholder="e.g. 60"/>
+            </div>
+
+            <div class="form-group">
+              <label for="wind_speed">Wind Speed (km/h)</label>
+              <input type="number" id="wind_speed" value="12.5" min="0" max="150" step="0.1" placeholder="e.g. 12.5"/>
+            </div>
+
+            <div class="form-group">
+              <label for="atmospheric_pressure">Atmospheric Pressure (hPa)</label>
+              <input type="number" id="atmospheric_pressure" value="1012.0" min="950" max="1050" step="0.1" placeholder="e.g. 1012.0"/>
+            </div>
+
+            <div class="form-group">
+              <label for="rainfall">Rainfall / Precipitation (mm)</label>
+              <input type="number" id="rainfall" value="0.0" min="0" max="300" step="0.1" placeholder="e.g. 0.0"/>
+            </div>
+
+            <div class="form-group">
+              <label for="region">Region</label>
+              <select id="region">
+                <option value="North" selected>North</option>
+                <option value="South">South</option>
+                <option value="East">East</option>
+                <option value="West">West</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="date">Date</label>
+              <input type="date" id="date" value="2026-05-26"/>
+            </div>
+
+            <div class="form-group">
+              <label for="season">Season</label>
+              <select id="season">
+                <option value="Spring">Spring</option>
+                <option value="Summer" selected>Summer</option>
+                <option value="Fall">Fall</option>
+                <option value="Winter">Winter</option>
+              </select>
+            </div>
+
+          </div><!-- /form-grid -->
+
+          <div class="form-actions">
+            <button class="btn-primary" id="predict-btn" onclick="predictWeather()">
+              <span id="predict-btn-icon">🔮</span>
+              <span id="predict-btn-text">Generate Forecast</span>
+            </button>
+            <button class="btn-secondary" onclick="resetForm()">↺ Reset</button>
+          </div>
+        </form>
+
+        <div class="error-box" id="predict-error"></div>
+      </div><!-- /card -->
+
+      <!-- Result Panel -->
+      <div id="prediction-panel">
+        <div class="result-hero">
+          <div class="result-main">
+            <h2>Outdoor Suitability (Play Index)</h2>
+            <div class="result-value" id="result-play">—</div>
+            <div class="result-unit">suitability classification</div>
+            <div class="result-ci">
+              Play Suitability Score: <span id="result-score">—</span>% (Confidence Interval: <span id="result-lower">—</span>% – <span id="result-upper">—</span>%)
+            </div>
+          </div>
+          <div class="result-meta">
+            <div class="meta-row">
+              <span class="meta-label">Predicted Weather Condition</span>
+              <span class="meta-value text-blue" id="meta-outlook">—</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-label">Forecasted Temperature</span>
+              <span class="meta-value text-yellow" id="meta-temp">—</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-label">Forecasted Rainfall</span>
+              <span class="meta-value text-purple" id="meta-rain">—</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-label">Region</span>
+              <span class="meta-value" id="meta-region">—</span>
+            </div>
+          </div>
+        </div>
+
+        <hr class="divider"/>
+
+        <!-- Metadata strip -->
+        <div class="grid-4" style="margin-top:0">
+          <div class="stat-card">
+            <div class="stat-label">Forecast Date</div>
+            <div class="stat-value text-purple" id="meta-date" style="font-size:22px">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Model accuracy (R²)</div>
+            <div class="stat-value text-green" id="meta-r2" style="font-size:22px">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Model RMSE</div>
+            <div class="stat-value text-yellow" id="meta-rmse" style="font-size:22px">—</div>
+            <div class="stat-sub">Root Mean Sq Error</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Forecast Engine</div>
+            <div class="stat-value" style="font-size:14px;line-height:1.4;margin-top:4px">Random Forest<br/>Regressor</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /tab-predictor -->
+
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <!-- TAB 2: FORECAST INSIGHTS                                     -->
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <div class="tab-panel" id="tab-insights">
+
+      <!-- Key metrics -->
+      <div class="grid-4" style="margin-bottom:28px" id="metrics-stats">
+        <div class="stat-card">
+          <div class="stat-label">Play Fit (R²)</div>
+          <div class="stat-value text-green" id="ins-r2">—</div>
+          <div class="stat-sub">Variance explained</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Temp Fit (R²)</div>
+          <div class="stat-value text-blue" id="ins-temp-r2">—</div>
+          <div class="stat-sub">Temperature R²</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Rain Fit (R²)</div>
+          <div class="stat-value text-purple" id="ins-rain-r2">—</div>
+          <div class="stat-sub">Precipitation R²</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Model Type</div>
+          <div class="stat-value" style="font-size:16px;margin-top:6px">Random Forest</div>
+          <div class="stat-sub">n_estimators = 150</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:28px">
+        <div class="section-title">📄 Evaluation Report</div>
+        <div class="metric-report" id="metrics-report">Loading model metrics…</div>
+        <div style="margin-top:16px; display:flex; gap:12px; flex-wrap:wrap;">
+          <button class="btn-secondary" onclick="loadInsights()">⟳ Refresh Metrics</button>
+          <button class="btn-secondary" onclick="triggerRetrain()">🔁 Retrain Model</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">📊 Operational Visualizations</div>
+        <div class="plot-grid" id="plots-grid">
+          <div class="plot-card" onclick="openLightbox('/results/image/temperature_trend.png')">
+            <img src="/results/image/temperature_trend.png" alt="Temperature Trend" onerror="imgError(this)"/>
+            <div class="plot-caption">📈 Temperature Trend</div>
+          </div>
+          <div class="plot-card" onclick="openLightbox('/results/image/humidity_distribution.png')">
+            <img src="/results/image/humidity_distribution.png" alt="Humidity Distribution" onerror="imgError(this)"/>
+            <div class="plot-caption">📊 Humidity Profile</div>
+          </div>
+          <div class="plot-card" onclick="openLightbox('/results/image/correlation_heatmap.png')">
+            <img src="/results/image/correlation_heatmap.png" alt="Correlation Heatmap" onerror="imgError(this)"/>
+            <div class="plot-caption">🌡️ Correlation Heatmap</div>
+          </div>
+          <div class="plot-card" onclick="openLightbox('/results/image/rainfall_visualization.png')">
+            <img src="/results/image/rainfall_visualization.png" alt="Rainfall Visualization" onerror="imgError(this)"/>
+            <div class="plot-caption">☔ Seasonal Rainfall</div>
+          </div>
+          <div class="plot-card" onclick="openLightbox('/results/image/actual_vs_predicted.png')">
+            <img src="/results/image/actual_vs_predicted.png" alt="Actual vs Predicted" onerror="imgError(this)"/>
+            <div class="plot-caption">🎯 Actual vs Predicted</div>
+          </div>
+          <div class="plot-card" onclick="openLightbox('/results/image/residuals_distribution.png')">
+            <img src="/results/image/residuals_distribution.png" alt="Residuals" onerror="imgError(this)"/>
+            <div class="plot-caption">📉 Error Distribution</div>
+          </div>
+          <div class="plot-card" onclick="openLightbox('/results/image/feature_importance.png')">
+            <img src="/results/image/feature_importance.png" alt="Feature Importance" onerror="imgError(this)"/>
+            <div class="plot-caption">⚡ Feature Importance</div>
+          </div>
+          <div class="plot-card" onclick="openLightbox('/results/image/forecast_trend.png')">
+            <img src="/results/image/forecast_trend.png" alt="Forecast Trend" onerror="imgError(this)"/>
+            <div class="plot-caption">🌀 Forecast Trend</div>
+          </div>
+          <div class="plot-card" onclick="openLightbox('/results/image/model_metrics.png')">
+            <img src="/results/image/model_metrics.png" alt="Model Metrics" onerror="imgError(this)"/>
+            <div class="plot-caption">🏅 Model Metrics Comparison</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /tab-insights -->
+
+  </div><!-- /main -->
+</div><!-- /wrapper -->
+
+<!-- Lightbox -->
+<div id="lightbox" onclick="closeLightbox()">
+  <button id="lightbox-close" onclick="closeLightbox()">✕</button>
+  <img id="lightbox-img" src="" alt="Plot"/>
+</div>
+
+<script>
+  const API = 'http://127.0.0.1:8000';
+
+  // Set default date to today
+  document.getElementById('date').value = new Date().toISOString().substring(0, 10);
+
+  /* ── Health Check ──────────────────────────────────────── */
+  async function checkHealth() {
+    try {
+      const res = await fetch(`${API}/health`);
+      const data = await res.json();
+      const el = document.getElementById('status-text');
+      if (data.status === 'ok') {
+        el.textContent = 'Connected to Weather API server (Ready)';
+        document.querySelector('.status-dot').style.background = '#10b981';
+      } else {
+        el.textContent = 'API connected – model not loaded';
+        document.querySelector('.status-dot').style.background = '#f59e0b';
+      }
+    } catch {
+      document.getElementById('status-text').textContent = 'API Offline – start backend';
+      document.querySelector('.status-dot').style.background = '#f43f5e';
+    }
+  }
+  checkHealth();
+  setInterval(checkHealth, 15000);
+
+  /* ── Tab switching ─────────────────────────────────────── */
+  function switchTab(name) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    document.getElementById('tab-btn-' + name).classList.add('active');
+    if (name === 'insights') loadInsights();
+  }
+
+  /* ── Predict Weather ────────────────────────────────────── */
+  async function predictWeather() {
+    const btn      = document.getElementById('predict-btn');
+    const icon     = document.getElementById('predict-btn-icon');
+    const txtEl    = document.getElementById('predict-btn-text');
+    const errorBox = document.getElementById('predict-error');
+
+    errorBox.style.display = 'none';
+
+    // Validate
+    const temp         = parseFloat(document.getElementById('temperature').value);
+    const humidity     = parseFloat(document.getElementById('humidity').value);
+    const windSpeed    = parseFloat(document.getElementById('wind_speed').value);
+    const pressure     = parseFloat(document.getElementById('atmospheric_pressure').value);
+    const rainfall     = parseFloat(document.getElementById('rainfall').value);
+    const dateVal      = document.getElementById('date').value;
+
+    if (isNaN(temp) || temp < -50 || temp > 60) { showError('Please enter a valid temperature between -50°C and 60°C.'); return; }
+    if (isNaN(humidity) || humidity < 0 || humidity > 100) { showError('Humidity must be between 0% and 100%.'); return; }
+    if (isNaN(windSpeed) || windSpeed < 0) { showError('Please enter a valid wind speed.'); return; }
+    if (isNaN(pressure) || pressure < 900 || pressure > 1100) { showError('Please enter a valid pressure between 900 and 1100 hPa.'); return; }
+    if (isNaN(rainfall) || rainfall < 0) { showError('Please enter a valid rainfall value.'); return; }
+    if (!dateVal) { showError('Please select a date.'); return; }
+
+    // Loading state
+    btn.disabled = true;
+    icon.innerHTML = '<span class="spinner"></span>';
+    txtEl.textContent = 'Forecasting…';
+
+    const payload = {
+      temperature:          temp,
+      humidity:             humidity,
+      wind_speed:           windSpeed,
+      atmospheric_pressure: pressure,
+      rainfall:             rainfall,
+      region:               document.getElementById('region').value,
+      date:                 dateVal,
+      season:               document.getElementById('season').value
+    };
+
+    try {
+      const res  = await fetch(`${API}/predict`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        showError(err.detail || 'Prediction failed.');
+        return;
+      }
+      const data = await res.json();
+      displayResult(data);
+    } catch (e) {
+      showError('Could not connect to the API. Make sure the backend server is running at ' + API);
+    } finally {
+      btn.disabled = false;
+      icon.textContent = '🔮';
+      txtEl.textContent = 'Generate Forecast';
+    }
+  }
+
+  function displayResult(data) {
+    document.getElementById('result-play').textContent    = data.predicted_play;
+    document.getElementById('result-score').textContent   = data.play_suitability_score.toFixed(1);
+    document.getElementById('result-lower').textContent   = data.play_lower_bound.toFixed(1);
+    document.getElementById('result-upper').textContent   = data.play_upper_bound.toFixed(1);
+    
+    document.getElementById('meta-outlook').textContent   = data.predicted_outlook;
+    document.getElementById('meta-temp').textContent      = data.forecasted_temperature.toFixed(1) + ' °C';
+    document.getElementById('meta-rain').textContent      = data.forecasted_rainfall.toFixed(1) + ' mm';
+    document.getElementById('meta-region').textContent    = data.region;
+    
+    document.getElementById('meta-date').textContent      = data.date;
+    document.getElementById('meta-r2').textContent        = (data.model_r2 * 100).toFixed(1) + '%';
+    document.getElementById('meta-rmse').textContent      = data.model_rmse.toFixed(3);
+
+    const panel = document.getElementById('prediction-panel');
+    panel.style.display = 'block';
+    panel.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('predict-error');
+    el.textContent = '⚠️ ' + msg;
+    el.style.display = 'block';
+  }
+
+  function resetForm() {
+    document.getElementById('weather-form').reset();
+    document.getElementById('prediction-panel').style.display = 'none';
+    document.getElementById('predict-error').style.display = 'none';
+    
+    document.getElementById('temperature').value = '22.5';
+    document.getElementById('humidity').value = '60';
+    document.getElementById('wind_speed').value = '12.5';
+    document.getElementById('atmospheric_pressure').value = '1012.0';
+    document.getElementById('rainfall').value = '0.0';
+    document.getElementById('date').value = new Date().toISOString().substring(0, 10);
+  }
+
+  /* ── Load Insights ─────────────────────────────────────── */
+  async function loadInsights() {
+    try {
+      const res  = await fetch(`${API}/results/metrics`);
+      const data = await res.json();
+      document.getElementById('metrics-report').textContent = data.text_report;
+
+      // Parse metrics
+      const lines = data.text_report.split('\n');
+      for (const line of lines) {
+        if (line.includes('Play Suitability') || line.includes('Play R²')) {
+          // find R2 score inside accuracy_results.txt
+          const nextLine = lines[lines.indexOf(line) + 1];
+          const m = nextLine.match(/R² Score\s*:\s*([\d.-]+)/);
+          if (m) document.getElementById('ins-r2').textContent = (parseFloat(m[1]) * 100).toFixed(1) + '%';
+        }
+        if (line.includes('Forecasted Temperature Model')) {
+          const nextLine = lines[lines.indexOf(line) + 1];
+          const m = nextLine.match(/R² Score\s*:\s*([\d.-]+)/);
+          if (m) document.getElementById('ins-temp-r2').textContent = (parseFloat(m[1]) * 100).toFixed(1) + '%';
+        }
+        if (line.includes('Forecasted Rainfall Model')) {
+          const nextLine = lines[lines.indexOf(line) + 1];
+          const m = nextLine.match(/R² Score\s*:\s*([\d.-]+)/);
+          if (m) document.getElementById('ins-rain-r2').textContent = (parseFloat(m[1]) * 100).toFixed(1) + '%';
+        }
+      }
+    } catch {
+      document.getElementById('metrics-report').textContent =
+        'Could not load metrics. Make sure the backend is running and the model has been trained.';
+    }
+  }
+
+  /* ── Retrain Model ─────────────────────────────────────── */
+  async function triggerRetrain() {
+    if (!confirm('Retraining will take some time. Proceed?')) return;
+    try {
+      const res  = await fetch(`${API}/retrain`, { method: 'POST' });
+      const data = await res.json();
+      alert('✅ ' + data.message);
+    } catch {
+      alert('⚠️ Could not reach the API to start retraining.');
+    }
+  }
+
+  /* ── Lightbox ──────────────────────────────────────────── */
+  function openLightbox(src) {
+    document.getElementById('lightbox-img').src = API + src + '?t=' + Date.now();
+    document.getElementById('lightbox').classList.add('open');
+  }
+  function closeLightbox() {
+    document.getElementById('lightbox').classList.remove('open');
+  }
+  function imgError(el) {
+    el.style.display = 'none';
+    const p = el.nextElementSibling;
+    if (p) p.textContent += ' (train model to generate)';
+  }
+
+  /* ── Keyboard shortcut ─────────────────────────────────── */
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeLightbox();
+  });
+</script>
+</body>
+</html>

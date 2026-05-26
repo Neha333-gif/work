@@ -1,0 +1,21 @@
+Weather Forecasting - Model Evaluation Report
+=================================================
+Play Suitability Index (Weather Fit) Model:
+  R² Score : 0.5012   (50.12%)
+  MAE      : 0.2437
+  MSE      : 0.1233
+  RMSE     : 0.3511
+
+Forecasted Temperature Model:
+  R² Score : 0.8841
+  MAE      : 2.3936 °C
+  RMSE     : 2.9807 °C
+
+Forecasted Rainfall Model:
+  R² Score : 0.3993
+  MAE      : 3.8499 mm
+  RMSE     : 7.7153 mm
+
+Model Type : RandomForestRegressor
+Features   : ['Region', 'Season', 'Temperature', 'Humidity', 'Wind Speed', 'Atmospheric Pressure', 'Rainfall', 'Outlook', 'Windy']
+Samples    : 1000 (train: 964, test: 242)
