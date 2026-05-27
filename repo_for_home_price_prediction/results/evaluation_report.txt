@@ -1,0 +1,5 @@
+MAE: 69,751.01
+MSE: 18,232,085,696.84
+RMSE: 135,026.24
+R2: 0.8706
+Model: Random Forest Regressor

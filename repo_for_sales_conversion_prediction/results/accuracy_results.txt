@@ -1,0 +1,29 @@
+Sales Conversion Prediction - Model Evaluation Report
+=================================================
+Selected Model           : Logistic Regression
+Accuracy                 : 0.7118
+Precision                : 0.9048
+Recall                   : 0.4872
+F1 Score                 : 0.6333
+Dataset Path             : C:\Users\peepl\Downloads\cust_segmentation_zip\repo_for_demand_forecasting\repo_for_demand_forecasting\sales conversion\KAG_conversion_data.csv
+Total Samples            : 1142
+Training Samples         : 913
+Testing Samples          : 229
+
+Model Comparison
+----------------
+Logistic Regression: acc=0.7118, pre=0.9048, rec=0.4872, f1=0.6333
+Decision Tree Classifier: acc=0.6507, pre=0.7176, rec=0.5214, f1=0.6040
+Random Forest Classifier: acc=0.6681, pre=0.7662, rec=0.5043, f1=0.6082
+
+Classification Report
+---------------------
+               precision    recall  f1-score   support
+
+No Conversion       0.64      0.95      0.76       112
+    Converted       0.90      0.49      0.63       117
+
+     accuracy                           0.71       229
+    macro avg       0.77      0.72      0.70       229
+ weighted avg       0.77      0.71      0.70       229
+

@@ -1,0 +1,29 @@
+Loan Default Prediction - Model Evaluation Report
+=================================================
+Selected Model           : Random Forest Classifier
+Accuracy                 : 0.9700
+Precision                : 0.5897
+Recall                   : 0.3433
+F1 Score                 : 0.4340
+Dataset Path             : C:\Users\peepl\Downloads\cust_segmentation_zip\repo_for_demand_forecasting\repo_for_demand_forecasting\loan default prediction\Default_Fin.csv
+Total Samples            : 10000
+Training Samples         : 8000
+Testing Samples          : 2000
+
+Model Comparison
+----------------
+Logistic Regression: acc=0.9725, pre=0.7143, rec=0.2985, f1=0.4211
+Decision Tree Classifier: acc=0.9635, pre=0.4400, rec=0.3284, f1=0.3761
+Random Forest Classifier: acc=0.9700, pre=0.5897, rec=0.3433, f1=0.4340
+
+Classification Report
+---------------------
+              precision    recall  f1-score   support
+
+  No Default       0.98      0.99      0.98      1933
+     Default       0.59      0.34      0.43        67
+
+    accuracy                           0.97      2000
+   macro avg       0.78      0.67      0.71      2000
+weighted avg       0.96      0.97      0.97      2000
+

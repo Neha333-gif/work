@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home Price Prediction</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #0f172a; color: #e2e8f0; }
+    .container { max-width: 980px; margin: 24px auto; padding: 20px; }
+    .card { background: #111827; border: 1px solid #334155; border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+    h1, h2 { margin-top: 0; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    label { font-size: 13px; color: #94a3b8; display: block; margin-bottom: 5px; }
+    input, select, button {
+      width: 100%; border-radius: 8px; border: 1px solid #475569; padding: 10px;
+      background: #0b1220; color: #f1f5f9;
+    }
+    button { background: #2563eb; border: none; font-weight: 600; cursor: pointer; }
+    button:hover { background: #1d4ed8; }
+    .result-box { background: #052e16; border: 1px solid #16a34a; border-radius: 10px; padding: 14px; display: none; }
+    .error { color: #fca5a5; margin-top: 8px; display: none; }
+    img { width: 100%; border-radius: 10px; border: 1px solid #334155; background: #020617; }
+    .plots { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 800px) { .grid, .plots { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>Home Price Prediction Dashboard</h1>
+      <p>Enter property details to generate an estimated home value and price range.</p>
+    </div>
+
+    <div class="card">
+      <h2>Property Input Form</h2>
+      <form id="home-price-form" onsubmit="return false;">
+        <div class="grid">
+          <div>
+            <label>Number of Bedrooms</label>
+            <input id="bedrooms" type="number" min="1" max="15" value="3" required />
+          </div>
+          <div>
+            <label>Number of Bathrooms</label>
+            <input id="bathrooms" type="number" min="1" max="10" step="0.5" value="2.5" required />
+          </div>
+          <div>
+            <label>Square Footage</label>
+            <input id="square_footage" type="number" min="300" max="20000" value="2400" required />
+          </div>
+          <div>
+            <label>Location (Postal Code)</label>
+            <input id="location" type="number" value="122010" required />
+          </div>
+          <div>
+            <label>Year Built</label>
+            <input id="year_built" type="number" min="1800" max="2030" value="2005" required />
+          </div>
+          <div>
+            <label>Garage Availability</label>
+            <select id="garage_availability">
+              <option value="1">Yes</option>
+              <option value="0">No</option>
+            </select>
+          </div>
+          <div>
+            <label>Lot Size</label>
+            <input id="lot_size" type="number" min="500" max="200000" value="5200" required />
+          </div>
+          <div>
+            <label>Property Type</label>
+            <select id="property_type">
+              <option>Apartment</option>
+              <option>Condo</option>
+              <option>Townhouse</option>
+              <option selected>Single Family</option>
+              <option>Luxury Villa</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-top: 12px;">
+          <button onclick="predictHomePrice()">Predict Home Price</button>
+          <div id="error" class="error"></div>
+        </div>
+      </form>
+    </div>
+
+    <div class="card result-box" id="result-box">
+      <h2>Prediction Result</h2>
+      <p><strong>Predicted Home Price:</strong> ₹<span id="predicted_home_price"></span></p>
+      <p><strong>Estimated Property Value Range:</strong> ₹<span id="range_lower"></span> - ₹<span id="range_upper"></span></p>
+      <p><strong>Model:</strong> <span id="selected_model"></span></p>
+      <p><strong>Model R2:</strong> <span id="model_r2"></span> | <strong>RMSE:</strong> <span id="model_rmse"></span></p>
+    </div>
+
+    <div class="card">
+      <h2>Generated Visualizations</h2>
+      <div class="plots">
+        <img src="/results/image/price_distribution.png" alt="price_distribution">
+        <img src="/results/image/correlation_heatmap.png" alt="correlation_heatmap">
+        <img src="/results/image/feature_importance.png" alt="feature_importance">
+        <img src="/results/image/actual_vs_predicted.png" alt="actual_vs_predicted">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = "http://127.0.0.1:8000";
+
+    function showError(msg) {
+      const el = document.getElementById("error");
+      el.style.display = "block";
+      el.textContent = msg;
+    }
+
+    async function predictHomePrice() {
+      const payload = {
+        bedrooms: Number(document.getElementById("bedrooms").value),
+        bathrooms: Number(document.getElementById("bathrooms").value),
+        square_footage: Number(document.getElementById("square_footage").value),
+        location: Number(document.getElementById("location").value),
+        year_built: Number(document.getElementById("year_built").value),
+        garage_availability: Number(document.getElementById("garage_availability").value),
+        lot_size: Number(document.getElementById("lot_size").value),
+        property_type: document.getElementById("property_type").value
+      };
+      document.getElementById("error").style.display = "none";
+
+      if (Number.isNaN(payload.bedrooms) || payload.bedrooms < 1) return showError("Enter a valid bedroom count.");
+      if (Number.isNaN(payload.bathrooms) || payload.bathrooms < 1) return showError("Enter a valid bathroom count.");
+      if (Number.isNaN(payload.square_footage) || payload.square_footage < 300) return showError("Enter valid square footage.");
+      if (Number.isNaN(payload.location)) return showError("Enter a valid postal code.");
+
+      try {
+        const res = await fetch(`${API}/predict`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) return showError(data.detail || "Prediction failed.");
+
+        document.getElementById("predicted_home_price").textContent = Number(data.predicted_home_price).toLocaleString();
+        document.getElementById("range_lower").textContent = Number(data.estimated_value_range.lower).toLocaleString();
+        document.getElementById("range_upper").textContent = Number(data.estimated_value_range.upper).toLocaleString();
+        document.getElementById("selected_model").textContent = data.selected_model;
+        document.getElementById("model_r2").textContent = data.model_r2;
+        document.getElementById("model_rmse").textContent = data.model_rmse;
+        document.getElementById("result-box").style.display = "block";
+      } catch (e) {
+        showError("Could not reach backend server. Start home_price_prediction.py first.");
+      }
+    }
+  </script>
+</body>
+</html>

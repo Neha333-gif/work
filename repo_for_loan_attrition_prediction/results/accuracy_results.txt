@@ -1,0 +1,29 @@
+Loan Attrition Prediction - Model Evaluation Report
+=================================================
+Selected Model           : Random Forest Classifier
+Accuracy                 : 0.9813
+Precision                : 0.9842
+Recall                   : 0.9659
+F1 Score                 : 0.9750
+Dataset Path             : C:\Users\peepl\Downloads\cust_segmentation_zip\repo_for_demand_forecasting\repo_for_demand_forecasting\loan_prediction_system\loan_approval_dataset.csv
+Total Samples            : 4269
+Training Samples         : 3415
+Testing Samples          : 854
+
+Model Comparison
+----------------
+Logistic Regression: acc=0.9227, pre=0.9159, rec=0.8762, f1=0.8956
+Decision Tree Classifier: acc=0.9742, pre=0.9748, rec=0.9567, f1=0.9656
+Random Forest Classifier: acc=0.9813, pre=0.9842, rec=0.9659, f1=0.9750
+
+Classification Report
+---------------------
+              precision    recall  f1-score   support
+
+    Approved       0.98      0.99      0.99       531
+    Rejected       0.98      0.97      0.97       323
+
+    accuracy                           0.98       854
+   macro avg       0.98      0.98      0.98       854
+weighted avg       0.98      0.98      0.98       854
+

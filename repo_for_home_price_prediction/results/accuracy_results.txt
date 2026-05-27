@@ -1,0 +1,17 @@
+Home Price Prediction - Model Evaluation Report
+=================================================
+Selected Model           : Random Forest Regressor
+MAE                      : 69,751.01
+MSE                      : 18,232,085,696.84
+RMSE                     : 135,026.24
+R2 Score                 : 0.8706
+Dataset Path             : C:\Users\peepl\Downloads\cust_segmentation_zip\repo_for_demand_forecasting\repo_for_demand_forecasting\House Price India.csv
+Total Samples            : 14620
+Training Samples         : 11696
+Testing Samples          : 2924
+
+Model Performance Comparison (by R2)
+------------------------------------
+Linear Regression: R2=0.7188, RMSE=199,069.43
+Decision Tree Regressor: R2=0.7567, RMSE=185,174.18
+Random Forest Regressor: R2=0.8706, RMSE=135,026.24

@@ -1,0 +1,116 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Medical Insurance Cost Prediction</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #0f172a; color: #e2e8f0; }
+    .container { max-width: 1080px; margin: 24px auto; padding: 20px; }
+    .card { background: #111827; border: 1px solid #334155; border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+    h1, h2 { margin-top: 0; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    label { font-size: 13px; color: #94a3b8; display: block; margin-bottom: 5px; }
+    input, select, textarea, button { width: 100%; border-radius: 8px; border: 1px solid #475569; padding: 10px; background: #0b1220; color: #f1f5f9; }
+    button { background: #2563eb; border: none; font-weight: 600; cursor: pointer; }
+    button:hover { background: #1d4ed8; }
+    .result-box { background: #052e16; border: 1px solid #16a34a; border-radius: 10px; padding: 14px; display: none; }
+    .error { color: #fca5a5; margin-top: 8px; display: none; }
+    img { width: 100%; border-radius: 10px; border: 1px solid #334155; background: #020617; }
+    .plots { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 900px) { .grid, .plots { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>Medical Insurance Cost Prediction Dashboard</h1>
+      <p>Enter patient insurance data to estimate predicted medical insurance cost and premium range.</p>
+    </div>
+
+    <div class="card">
+      <h2>Patient Insurance Input Form</h2>
+      <form id="insurance-form" onsubmit="return false;">
+        <div class="grid">
+          <div><label>Age</label><input id="age" type="number" min="18" max="100" value="35" required /></div>
+          <div><label>Gender</label><select id="gender"><option>male</option><option>female</option></select></div>
+          <div><label>BMI</label><input id="bmi" type="number" min="10" max="80" step="0.1" value="28.5" required /></div>
+          <div><label>Number of Children</label><input id="number_of_children" type="number" min="0" max="10" value="2" required /></div>
+          <div><label>Smoking Status</label><select id="smoking_status"><option>no</option><option>yes</option></select></div>
+          <div><label>Region</label><select id="region"><option>northeast</option><option>northwest</option><option>southeast</option><option>southwest</option></select></div>
+          <div><label>Annual Income</label><input id="annual_income" type="number" min="1000" value="550000" required /></div>
+          <div><label>Existing Medical Conditions</label><textarea id="existing_medical_conditions" rows="3">Mild hypertension</textarea></div>
+        </div>
+        <div style="margin-top: 12px;">
+          <button onclick="predictInsuranceCost()">Run Medical Insurance Cost Prediction</button>
+          <div id="error" class="error"></div>
+        </div>
+      </form>
+    </div>
+
+    <div class="card result-box" id="result-box">
+      <h2>Prediction Result</h2>
+      <p><strong>Predicted Medical Insurance Cost:</strong> <span id="predicted_medical_insurance_cost"></span></p>
+      <p><strong>Estimated Insurance Premium Range:</strong> <span id="range_lower"></span> to <span id="range_upper"></span></p>
+      <p><strong>Model:</strong> <span id="selected_model"></span> | <strong>RMSE:</strong> <span id="model_rmse"></span> | <strong>R2:</strong> <span id="model_r2"></span></p>
+    </div>
+
+    <div class="card">
+      <h2>Generated Visualizations</h2>
+      <div class="plots">
+        <img src="/results/image/insurance_cost_distribution.png" alt="insurance_cost_distribution">
+        <img src="/results/image/correlation_heatmap.png" alt="correlation_heatmap">
+        <img src="/results/image/feature_importance.png" alt="feature_importance">
+        <img src="/results/image/actual_vs_predicted.png" alt="actual_vs_predicted">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = "http://127.0.0.1:8000";
+    function showError(msg) {
+      const el = document.getElementById("error");
+      el.style.display = "block";
+      el.textContent = msg;
+    }
+
+    async function predictInsuranceCost() {
+      const payload = {
+        age: Number(document.getElementById("age").value),
+        gender: document.getElementById("gender").value,
+        bmi: Number(document.getElementById("bmi").value),
+        number_of_children: Number(document.getElementById("number_of_children").value),
+        smoking_status: document.getElementById("smoking_status").value,
+        region: document.getElementById("region").value,
+        annual_income: Number(document.getElementById("annual_income").value),
+        existing_medical_conditions: document.getElementById("existing_medical_conditions").value
+      };
+      document.getElementById("error").style.display = "none";
+
+      if (Number.isNaN(payload.age) || payload.age < 18) return showError("Enter valid age.");
+      if (Number.isNaN(payload.bmi) || payload.bmi < 10) return showError("Enter valid BMI.");
+      if (Number.isNaN(payload.annual_income) || payload.annual_income < 1000) return showError("Enter valid annual income.");
+
+      try {
+        const res = await fetch(`${API}/predict`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) return showError(data.detail || "Prediction failed.");
+
+        document.getElementById("predicted_medical_insurance_cost").textContent = data.predicted_medical_insurance_cost;
+        document.getElementById("range_lower").textContent = data.estimated_insurance_premium_range.lower;
+        document.getElementById("range_upper").textContent = data.estimated_insurance_premium_range.upper;
+        document.getElementById("selected_model").textContent = data.selected_model;
+        document.getElementById("model_rmse").textContent = data.model_rmse;
+        document.getElementById("model_r2").textContent = data.model_r2;
+        document.getElementById("result-box").style.display = "block";
+      } catch (e) {
+        showError("Could not reach backend server. Start medical_insurance_cost_prediction.py first.");
+      }
+    }
+  </script>
+</body>
+</html>

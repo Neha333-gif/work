@@ -1,0 +1,23 @@
+Telecom Revenue Prediction Model Evaluation Report
+==================================================
+Dataset: telecom_revenue_prediction_dataset.csv (2000 samples)
+Model Type: Random Forest Regressor
+Training Samples: 1600 | Test Samples: 400
+
+Performance Metrics:
+  Mean Absolute Error (MAE): $278.59
+  Mean Squared Error (MSE): $760,999.02
+  Root Mean Squared Error (RMSE): $872.35
+  R² Score: 0.6491
+
+Features Used: 13
+  Numeric Features: 8
+  Categorical Features: 5
+
+Generated Visualizations:
+  - revenue_distribution.png
+  - actual_vs_predicted.png
+  - feature_importance.png
+  - residuals_distribution.png
+  - revenue_comparison.png
+  - model_performance.png

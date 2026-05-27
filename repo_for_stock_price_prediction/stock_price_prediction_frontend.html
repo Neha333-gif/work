@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stock Price Prediction</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #0f172a; color: #e2e8f0; }
+    .container { max-width: 1080px; margin: 24px auto; padding: 20px; }
+    .card { background: #111827; border: 1px solid #334155; border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+    h1, h2 { margin-top: 0; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    label { font-size: 13px; color: #94a3b8; display: block; margin-bottom: 5px; }
+    input, select, button { width: 100%; border-radius: 8px; border: 1px solid #475569; padding: 10px; background: #0b1220; color: #f1f5f9; box-sizing: border-box; }
+    button { background: #2563eb; border: none; font-weight: 600; cursor: pointer; }
+    button:hover { background: #1d4ed8; }
+    .result-box { background: #052e16; border: 1px solid #16a34a; border-radius: 10px; padding: 14px; display: none; }
+    .error { color: #fca5a5; margin-top: 8px; display: none; }
+    img { width: 100%; border-radius: 10px; border: 1px solid #334155; background: #020617; }
+    .plots { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .badge { display: inline-block; padding: 4px 10px; border-radius: 999px; background: #1d4ed8; font-weight: 700; }
+    .bullish { background: #16a34a; }
+    .bearish { background: #dc2626; }
+    .neutral { background: #64748b; }
+    @media (max-width: 900px) { .grid, .plots { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card" id="dashboard">
+      <h1>Stock Price Prediction Dashboard</h1>
+      <p>Enter stock market data to estimate predicted stock price, price range, and market trend.</p>
+    </div>
+
+    <div class="card" id="input-form">
+      <h2>Stock Market Input Form</h2>
+      <form id="stock-form" onsubmit="return false;">
+        <div class="grid">
+          <div><label>Opening Price</label><input id="opening_price" type="number" min="0" step="0.01" value="105.50" required /></div>
+          <div><label>Closing Price</label><input id="closing_price" type="number" min="0" step="0.01" value="107.25" required /></div>
+          <div><label>Highest Price</label><input id="highest_price" type="number" min="0" step="0.01" value="108.10" required /></div>
+          <div><label>Lowest Price</label><input id="lowest_price" type="number" min="0" step="0.01" value="104.80" required /></div>
+          <div><label>Trading Volume</label><input id="trading_volume" type="number" min="0" step="1" value="1250000" required /></div>
+          <div><label>Market Capitalization</label><input id="market_capitalization" type="number" min="0" step="1" value="8500000000" required /></div>
+          <div><label>Moving Average</label><input id="moving_average" type="number" min="0" step="0.01" value="106.40" required /></div>
+          <div><label>Volatility Index</label><input id="volatility_index" type="number" min="0" step="0.01" value="1.85" required /></div>
+          <div><label>Company Sector</label><select id="company_sector"><option>Technology</option><option>Finance</option><option>Healthcare</option><option>Energy</option></select></div>
+        </div>
+        <div style="margin-top: 12px;">
+          <button onclick="predictStockPrice()">Run Stock Price Prediction</button>
+          <div id="error" class="error"></div>
+        </div>
+      </form>
+    </div>
+
+    <div class="card result-box" id="result-box">
+      <h2>Prediction Result</h2>
+      <p><strong>Predicted Stock Price:</strong> <span id="predicted_stock_price"></span></p>
+      <p><strong>Estimated Price Range:</strong> <span id="range_lower"></span> to <span id="range_upper"></span></p>
+      <p><strong>Market Trend Indicator:</strong> <span id="market_trend_indicator" class="badge"></span></p>
+      <p><strong>Model:</strong> <span id="selected_model"></span> | <strong>RMSE:</strong> <span id="model_rmse"></span> | <strong>R2:</strong> <span id="model_r2"></span></p>
+    </div>
+
+    <div class="card">
+      <h2>Generated Visualizations</h2>
+      <div class="plots">
+        <img src="/results/image/stock_price_trend.png" alt="stock_price_trend">
+        <img src="/results/image/correlation_heatmap.png" alt="correlation_heatmap">
+        <img src="/results/image/feature_importance.png" alt="feature_importance">
+        <img src="/results/image/actual_vs_predicted.png" alt="actual_vs_predicted">
+        <img src="/results/image/volume_vs_price.png" alt="volume_vs_price">
+        <img src="/results/image/moving_average_comparison.png" alt="moving_average_comparison">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = window.location.origin;
+    function showError(msg) {
+      const el = document.getElementById("error");
+      el.style.display = "block";
+      el.textContent = msg;
+    }
+
+    async function predictStockPrice() {
+      const payload = {
+        opening_price: Number(document.getElementById("opening_price").value),
+        closing_price: Number(document.getElementById("closing_price").value),
+        highest_price: Number(document.getElementById("highest_price").value),
+        lowest_price: Number(document.getElementById("lowest_price").value),
+        trading_volume: Number(document.getElementById("trading_volume").value),
+        market_capitalization: Number(document.getElementById("market_capitalization").value),
+        moving_average: Number(document.getElementById("moving_average").value),
+        volatility_index: Number(document.getElementById("volatility_index").value),
+        company_sector: document.getElementById("company_sector").value
+      };
+      document.getElementById("error").style.display = "none";
+
+      if (Number.isNaN(payload.opening_price) || payload.opening_price < 0) return showError("Enter valid opening price.");
+      if (Number.isNaN(payload.closing_price) || payload.closing_price < 0) return showError("Enter valid closing price.");
+      if (Number.isNaN(payload.highest_price) || payload.highest_price < payload.lowest_price) return showError("Highest price must be >= lowest price.");
+      if (Number.isNaN(payload.trading_volume) || payload.trading_volume < 0) return showError("Enter valid trading volume.");
+      if (Number.isNaN(payload.market_capitalization) || payload.market_capitalization < 0) return showError("Enter valid market capitalization.");
+
+      try {
+        const res = await fetch(`${API}/predict`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) return showError(data.detail || "Prediction failed.");
+
+        document.getElementById("predicted_stock_price").textContent = data.predicted_stock_price;
+        document.getElementById("range_lower").textContent = data.estimated_price_range.lower;
+        document.getElementById("range_upper").textContent = data.estimated_price_range.upper;
+        const trendEl = document.getElementById("market_trend_indicator");
+        trendEl.textContent = data.market_trend_indicator;
+        trendEl.className = "badge " + data.market_trend_indicator.toLowerCase();
+        document.getElementById("selected_model").textContent = data.selected_model;
+        document.getElementById("model_rmse").textContent = data.model_rmse;
+        document.getElementById("model_r2").textContent = data.model_r2;
+        document.getElementById("result-box").style.display = "block";
+      } catch (err) {
+        showError("Unable to reach backend. Start server with: python stock_price_prediction.py");
+      }
+    }
+  </script>
+</body>
+</html>

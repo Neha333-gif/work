@@ -1,0 +1,17 @@
+Retail Sales Forecasting - Model Evaluation Report
+=================================================
+Selected Model           : Decision Tree Regressor
+MAE                      : 0.0000
+MSE                      : 0.0000
+RMSE                     : 0.0000
+R2 Score                 : 1.0000
+Dataset Path             : C:\Users\peepl\Downloads\cust_segmentation_zip\repo_for_demand_forecasting\repo_for_demand_forecasting\retail_sales_dataset.csv
+Total Samples            : 1000
+Training Samples         : 800
+Testing Samples          : 200
+
+Model Comparison
+----------------
+Linear Regression: MAE=0.0000, RMSE=0.0000, R2=1.0000
+Decision Tree Regressor: MAE=0.0000, RMSE=0.0000, R2=1.0000
+Random Forest Regressor: MAE=0.0000, RMSE=0.0000, R2=1.0000

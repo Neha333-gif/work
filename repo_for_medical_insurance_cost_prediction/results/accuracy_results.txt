@@ -1,0 +1,17 @@
+Medical Insurance Cost Prediction - Model Evaluation Report
+=================================================
+Selected Model           : Random Forest Regressor
+MAE                      : 2452.1081
+MSE                      : 19740914.7618
+RMSE                     : 4443.0749
+R2 Score                 : 0.8926
+Dataset Path             : C:\Users\peepl\Downloads\cust_segmentation_zip\repo_for_demand_forecasting\repo_for_demand_forecasting\medical insurance\medical_insurance.csv
+Total Samples            : 1337
+Training Samples         : 1069
+Testing Samples          : 268
+
+Model Comparison
+----------------
+Linear Regression: MAE=4182.3532, RMSE=5957.6088, R2=0.8068
+Decision Tree Regressor: MAE=2716.1790, RMSE=5444.5406, R2=0.8387
+Random Forest Regressor: MAE=2452.1081, RMSE=4443.0749, R2=0.8926

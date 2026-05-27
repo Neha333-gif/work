@@ -1,0 +1,29 @@
+Product Recommendation System - Model Evaluation Report
+=================================================
+Selected Model           : Random Forest Classifier
+Accuracy                 : 0.9958
+Precision                : 0.9961
+Recall                   : 0.9985
+F1 Score                 : 0.9973
+Dataset Path             : C:\Users\peepl\Downloads\cust_segmentation_zip\repo_for_demand_forecasting\repo_for_demand_forecasting\product_recommendation_engine\ratings_Beauty.csv
+Total Samples            : 30000
+Training Samples         : 24000
+Testing Samples          : 6000
+
+Model Comparison
+----------------
+K-Nearest Neighbors: acc=0.9947, pre=0.9942, rec=0.9989, f1=0.9966
+Decision Tree Classifier: acc=0.9943, pre=0.9942, rec=0.9985, f1=0.9963
+Random Forest Classifier: acc=0.9958, pre=0.9961, rec=0.9985, f1=0.9973
+
+Classification Report
+---------------------
+              precision    recall  f1-score   support
+
+   Not Liked       0.99      0.99      0.99      1363
+       Liked       1.00      1.00      1.00      4637
+
+    accuracy                           1.00      6000
+   macro avg       1.00      0.99      0.99      6000
+weighted avg       1.00      1.00      1.00      6000
+

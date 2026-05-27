@@ -1,0 +1,126 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Performance Prediction</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #0f172a; color: #e2e8f0; }
+    .container { max-width: 1080px; margin: 24px auto; padding: 20px; }
+    .card { background: #111827; border: 1px solid #334155; border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+    h1, h2 { margin-top: 0; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    label { font-size: 13px; color: #94a3b8; display: block; margin-bottom: 5px; }
+    input, select, button { width: 100%; border-radius: 8px; border: 1px solid #475569; padding: 10px; background: #0b1220; color: #f1f5f9; box-sizing: border-box; }
+    button { background: #2563eb; border: none; font-weight: 600; cursor: pointer; }
+    button:hover { background: #1d4ed8; }
+    .result-box { background: #052e16; border: 1px solid #16a34a; border-radius: 10px; padding: 14px; display: none; }
+    .error { color: #fca5a5; margin-top: 8px; display: none; }
+    img { width: 100%; border-radius: 10px; border: 1px solid #334155; background: #020617; }
+    .plots { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .badge { display: inline-block; padding: 4px 10px; border-radius: 999px; background: #1d4ed8; font-weight: 700; }
+    @media (max-width: 900px) { .grid, .plots { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card" id="dashboard">
+      <h1>Student Performance Prediction Dashboard</h1>
+      <p>Enter student academic data to estimate predicted final exam performance and grade range.</p>
+    </div>
+
+    <div class="card" id="input-form">
+      <h2>Student Academic Input Form</h2>
+      <form id="student-form" onsubmit="return false;">
+        <div class="grid">
+          <div><label>Student Age</label><input id="student_age" type="number" min="14" max="30" value="18" required /></div>
+          <div><label>Gender</label><select id="gender"><option>Male</option><option>Female</option></select></div>
+          <div><label>Attendance Percentage</label><input id="attendance_percentage" type="number" min="0" max="100" step="0.1" value="85" required /></div>
+          <div><label>Study Hours (per week)</label><input id="study_hours" type="number" min="0" max="60" step="0.5" value="25" required /></div>
+          <div><label>Previous Exam Scores</label><input id="previous_exam_scores" type="number" min="0" max="100" value="78" required /></div>
+          <div><label>Assignment Completion Rate (%)</label><input id="assignment_completion_rate" type="number" min="0" max="100" value="90" required /></div>
+          <div><label>Participation Level</label><select id="participation_level"><option>High</option><option>Medium</option><option>Low</option></select></div>
+          <div><label>Subject</label><select id="subject"><option>High School</option><option>Bachelors</option><option>Masters</option><option>PhD</option></select></div>
+          <div><label>Sleep Hours (per night)</label><input id="sleep_hours" type="number" min="0" max="16" step="0.5" value="7" required /></div>
+        </div>
+        <div style="margin-top: 12px;">
+          <button onclick="predictStudentPerformance()">Run Student Performance Prediction</button>
+          <div id="error" class="error"></div>
+        </div>
+      </form>
+    </div>
+
+    <div class="card result-box" id="result-box">
+      <h2>Prediction Result</h2>
+      <p><strong>Predicted Student Performance:</strong> <span id="predicted_student_performance"></span></p>
+      <p><strong>Estimated Grade/Score Range:</strong> <span id="range_lower"></span> to <span id="range_upper"></span></p>
+      <p><strong>Estimated Grade:</strong> <span id="estimated_grade" class="badge"></span></p>
+      <p><strong>Model:</strong> <span id="selected_model"></span> | <strong>RMSE:</strong> <span id="model_rmse"></span> | <strong>R2:</strong> <span id="model_r2"></span></p>
+    </div>
+
+    <div class="card">
+      <h2>Generated Visualizations</h2>
+      <div class="plots">
+        <img src="/results/image/score_distribution.png" alt="score_distribution">
+        <img src="/results/image/correlation_heatmap.png" alt="correlation_heatmap">
+        <img src="/results/image/feature_importance.png" alt="feature_importance">
+        <img src="/results/image/actual_vs_predicted.png" alt="actual_vs_predicted">
+        <img src="/results/image/attendance_vs_score.png" alt="attendance_vs_score">
+        <img src="/results/image/study_hours_impact.png" alt="study_hours_impact">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = window.location.origin;
+    function showError(msg) {
+      const el = document.getElementById("error");
+      el.style.display = "block";
+      el.textContent = msg;
+    }
+
+    async function predictStudentPerformance() {
+      const payload = {
+        student_age: Number(document.getElementById("student_age").value),
+        gender: document.getElementById("gender").value,
+        attendance_percentage: Number(document.getElementById("attendance_percentage").value),
+        study_hours: Number(document.getElementById("study_hours").value),
+        previous_exam_scores: Number(document.getElementById("previous_exam_scores").value),
+        assignment_completion_rate: Number(document.getElementById("assignment_completion_rate").value),
+        participation_level: document.getElementById("participation_level").value,
+        subject: document.getElementById("subject").value,
+        sleep_hours: Number(document.getElementById("sleep_hours").value)
+      };
+      document.getElementById("error").style.display = "none";
+
+      if (Number.isNaN(payload.student_age) || payload.student_age < 14) return showError("Enter valid student age.");
+      if (Number.isNaN(payload.attendance_percentage) || payload.attendance_percentage < 0 || payload.attendance_percentage > 100) return showError("Enter valid attendance percentage.");
+      if (Number.isNaN(payload.study_hours) || payload.study_hours < 0) return showError("Enter valid study hours.");
+      if (Number.isNaN(payload.previous_exam_scores) || payload.previous_exam_scores < 0 || payload.previous_exam_scores > 100) return showError("Enter valid previous exam scores.");
+      if (Number.isNaN(payload.assignment_completion_rate) || payload.assignment_completion_rate < 0 || payload.assignment_completion_rate > 100) return showError("Enter valid assignment completion rate.");
+      if (Number.isNaN(payload.sleep_hours) || payload.sleep_hours < 0) return showError("Enter valid sleep hours.");
+
+      try {
+        const res = await fetch(`${API}/predict`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) return showError(data.detail || "Prediction failed.");
+
+        document.getElementById("predicted_student_performance").textContent = data.predicted_student_performance;
+        document.getElementById("range_lower").textContent = data.estimated_grade_score_range.lower;
+        document.getElementById("range_upper").textContent = data.estimated_grade_score_range.upper;
+        document.getElementById("estimated_grade").textContent = data.estimated_grade_score_range.grade;
+        document.getElementById("selected_model").textContent = data.selected_model;
+        document.getElementById("model_rmse").textContent = data.model_rmse;
+        document.getElementById("model_r2").textContent = data.model_r2;
+        document.getElementById("result-box").style.display = "block";
+      } catch (err) {
+        showError("Unable to reach backend. Start server with: python student_performance_prediction.py");
+      }
+    }
+  </script>
+</body>
+</html>

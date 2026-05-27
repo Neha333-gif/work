@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Resume Screening</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #0f172a; color: #e2e8f0; }
+    .container { max-width: 980px; margin: 24px auto; padding: 20px; }
+    .card { background: #111827; border: 1px solid #334155; border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+    h1, h2 { margin-top: 0; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    label { font-size: 13px; color: #94a3b8; display: block; margin-bottom: 5px; }
+    input, select, textarea, button {
+      width: 100%; border-radius: 8px; border: 1px solid #475569; padding: 10px;
+      background: #0b1220; color: #f1f5f9;
+    }
+    textarea { min-height: 120px; resize: vertical; }
+    button { background: #2563eb; border: none; font-weight: 600; cursor: pointer; }
+    button:hover { background: #1d4ed8; }
+    .result-box { background: #052e16; border: 1px solid #16a34a; border-radius: 10px; padding: 14px; display: none; }
+    .error { color: #fca5a5; margin-top: 8px; display: none; }
+    img { width: 100%; border-radius: 10px; border: 1px solid #334155; background: #020617; }
+    .plots { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 800px) { .grid, .plots { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>AI Resume Screening Dashboard</h1>
+      <p>Submit candidate details to receive a predicted candidate category, screening result, and suitability score.</p>
+    </div>
+
+    <div class="card">
+      <h2>Candidate Input Form</h2>
+      <form id="resume-form" onsubmit="return false;">
+        <div class="grid">
+          <div>
+            <label>Resume Text</label>
+            <textarea id="resume_text" required>Experienced software engineer with Python, SQL, and machine learning skills. Delivered scalable APIs and analytics dashboards.</textarea>
+          </div>
+          <div>
+            <label>Candidate Skills (comma-separated)</label>
+            <textarea id="candidate_skills" required>Python, SQL, FastAPI, Machine Learning</textarea>
+          </div>
+          <div>
+            <label>Experience Level (years)</label>
+            <input id="experience_level" type="number" min="0" max="40" value="5" required />
+          </div>
+          <div>
+            <label>Education</label>
+            <select id="education">
+              <option>Bachelors</option>
+              <option>Masters</option>
+              <option>PhD</option>
+              <option>High School</option>
+            </select>
+          </div>
+          <div>
+            <label>Certifications</label>
+            <input id="certifications" type="number" min="0" max="30" value="2" required />
+          </div>
+          <div>
+            <label>Job Role Applied</label>
+            <input id="job_role_applied" type="text" value="Machine Learning Engineer" required />
+          </div>
+          <div>
+            <label>Skills Match Score (0-100)</label>
+            <input id="skills_match_score" type="number" min="0" max="100" step="0.1" value="82.5" required />
+          </div>
+        </div>
+        <div style="margin-top: 12px;">
+          <button onclick="predict()">Run Resume Screening Prediction</button>
+          <div id="error" class="error"></div>
+        </div>
+      </form>
+    </div>
+
+    <div class="card result-box" id="result-box">
+      <h2>Prediction Result</h2>
+      <p><strong>Predicted Candidate Category:</strong> <span id="predicted_category"></span></p>
+      <p><strong>Resume Screening Result:</strong> <span id="screening_result"></span></p>
+      <p><strong>Candidate Suitability Score:</strong> <span id="suitability_score"></span>%</p>
+      <p><strong>Model:</strong> <span id="selected_model"></span> | <strong>Model Accuracy:</strong> <span id="model_accuracy"></span>%</p>
+    </div>
+
+    <div class="card">
+      <h2>Generated Visualizations</h2>
+      <div class="plots">
+        <img src="/results/image/confusion_matrix.png" alt="confusion_matrix">
+        <img src="/results/image/roc_curve.png" alt="roc_curve">
+        <img src="/results/image/feature_importance.png" alt="feature_importance">
+        <img src="/results/image/correlation_heatmap.png" alt="correlation_heatmap">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = "http://127.0.0.1:8000";
+    function showError(msg) {
+      const el = document.getElementById("error");
+      el.style.display = "block";
+      el.textContent = msg;
+    }
+    async function predict() {
+      const resumeText = document.getElementById("resume_text").value.trim();
+      const skills = document.getElementById("candidate_skills").value.trim();
+      const experience = Number(document.getElementById("experience_level").value);
+      const certifications = Number(document.getElementById("certifications").value);
+      const role = document.getElementById("job_role_applied").value.trim();
+      const score = Number(document.getElementById("skills_match_score").value);
+      document.getElementById("error").style.display = "none";
+
+      if (!resumeText || resumeText.length < 30) return showError("Resume text must be at least 30 characters.");
+      if (!skills) return showError("Please provide candidate skills.");
+      if (!role) return showError("Please enter job role applied.");
+      if (Number.isNaN(score) || score < 0 || score > 100) return showError("Skills match score must be between 0 and 100.");
+
+      const payload = {
+        resume_text: resumeText,
+        candidate_skills: skills,
+        experience_level: experience,
+        education: document.getElementById("education").value,
+        certifications: certifications,
+        job_role_applied: role,
+        skills_match_score: score
+      };
+
+      try {
+        const res = await fetch(`${API}/predict`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) return showError(data.detail || "Prediction failed.");
+
+        document.getElementById("predicted_category").textContent = data.predicted_candidate_category;
+        document.getElementById("screening_result").textContent = data.resume_screening_result;
+        document.getElementById("suitability_score").textContent = data.candidate_suitability_score;
+        document.getElementById("selected_model").textContent = data.selected_model;
+        document.getElementById("model_accuracy").textContent = data.model_accuracy;
+        document.getElementById("result-box").style.display = "block";
+      } catch (e) {
+        showError("Could not reach backend server. Start resume_screening.py first.");
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+{
+  "predicted_candidate_category": "No",
+  "resume_screening_result": "Needs Manual Review",
+  "candidate_suitability_score": 69.99,
+  "applied_role": "Data Analyst",
+  "selected_model": "Random Forest",
+  "model_accuracy": 89.72
+}

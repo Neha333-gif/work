@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Retail Sales Forecasting</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #0f172a; color: #e2e8f0; }
+    .container { max-width: 1080px; margin: 24px auto; padding: 20px; }
+    .card { background: #111827; border: 1px solid #334155; border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+    h1, h2 { margin-top: 0; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    label { font-size: 13px; color: #94a3b8; display: block; margin-bottom: 5px; }
+    input, select, button { width: 100%; border-radius: 8px; border: 1px solid #475569; padding: 10px; background: #0b1220; color: #f1f5f9; box-sizing: border-box; }
+    button { background: #2563eb; border: none; font-weight: 600; cursor: pointer; }
+    button:hover { background: #1d4ed8; }
+    .result-box { background: #052e16; border: 1px solid #16a34a; border-radius: 10px; padding: 14px; display: none; }
+    .error { color: #fca5a5; margin-top: 8px; display: none; }
+    img { width: 100%; border-radius: 10px; border: 1px solid #334155; background: #020617; }
+    .plots { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .badge { display: inline-block; padding: 4px 10px; border-radius: 999px; background: #1d4ed8; font-weight: 700; }
+    .growing { background: #16a34a; }
+    .declining { background: #dc2626; }
+    .stable { background: #64748b; }
+    @media (max-width: 900px) { .grid, .plots { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card" id="dashboard">
+      <h1>Retail Sales Forecasting Dashboard</h1>
+      <p>Enter retail sales data to forecast sales revenue, estimated range, and sales trend.</p>
+    </div>
+
+    <div class="card" id="input-form">
+      <h2>Retail Sales Input Form</h2>
+      <form id="retail-form" onsubmit="return false;">
+        <div class="grid">
+          <div><label>Product Category</label><select id="product_category"><option>Beauty</option><option>Clothing</option><option>Electronics</option></select></div>
+          <div><label>Store Location</label><select id="store_location"><option>North</option><option>South</option><option>East</option><option>West</option></select></div>
+          <div><label>Previous Month Sales</label><input id="previous_month_sales" type="number" min="0" step="0.01" value="8500" required /></div>
+          <div><label>Marketing Spend</label><input id="marketing_spend" type="number" min="0" step="0.01" value="1200" required /></div>
+          <div><label>Seasonal Demand Index (0-1)</label><input id="seasonal_demand_index" type="number" min="0" max="1" step="0.01" value="0.75" required /></div>
+          <div><label>Number of Customers</label><input id="number_of_customers" type="number" min="1" value="120" required /></div>
+          <div><label>Discount Percentage</label><input id="discount_percentage" type="number" min="0" max="100" step="0.1" value="10" required /></div>
+          <div><label>Inventory Level</label><input id="inventory_level" type="number" min="0" value="450" required /></div>
+          <div><label>Promotion Type</label><select id="promotion_type"><option>Standard</option><option>Seasonal</option><option>Clearance</option><option>Flash Sale</option></select></div>
+        </div>
+        <div style="margin-top: 12px;">
+          <button onclick="predictRetailSales()">Run Retail Sales Forecast</button>
+          <div id="error" class="error"></div>
+        </div>
+      </form>
+    </div>
+
+    <div class="card result-box" id="result-box">
+      <h2>Forecast Result</h2>
+      <p><strong>Forecasted Retail Sales:</strong> $<span id="forecasted_retail_sales"></span></p>
+      <p><strong>Estimated Revenue Range:</strong> $<span id="range_lower"></span> to $<span id="range_upper"></span></p>
+      <p><strong>Sales Trend Indicator:</strong> <span id="sales_trend_indicator" class="badge"></span></p>
+      <p><strong>Model:</strong> <span id="selected_model"></span> | <strong>RMSE:</strong> <span id="model_rmse"></span> | <strong>R2:</strong> <span id="model_r2"></span></p>
+    </div>
+
+    <div class="card">
+      <h2>Generated Visualizations</h2>
+      <div class="plots">
+        <img src="/results/image/sales_trend.png" alt="sales_trend">
+        <img src="/results/image/correlation_heatmap.png" alt="correlation_heatmap">
+        <img src="/results/image/feature_importance.png" alt="feature_importance">
+        <img src="/results/image/actual_vs_forecasted.png" alt="actual_vs_forecasted">
+        <img src="/results/image/monthly_sales_analysis.png" alt="monthly_sales_analysis">
+        <img src="/results/image/regional_sales_performance.png" alt="regional_sales_performance">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = window.location.origin;
+    function showError(msg) {
+      const el = document.getElementById("error");
+      el.style.display = "block";
+      el.textContent = msg;
+    }
+
+    async function predictRetailSales() {
+      const payload = {
+        product_category: document.getElementById("product_category").value,
+        store_location: document.getElementById("store_location").value,
+        previous_month_sales: Number(document.getElementById("previous_month_sales").value),
+        marketing_spend: Number(document.getElementById("marketing_spend").value),
+        seasonal_demand_index: Number(document.getElementById("seasonal_demand_index").value),
+        number_of_customers: Number(document.getElementById("number_of_customers").value),
+        discount_percentage: Number(document.getElementById("discount_percentage").value),
+        inventory_level: Number(document.getElementById("inventory_level").value),
+        promotion_type: document.getElementById("promotion_type").value
+      };
+      document.getElementById("error").style.display = "none";
+
+      if (Number.isNaN(payload.previous_month_sales) || payload.previous_month_sales < 0) return showError("Enter valid previous month sales.");
+      if (Number.isNaN(payload.marketing_spend) || payload.marketing_spend < 0) return showError("Enter valid marketing spend.");
+      if (Number.isNaN(payload.seasonal_demand_index) || payload.seasonal_demand_index < 0 || payload.seasonal_demand_index > 1) return showError("Seasonal demand index must be between 0 and 1.");
+      if (Number.isNaN(payload.number_of_customers) || payload.number_of_customers < 1) return showError("Enter valid number of customers.");
+      if (Number.isNaN(payload.discount_percentage) || payload.discount_percentage < 0 || payload.discount_percentage > 100) return showError("Enter valid discount percentage.");
+
+      try {
+        const res = await fetch(`${API}/predict`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) return showError(data.detail || "Forecast failed.");
+
+        document.getElementById("forecasted_retail_sales").textContent = data.forecasted_retail_sales;
+        document.getElementById("range_lower").textContent = data.estimated_revenue_range.lower;
+        document.getElementById("range_upper").textContent = data.estimated_revenue_range.upper;
+        const trendEl = document.getElementById("sales_trend_indicator");
+        trendEl.textContent = data.sales_trend_indicator;
+        trendEl.className = "badge " + data.sales_trend_indicator.toLowerCase();
+        document.getElementById("selected_model").textContent = data.selected_model;
+        document.getElementById("model_rmse").textContent = data.model_rmse;
+        document.getElementById("model_r2").textContent = data.model_r2;
+        document.getElementById("result-box").style.display = "block";
+      } catch (err) {
+        showError("Unable to reach backend. Start server with: python retail_sales_forecasting.py");
+      }
+    }
+  </script>
+</body>
+</html>

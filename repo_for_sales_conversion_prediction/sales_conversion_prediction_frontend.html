@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sales Conversion Prediction</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #0f172a; color: #e2e8f0; }
+    .container { max-width: 1080px; margin: 24px auto; padding: 20px; }
+    .card { background: #111827; border: 1px solid #334155; border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+    h1, h2 { margin-top: 0; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    label { font-size: 13px; color: #94a3b8; display: block; margin-bottom: 5px; }
+    input, select, button { width: 100%; border-radius: 8px; border: 1px solid #475569; padding: 10px; background: #0b1220; color: #f1f5f9; box-sizing: border-box; }
+    button { background: #2563eb; border: none; font-weight: 600; cursor: pointer; }
+    button:hover { background: #1d4ed8; }
+    .result-box { background: #052e16; border: 1px solid #16a34a; border-radius: 10px; padding: 14px; display: none; }
+    .error { color: #fca5a5; margin-top: 8px; display: none; }
+    img { width: 100%; border-radius: 10px; border: 1px solid #334155; background: #020617; }
+    .plots { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .badge { display: inline-block; padding: 4px 10px; border-radius: 999px; background: #1d4ed8; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card" id="dashboard">
+      <h1>Sales Conversion Prediction Dashboard</h1>
+      <p>Enter customer lead data to predict sales conversion outcome, probability score, and conversion category.</p>
+    </div>
+
+    <div class="card" id="input-form">
+      <h2>Customer Lead Input Form</h2>
+      <form id="conversion-form" onsubmit="return false;">
+        <div class="grid">
+          <div><label>Customer Age</label><input id="customer_age" type="number" min="18" max="70" value="35" required /></div>
+          <div><label>Annual Income</label><input id="annual_income" type="number" min="1000" value="75000" required /></div>
+          <div><label>Lead Source</label><select id="lead_source"><option>Facebook</option><option>Google</option><option>Email</option><option>Referral</option></select></div>
+          <div><label>Number of Interactions</label><input id="number_of_interactions" type="number" min="0" value="5" required /></div>
+          <div><label>Product Interest Level</label><select id="product_interest_level"><option>High</option><option>Medium</option><option>Low</option></select></div>
+          <div><label>Marketing Campaign Type</label><select id="marketing_campaign_type"><option>Awareness</option><option>Retargeting</option><option>Promotion</option></select></div>
+          <div><label>Website Visit Duration (minutes)</label><input id="website_visit_duration" type="number" min="0" step="0.1" value="12" required /></div>
+          <div><label>Previous Purchase History</label><input id="previous_purchase_history" type="number" min="0" value="1" required /></div>
+          <div><label>Region</label><select id="region"><option>North</option><option>South</option><option>East</option><option>West</option></select></div>
+        </div>
+        <div style="margin-top: 12px;">
+          <button onclick="predictSalesConversion()">Run Sales Conversion Prediction</button>
+          <div id="error" class="error"></div>
+        </div>
+      </form>
+    </div>
+
+    <div class="card result-box" id="result-box">
+      <h2>Prediction Result</h2>
+      <p><strong>Sales Conversion Prediction:</strong> <span id="sales_conversion_prediction"></span></p>
+      <p><strong>Conversion Probability Score:</strong> <span id="conversion_probability_score"></span>%</p>
+      <p><strong>Customer Conversion Category:</strong> <span id="customer_conversion_category" class="badge"></span></p>
+      <p><strong>Model:</strong> <span id="selected_model"></span> | <strong>Accuracy:</strong> <span id="model_accuracy"></span>%</p>
+    </div>
+
+    <div class="card">
+      <h2>Generated Visualizations</h2>
+      <div class="plots">
+        <img src="/results/image/conversion_distribution.png" alt="conversion_distribution">
+        <img src="/results/image/correlation_heatmap.png" alt="correlation_heatmap">
+        <img src="/results/image/feature_importance.png" alt="feature_importance">
+        <img src="/results/image/confusion_matrix.png" alt="confusion_matrix">
+        <img src="/results/image/roc_curve.png" alt="roc_curve">
+        <img src="/results/image/lead_source_analysis.png" alt="lead_source_analysis">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = window.location.origin;
+    function showError(msg) {
+      const el = document.getElementById("error");
+      el.style.display = "block";
+      el.textContent = msg;
+    }
+
+    async function predictSalesConversion() {
+      const payload = {
+        customer_age: Number(document.getElementById("customer_age").value),
+        annual_income: Number(document.getElementById("annual_income").value),
+        lead_source: document.getElementById("lead_source").value,
+        number_of_interactions: Number(document.getElementById("number_of_interactions").value),
+        product_interest_level: document.getElementById("product_interest_level").value,
+        marketing_campaign_type: document.getElementById("marketing_campaign_type").value,
+        website_visit_duration: Number(document.getElementById("website_visit_duration").value),
+        previous_purchase_history: Number(document.getElementById("previous_purchase_history").value),
+        region: document.getElementById("region").value
+      };
+      document.getElementById("error").style.display = "none";
+
+      if (Number.isNaN(payload.customer_age) || payload.customer_age < 18) return showError("Enter valid customer age.");
+      if (Number.isNaN(payload.annual_income) || payload.annual_income < 1000) return showError("Enter valid annual income.");
+      if (Number.isNaN(payload.number_of_interactions) || payload.number_of_interactions < 0) return showError("Enter valid number of interactions.");
+      if (Number.isNaN(payload.website_visit_duration) || payload.website_visit_duration < 0) return showError("Enter valid website visit duration.");
+
+      try {
+        const res = await fetch(`${API}/predict`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) return showError(data.detail || "Prediction failed.");
+
+        document.getElementById("sales_conversion_prediction").textContent = data.sales_conversion_prediction;
+        document.getElementById("conversion_probability_score").textContent = data.conversion_probability_score;
+        document.getElementById("customer_conversion_category").textContent = data.customer_conversion_category;
+        document.getElementById("selected_model").textContent = data.selected_model;
+        document.getElementById("model_accuracy").textContent = data.model_accuracy;
+        document.getElementById("result-box").style.display = "block";
+      } catch (err) {
+        showError("Unable to reach backend. Start server with: python sales_conversion_prediction.py");
+      }
+    }
+  </script>
+</body>
+</html>

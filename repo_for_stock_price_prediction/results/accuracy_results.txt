@@ -1,0 +1,17 @@
+Stock Price Prediction - Model Evaluation Report
+=================================================
+Selected Model           : Random Forest Regressor
+MAE                      : 0.9960
+MSE                      : 1.7380
+RMSE                     : 1.3183
+R2 Score                 : 0.8890
+Dataset Path             : C:\Users\peepl\Downloads\cust_segmentation_zip\repo_for_demand_forecasting\repo_for_demand_forecasting\stock_data.csv
+Total Samples            : 365
+Training Samples         : 292
+Testing Samples          : 73
+
+Model Comparison
+----------------
+Linear Regression: MAE=1.8709, RMSE=2.3742, R2=0.6400
+Decision Tree Regressor: MAE=1.2243, RMSE=1.6365, R2=0.8290
+Random Forest Regressor: MAE=0.9960, RMSE=1.3183, R2=0.8890

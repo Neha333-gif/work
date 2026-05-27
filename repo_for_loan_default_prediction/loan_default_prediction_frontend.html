@@ -1,0 +1,123 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Loan Default Prediction</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #0f172a; color: #e2e8f0; }
+    .container { max-width: 1080px; margin: 24px auto; padding: 20px; }
+    .card { background: #111827; border: 1px solid #334155; border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+    h1, h2 { margin-top: 0; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    label { font-size: 13px; color: #94a3b8; display: block; margin-bottom: 5px; }
+    input, select, button {
+      width: 100%; border-radius: 8px; border: 1px solid #475569; padding: 10px;
+      background: #0b1220; color: #f1f5f9;
+    }
+    button { background: #2563eb; border: none; font-weight: 600; cursor: pointer; }
+    button:hover { background: #1d4ed8; }
+    .result-box { background: #052e16; border: 1px solid #16a34a; border-radius: 10px; padding: 14px; display: none; }
+    .error { color: #fca5a5; margin-top: 8px; display: none; }
+    img { width: 100%; border-radius: 10px; border: 1px solid #334155; background: #020617; }
+    .plots { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 900px) { .grid, .plots { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>Loan Default Prediction Dashboard</h1>
+      <p>Enter borrower financial data to estimate loan default risk and probability score.</p>
+    </div>
+
+    <div class="card">
+      <h2>Borrower Input Form</h2>
+      <form id="loan-form" onsubmit="return false;">
+        <div class="grid">
+          <div><label>Customer Age</label><input id="customer_age" type="number" min="18" max="85" value="35" required /></div>
+          <div><label>Annual Income</label><input id="annual_income" type="number" min="50000" value="420000" required /></div>
+          <div><label>Loan Amount</label><input id="loan_amount" type="number" min="1000" value="180000" required /></div>
+          <div><label>Credit Score</label><input id="credit_score" type="number" min="300" max="900" value="640" required /></div>
+          <div><label>Employment Status</label><select id="employment_status"><option>Employed</option><option>Self Employed</option><option>Unemployed</option></select></div>
+          <div><label>Loan Term</label><input id="loan_term" type="number" min="1" max="40" value="10" required /></div>
+          <div><label>Interest Rate</label><input id="interest_rate" type="number" min="1" max="40" step="0.1" value="12.5" required /></div>
+          <div><label>Existing Debt</label><input id="existing_debt" type="number" min="0" value="8000" required /></div>
+          <div><label>Payment History</label><select id="payment_history"><option>Good</option><option>Average</option><option>Poor</option></select></div>
+          <div><label>Number of Dependents</label><input id="number_of_dependents" type="number" min="0" max="10" value="2" required /></div>
+        </div>
+        <div style="margin-top: 12px;">
+          <button onclick="predictLoanDefault()">Run Loan Default Risk Prediction</button>
+          <div id="error" class="error"></div>
+        </div>
+      </form>
+    </div>
+
+    <div class="card result-box" id="result-box">
+      <h2>Prediction Result</h2>
+      <p><strong>Loan Default Risk:</strong> <span id="loan_default_risk"></span></p>
+      <p><strong>Default Probability Score:</strong> <span id="default_probability_score"></span>%</p>
+      <p><strong>Risk Category:</strong> <span id="risk_category"></span></p>
+      <p><strong>Model:</strong> <span id="selected_model"></span> | <strong>Model Accuracy:</strong> <span id="model_accuracy"></span>%</p>
+    </div>
+
+    <div class="card">
+      <h2>Generated Visualizations</h2>
+      <div class="plots">
+        <img src="/results/image/default_distribution.png" alt="default_distribution">
+        <img src="/results/image/correlation_heatmap.png" alt="correlation_heatmap">
+        <img src="/results/image/feature_importance.png" alt="feature_importance">
+        <img src="/results/image/confusion_matrix.png" alt="confusion_matrix">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = "http://127.0.0.1:8000";
+    function showError(msg) {
+      const el = document.getElementById("error");
+      el.style.display = "block";
+      el.textContent = msg;
+    }
+
+    async function predictLoanDefault() {
+      const payload = {
+        customer_age: Number(document.getElementById("customer_age").value),
+        annual_income: Number(document.getElementById("annual_income").value),
+        loan_amount: Number(document.getElementById("loan_amount").value),
+        credit_score: Number(document.getElementById("credit_score").value),
+        employment_status: document.getElementById("employment_status").value,
+        loan_term: Number(document.getElementById("loan_term").value),
+        interest_rate: Number(document.getElementById("interest_rate").value),
+        existing_debt: Number(document.getElementById("existing_debt").value),
+        payment_history: document.getElementById("payment_history").value,
+        number_of_dependents: Number(document.getElementById("number_of_dependents").value)
+      };
+      document.getElementById("error").style.display = "none";
+
+      if (Number.isNaN(payload.annual_income) || payload.annual_income < 50000) return showError("Enter valid annual income.");
+      if (Number.isNaN(payload.loan_amount) || payload.loan_amount < 1000) return showError("Enter valid loan amount.");
+      if (Number.isNaN(payload.credit_score) || payload.credit_score < 300 || payload.credit_score > 900) return showError("Credit score must be between 300 and 900.");
+
+      try {
+        const res = await fetch(`${API}/predict`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) return showError(data.detail || "Prediction failed.");
+
+        document.getElementById("loan_default_risk").textContent = data.loan_default_risk;
+        document.getElementById("default_probability_score").textContent = data.default_probability_score;
+        document.getElementById("risk_category").textContent = data.risk_category;
+        document.getElementById("selected_model").textContent = data.selected_model;
+        document.getElementById("model_accuracy").textContent = data.model_accuracy;
+        document.getElementById("result-box").style.display = "block";
+      } catch (e) {
+        showError("Could not reach backend server. Start loan_default_prediction.py first.");
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Telecom Revenue Prediction</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+      background: linear-gradient(135deg, #0b1220 0%, #1a2847 100%);
+      color: #e2e8f0;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container { max-width: 1200px; margin: 0 auto; }
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding: 30px 20px;
+      background: rgba(125, 211, 252, 0.1);
+      border-radius: 20px;
+      border: 1px solid rgba(125, 211, 252, 0.2);
+    }
+    h1 { 
+      font-size: 2.5rem; 
+      margin-bottom: 10px; 
+      color: #7dd3fc;
+      text-shadow: 0 2px 10px rgba(125, 211, 252, 0.2);
+    }
+    .subtitle { font-size: 1.1rem; color: #94a3b8; }
+    .grid { 
+      display: grid; 
+      grid-template-columns: 1.2fr 0.8fr; 
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+    .card { 
+      background: rgba(15, 23, 42, 0.95); 
+      border: 1px solid rgba(96, 165, 250, 0.2); 
+      border-radius: 20px; 
+      padding: 30px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+    .card h2 { 
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+      color: #38bdf8;
+    }
+    .form-section {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .form-group { 
+      display: flex;
+      flex-direction: column;
+    }
+    .form-group.full { grid-column: 1 / -1; }
+    label { 
+      display: block; 
+      margin-bottom: 8px; 
+      font-size: 0.95rem; 
+      color: #cbd5e1;
+      font-weight: 500;
+    }
+    input, select { 
+      width: 100%; 
+      padding: 12px 14px; 
+      border-radius: 10px; 
+      background: #111827; 
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      color: #e2e8f0;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: #7dd3fc;
+      box-shadow: 0 0 0 3px rgba(125, 211, 252, 0.1);
+      background: #1a2847;
+    }
+    .button-group {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 24px;
+    }
+    button { 
+      border: none; 
+      border-radius: 10px; 
+      padding: 14px 24px; 
+      font-size: 1rem; 
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      flex: 1;
+      min-width: 150px;
+    }
+    .btn-primary { 
+      background: linear-gradient(135deg, #7dd3fc, #38bdf8);
+      color: #0f172a;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(56, 189, 248, 0.3);
+    }
+    .btn-secondary { 
+      background: transparent; 
+      border: 2px solid rgba(148, 163, 184, 0.4);
+      color: #cbd5e1;
+    }
+    .btn-secondary:hover {
+      border-color: #7dd3fc;
+      color: #7dd3fc;
+      background: rgba(125, 211, 252, 0.1);
+    }
+    .result { 
+      display: grid; 
+      gap: 16px;
+    }
+    .metric { 
+      background: rgba(17, 24, 39, 0.8);
+      border: 1px solid rgba(96, 165, 250, 0.1);
+      border-radius: 15px; 
+      padding: 20px;
+      text-align: center;
+    }
+    .metric h3 { 
+      margin: 0 0 12px; 
+      font-size: 0.9rem; 
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .metric p { 
+      margin: 0; 
+      font-size: 2rem; 
+      font-weight: 700;
+      color: #34d399;
+    }
+    .metric.warning p { color: #f59e0b; }
+    .metric.error p { color: #ef4444; }
+    .plots { 
+      display: grid; 
+      grid-template-columns: repeat(2, minmax(0, 1fr)); 
+      gap: 20px;
+      margin-top: 30px;
+    }
+    .plot { 
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(96, 165, 250, 0.2);
+      border-radius: 15px;
+      overflow: hidden;
+      aspect-ratio: 16/9;
+    }
+    .plot img { 
+      width: 100%; 
+      height: 100%;
+      object-fit: contain;
+      background: #0f172a;
+    }
+    pre { 
+      background: #0f172a; 
+      padding: 18px; 
+      border-radius: 10px; 
+      overflow-x: auto; 
+      color: #cbd5e1;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      max-height: 300px;
+      overflow-y: auto;
+      border: 1px solid rgba(148, 163, 184, 0.1);
+    }
+    .loading { opacity: 0.6; pointer-events: none; }
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(125, 211, 252, 0.3);
+      border-top-color: #7dd3fc;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .error-message {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      display: none;
+    }
+    @media (max-width: 1024px) { 
+      .grid { grid-template-columns: 1fr; }
+      .form-section { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) { 
+      .plots { grid-template-columns: 1fr; }
+      h1 { font-size: 1.8rem; }
+      .button-group button { min-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📡 Telecom Revenue Prediction</h1>
+      <p class="subtitle">Intelligent revenue forecasting for telecom customers</p>
+    </header>
+
+    <div class="grid">
+      <div class="card">
+        <h2>Customer Profile & Revenue Forecast</h2>
+        <div class="error-message" id="errorMessage"></div>
+        
+        <div class="form-section">
+          <div class="form-group">
+            <label for="network_age">Network Age (days)</label>
+            <input id="network_age" type="number" min="0" max="3000" value="500" />
+          </div>
+          <div class="form-group">
+            <label for="Aggregate_SMS_Rev">SMS Revenue</label>
+            <input id="Aggregate_SMS_Rev" type="number" min="0" max="1000" step="0.01" value="50" />
+          </div>
+          <div class="form-group">
+            <label for="Aggregate_Data_Rev">Data Revenue</label>
+            <input id="Aggregate_Data_Rev" type="number" min="0" max="1000" step="0.01" value="100" />
+          </div>
+          <div class="form-group">
+            <label for="Aggregate_Data_Vol">Data Volume (GB)</label>
+            <input id="Aggregate_Data_Vol" type="number" min="0" max="50000" step="0.1" value="500" />
+          </div>
+          <div class="form-group">
+            <label for="Aggregate_Calls">Total Calls</label>
+            <input id="Aggregate_Calls" type="number" min="0" max="5000" value="200" />
+          </div>
+          <div class="form-group">
+            <label for="Aggregate_ONNET_REV">On-Net Revenue</label>
+            <input id="Aggregate_ONNET_REV" type="number" min="0" max="100000" value="10000" />
+          </div>
+          <div class="form-group">
+            <label for="Aggregate_OFFNET_REV">Off-Net Revenue</label>
+            <input id="Aggregate_OFFNET_REV" type="number" min="0" max="200000" value="50000" />
+          </div>
+          <div class="form-group">
+            <label for="Aggregate_complaint_count">Complaint Count</label>
+            <input id="Aggregate_complaint_count" type="number" min="0" max="100" value="0" />
+          </div>
+          <div class="form-group">
+            <label for="aug_user_type">August User Type</label>
+            <select id="aug_user_type">
+              <option selected>2G</option>
+              <option>3G</option>
+              <option>4G</option>
+              <option>LTE</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="sep_user_type">September User Type</label>
+            <select id="sep_user_type">
+              <option selected>2G</option>
+              <option>3G</option>
+              <option>4G</option>
+              <option>LTE</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="aug_fav_a">August Favorite App</label>
+            <input id="aug_fav_a" type="text" value="telenor" />
+          </div>
+          <div class="form-group">
+            <label for="sep_fav_a">September Favorite App</label>
+            <input id="sep_fav_a" type="text" value="mobilink" />
+          </div>
+        </div>
+
+        <div class="button-group">
+          <button class="btn-primary" onclick="predictRevenue()">🔮 Predict Revenue</button>
+          <button class="btn-secondary" onclick="loadMetrics()">📊 Load Metrics</button>
+        </div>
+      </div>
+
+      <div class="card result">
+        <div class="metric">
+          <h3>Predicted Monthly Revenue</h3>
+          <p id="revenueValue">–</p>
+        </div>
+        <div class="metric">
+          <h3>Prediction Status</h3>
+          <p id="statusValue">Waiting</p>
+        </div>
+        <div class="metric">
+          <h3>Model Confidence</h3>
+          <p id="confidenceValue">–</p>
+        </div>
+        <div style="margin-top: 20px;">
+          <h3 style="color: #cbd5e1; margin-bottom: 12px;">Evaluation Report</h3>
+          <pre id="metricsReport">Click "Load Metrics" to view detailed model performance...</pre>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top: 40px;">
+      <h2 style="color: #7dd3fc; margin-bottom: 20px; font-size: 1.5rem;">📈 Model Visualizations</h2>
+      <div class="plots">
+        <div class="plot">
+          <img id="plot1" src="/results/image/revenue_distribution.png" alt="Revenue distribution" />
+        </div>
+        <div class="plot">
+          <img id="plot2" src="/results/image/actual_vs_predicted.png" alt="Actual vs predicted" />
+        </div>
+        <div class="plot">
+          <img id="plot3" src="/results/image/feature_importance.png" alt="Feature importance" />
+        </div>
+        <div class="plot">
+          <img id="plot4" src="/results/image/residuals_distribution.png" alt="Residuals distribution" />
+        </div>
+        <div class="plot">
+          <img id="plot5" src="/results/image/revenue_comparison.png" alt="Revenue comparison" />
+        </div>
+        <div class="plot">
+          <img id="plot6" src="/results/image/model_performance.png" alt="Model performance" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showError(message) {
+      const errorDiv = document.getElementById('errorMessage');
+      errorDiv.textContent = message;
+      errorDiv.style.display = 'block';
+      setTimeout(() => { errorDiv.style.display = 'none'; }, 5000);
+    }
+
+    async function predictRevenue() {
+      const payload = {
+        network_age: Number(document.getElementById('network_age').value),
+        Aggregate_SMS_Rev: Number(document.getElementById('Aggregate_SMS_Rev').value),
+        Aggregate_Data_Rev: Number(document.getElementById('Aggregate_Data_Rev').value),
+        Aggregate_Data_Vol: Number(document.getElementById('Aggregate_Data_Vol').value),
+        Aggregate_Calls: Number(document.getElementById('Aggregate_Calls').value),
+        Aggregate_ONNET_REV: Number(document.getElementById('Aggregate_ONNET_REV').value),
+        Aggregate_OFFNET_REV: Number(document.getElementById('Aggregate_OFFNET_REV').value),
+        Aggregate_complaint_count: Number(document.getElementById('Aggregate_complaint_count').value),
+        aug_user_type: document.getElementById('aug_user_type').value,
+        sep_user_type: document.getElementById('sep_user_type').value,
+        aug_fav_a: document.getElementById('aug_fav_a').value,
+        sep_fav_a: document.getElementById('sep_fav_a').value,
+      };
+
+      const button = event.target;
+      button.disabled = true;
+      button.innerHTML = '<span class="spinner"></span> Predicting...';
+
+      try {
+        const result = await fetch('/predict', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        
+        const data = await result.json();
+        
+        if (!result.ok) {
+          showError(data.detail || 'Prediction failed.');
+          document.getElementById('statusValue').textContent = 'Error';
+          return;
+        }
+        
+        const revenue = data.predicted_revenue;
+        document.getElementById('revenueValue').textContent = '$' + revenue.toLocaleString('en-US', { 
+          minimumFractionDigits: 2, 
+          maximumFractionDigits: 2 
+        });
+        document.getElementById('statusValue').textContent = '✓ Ready';
+        document.getElementById('confidenceValue').textContent = 'High';
+      } catch (err) {
+        showError('Network error: ' + err.message);
+        document.getElementById('statusValue').textContent = 'Error';
+      } finally {
+        button.disabled = false;
+        button.innerHTML = '🔮 Predict Revenue';
+      }
+    }
+
+    async function loadMetrics() {
+      const button = event.target;
+      button.disabled = true;
+      button.innerHTML = '<span class="spinner"></span> Loading...';
+
+      try {
+        const result = await fetch('/results/metrics');
+        if (!result.ok) {
+          document.getElementById('metricsReport').textContent = 'Unable to load metrics';
+          return;
+        }
+        const data = await result.json();
+        document.getElementById('metricsReport').textContent = data.report;
+        
+        // Refresh all plot images
+        ['plot1','plot2','plot3','plot4','plot5','plot6'].forEach(id => {
+          const img = document.getElementById(id);
+          if (img) {
+            img.src = img.src.split('?')[0] + '?v=' + Date.now();
+          }
+        });
+      } catch (err) {
+        document.getElementById('metricsReport').textContent = 'Error loading metrics: ' + err.message;
+      } finally {
+        button.disabled = false;
+        button.innerHTML = '📊 Load Metrics';
+      }
+    }
+
+    // Load metrics on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(loadMetrics, 500);
+    });
+  </script>
+</body>
+</html>

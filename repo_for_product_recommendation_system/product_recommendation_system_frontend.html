@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Product Recommendation System</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #0f172a; color: #e2e8f0; }
+    .container { max-width: 1080px; margin: 24px auto; padding: 20px; }
+    .card { background: #111827; border: 1px solid #334155; border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+    h1, h2 { margin-top: 0; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    label { font-size: 13px; color: #94a3b8; display: block; margin-bottom: 5px; }
+    input, select, button { width: 100%; border-radius: 8px; border: 1px solid #475569; padding: 10px; background: #0b1220; color: #f1f5f9; box-sizing: border-box; }
+    button { background: #2563eb; border: none; font-weight: 600; cursor: pointer; }
+    button:hover { background: #1d4ed8; }
+    .result-box { background: #052e16; border: 1px solid #16a34a; border-radius: 10px; padding: 14px; display: none; }
+    .error { color: #fca5a5; margin-top: 8px; display: none; }
+    img { width: 100%; border-radius: 10px; border: 1px solid #334155; background: #020617; }
+    .plots { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .badge { display: inline-block; padding: 4px 10px; border-radius: 999px; background: #1d4ed8; font-weight: 700; margin: 2px; }
+    ul { margin: 8px 0; padding-left: 20px; }
+    @media (max-width: 900px) { .grid, .plots { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card" id="dashboard">
+      <h1>Product Recommendation System Dashboard</h1>
+      <p>Enter customer product interaction data to get personalized product recommendations.</p>
+    </div>
+
+    <div class="card" id="input-form">
+      <h2>Customer Product Interaction Form</h2>
+      <form id="recommendation-form" onsubmit="return false;">
+        <div class="grid">
+          <div><label>Customer ID</label><input id="customer_id" type="text" value="A39HTATAQ9V7YF" required /></div>
+          <div><label>Product Category</label><select id="product_category"><option>Beauty Essentials</option><option>Popular Beauty</option><option>Trending Beauty</option><option>Top Rated Beauty</option></select></div>
+          <div><label>Previous Purchases</label><input id="previous_purchases" type="number" min="0" value="12" required /></div>
+          <div><label>Product Ratings (1-5)</label><input id="product_ratings" type="number" min="1" max="5" step="0.1" value="4.5" required /></div>
+          <div><label>Preferred Brand</label><input id="preferred_brand" type="text" value="020" required /></div>
+          <div><label>Budget Range</label><select id="budget_range"><option>Low</option><option>Medium</option><option>High</option><option selected>Premium</option></select></div>
+          <div><label>Shopping Frequency</label><select id="shopping_frequency"><option>Rare</option><option>Occasional</option><option selected>Regular</option><option>Frequent</option></select></div>
+          <div><label>Product Interest Type</label><select id="product_interest_type"><option>High Interest</option><option>Low Interest</option></select></div>
+        </div>
+        <div style="margin-top: 12px;">
+          <button onclick="getRecommendations()">Get Product Recommendations</button>
+          <div id="error" class="error"></div>
+        </div>
+      </form>
+    </div>
+
+    <div class="card result-box" id="result-box">
+      <h2>Recommendation Result</h2>
+      <p><strong>Recommended Products:</strong></p>
+      <ul id="recommended_products"></ul>
+      <p><strong>Recommendation Confidence Score:</strong> <span id="recommendation_confidence_score"></span>%</p>
+      <p><strong>Suggested Product Categories:</strong></p>
+      <div id="suggested_product_categories"></div>
+      <p><strong>Model:</strong> <span id="selected_model"></span> | <strong>Accuracy:</strong> <span id="model_accuracy"></span>%</p>
+    </div>
+
+    <div class="card">
+      <h2>Generated Visualizations</h2>
+      <div class="plots">
+        <img src="/results/image/product_popularity.png" alt="product_popularity">
+        <img src="/results/image/correlation_heatmap.png" alt="correlation_heatmap">
+        <img src="/results/image/feature_importance.png" alt="feature_importance">
+        <img src="/results/image/user_product_interaction.png" alt="user_product_interaction">
+        <img src="/results/image/category_wise_recommendation.png" alt="category_wise_recommendation">
+        <img src="/results/image/product_rating_distribution.png" alt="product_rating_distribution">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = window.location.origin;
+    function showError(msg) {
+      const el = document.getElementById("error");
+      el.style.display = "block";
+      el.textContent = msg;
+    }
+
+    async function getRecommendations() {
+      const payload = {
+        customer_id: document.getElementById("customer_id").value.trim(),
+        product_category: document.getElementById("product_category").value,
+        previous_purchases: Number(document.getElementById("previous_purchases").value),
+        product_ratings: Number(document.getElementById("product_ratings").value),
+        preferred_brand: document.getElementById("preferred_brand").value,
+        budget_range: document.getElementById("budget_range").value,
+        shopping_frequency: document.getElementById("shopping_frequency").value,
+        product_interest_type: document.getElementById("product_interest_type").value
+      };
+      document.getElementById("error").style.display = "none";
+
+      if (!payload.customer_id) return showError("Enter a valid customer ID.");
+      if (Number.isNaN(payload.product_ratings) || payload.product_ratings < 1 || payload.product_ratings > 5) return showError("Product ratings must be between 1 and 5.");
+      if (Number.isNaN(payload.previous_purchases) || payload.previous_purchases < 0) return showError("Enter valid previous purchases count.");
+
+      try {
+        const res = await fetch(`${API}/predict`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) return showError(data.detail || "Recommendation failed.");
+
+        const list = document.getElementById("recommended_products");
+        list.innerHTML = "";
+        (data.recommended_products || []).forEach(p => {
+          const li = document.createElement("li");
+          li.textContent = p;
+          list.appendChild(li);
+        });
+
+        document.getElementById("recommendation_confidence_score").textContent = data.recommendation_confidence_score;
+        const catDiv = document.getElementById("suggested_product_categories");
+        catDiv.innerHTML = "";
+        (data.suggested_product_categories || []).forEach(c => {
+          const span = document.createElement("span");
+          span.className = "badge";
+          span.textContent = c;
+          catDiv.appendChild(span);
+        });
+        document.getElementById("selected_model").textContent = data.selected_model;
+        document.getElementById("model_accuracy").textContent = data.model_accuracy;
+        document.getElementById("result-box").style.display = "block";
+      } catch (err) {
+        showError("Unable to reach backend. Start server with: python product_recommendation_system.py");
+      }
+    }
+  </script>
+</body>
+</html>

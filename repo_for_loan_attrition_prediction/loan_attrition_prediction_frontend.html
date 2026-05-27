@@ -1,0 +1,169 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Loan Attrition Prediction</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #0f172a; color: #e2e8f0; }
+    .container { max-width: 1080px; margin: 24px auto; padding: 20px; }
+    .card { background: #111827; border: 1px solid #334155; border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+    h1, h2 { margin-top: 0; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    label { font-size: 13px; color: #94a3b8; display: block; margin-bottom: 5px; }
+    input, select, button {
+      width: 100%; border-radius: 8px; border: 1px solid #475569; padding: 10px;
+      background: #0b1220; color: #f1f5f9;
+    }
+    button { background: #2563eb; border: none; font-weight: 600; cursor: pointer; }
+    button:hover { background: #1d4ed8; }
+    .result-box { background: #052e16; border: 1px solid #16a34a; border-radius: 10px; padding: 14px; display: none; }
+    .error { color: #fca5a5; margin-top: 8px; display: none; }
+    img { width: 100%; border-radius: 10px; border: 1px solid #334155; background: #020617; }
+    .plots { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 900px) { .grid, .plots { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>Loan Attrition Prediction Dashboard</h1>
+      <p>Enter customer loan details to estimate attrition risk and probability score.</p>
+    </div>
+
+    <div class="card">
+      <h2>Loan Customer Input Form</h2>
+      <form id="loan-form" onsubmit="return false;">
+        <div class="grid">
+          <div>
+            <label>Customer Age</label>
+            <input id="customer_age" type="number" min="18" max="85" value="36" required />
+          </div>
+          <div>
+            <label>Annual Income</label>
+            <input id="annual_income" type="number" min="100000" value="6800000" required />
+          </div>
+          <div>
+            <label>Loan Amount</label>
+            <input id="loan_amount" type="number" min="100000" value="18000000" required />
+          </div>
+          <div>
+            <label>Credit Score</label>
+            <input id="credit_score" type="number" min="300" max="900" value="710" required />
+          </div>
+          <div>
+            <label>Employment Status</label>
+            <select id="employment_status">
+              <option>Employed</option>
+              <option>Self Employed</option>
+              <option>Business Owner</option>
+              <option>Freelancer</option>
+            </select>
+          </div>
+          <div>
+            <label>Loan Type</label>
+            <select id="loan_type">
+              <option>Home Loan</option>
+              <option>Personal Loan</option>
+              <option>Business Loan</option>
+              <option>Vehicle Loan</option>
+            </select>
+          </div>
+          <div>
+            <label>Loan Tenure</label>
+            <input id="loan_tenure" type="number" min="2" max="30" value="12" required />
+          </div>
+          <div>
+            <label>EMI Amount</label>
+            <input id="emi_amount" type="number" min="1000" value="145000" required />
+          </div>
+          <div>
+            <label>Existing Debt</label>
+            <input id="existing_debt" type="number" min="0" value="1250000" required />
+          </div>
+          <div>
+            <label>Payment History</label>
+            <select id="payment_history">
+              <option>Good</option>
+              <option>Average</option>
+              <option>Poor</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-top: 12px;">
+          <button onclick="predictLoanAttrition()">Run Loan Attrition Risk Prediction</button>
+          <div id="error" class="error"></div>
+        </div>
+      </form>
+    </div>
+
+    <div class="card result-box" id="result-box">
+      <h2>Prediction Result</h2>
+      <p><strong>Loan Attrition Risk:</strong> <span id="loan_attrition_risk"></span></p>
+      <p><strong>Attrition Probability Score:</strong> <span id="attrition_probability_score"></span>%</p>
+      <p><strong>Risk Category:</strong> <span id="risk_category"></span></p>
+      <p><strong>Model:</strong> <span id="selected_model"></span> | <strong>Model Accuracy:</strong> <span id="model_accuracy"></span>%</p>
+    </div>
+
+    <div class="card">
+      <h2>Generated Visualizations</h2>
+      <div class="plots">
+        <img src="/results/image/attrition_distribution.png" alt="attrition_distribution">
+        <img src="/results/image/correlation_heatmap.png" alt="correlation_heatmap">
+        <img src="/results/image/feature_importance.png" alt="feature_importance">
+        <img src="/results/image/confusion_matrix.png" alt="confusion_matrix">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = "http://127.0.0.1:8000";
+
+    function showError(msg) {
+      const el = document.getElementById("error");
+      el.style.display = "block";
+      el.textContent = msg;
+    }
+
+    async function predictLoanAttrition() {
+      const payload = {
+        customer_age: Number(document.getElementById("customer_age").value),
+        annual_income: Number(document.getElementById("annual_income").value),
+        loan_amount: Number(document.getElementById("loan_amount").value),
+        credit_score: Number(document.getElementById("credit_score").value),
+        employment_status: document.getElementById("employment_status").value,
+        loan_type: document.getElementById("loan_type").value,
+        loan_tenure: Number(document.getElementById("loan_tenure").value),
+        emi_amount: Number(document.getElementById("emi_amount").value),
+        existing_debt: Number(document.getElementById("existing_debt").value),
+        payment_history: document.getElementById("payment_history").value
+      };
+
+      document.getElementById("error").style.display = "none";
+
+      if (Number.isNaN(payload.annual_income) || payload.annual_income < 100000) return showError("Enter valid annual income.");
+      if (Number.isNaN(payload.loan_amount) || payload.loan_amount < 100000) return showError("Enter valid loan amount.");
+      if (Number.isNaN(payload.credit_score) || payload.credit_score < 300 || payload.credit_score > 900) return showError("Credit score must be between 300 and 900.");
+
+      try {
+        const res = await fetch(`${API}/predict`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) return showError(data.detail || "Prediction failed.");
+
+        document.getElementById("loan_attrition_risk").textContent = data.loan_attrition_risk;
+        document.getElementById("attrition_probability_score").textContent = data.attrition_probability_score;
+        document.getElementById("risk_category").textContent = data.risk_category;
+        document.getElementById("selected_model").textContent = data.selected_model;
+        document.getElementById("model_accuracy").textContent = data.model_accuracy;
+        document.getElementById("result-box").style.display = "block";
+      } catch (e) {
+        showError("Could not reach backend server. Start loan_attrition_prediction.py first.");
+      }
+    }
+  </script>
+</body>
+</html>
