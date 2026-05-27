@@ -1,0 +1,20 @@
+Energy Consumption Prediction - Model Evaluation Report
+=========================================================
+Model     : RandomForestRegressor (n_estimators=120, max_depth=12)
+Dataset   : Energy_consumption_dataset.csv (5000 samples)
+Features  : ['Month', 'Hour', 'DayOfWeek', 'Holiday', 'Temperature', 'Humidity', 'SquareFootage', 'Occupancy', 'HVACUsage', 'LightingUsage', 'RenewableEnergy']
+
+Performance Metrics
+-------------------
+MAE       : 6.303
+MSE       : 62.929
+RMSE      : 7.933
+R2 Score  : 0.246
+
+Top 5 Predictions
+------------------
+Actual=84.779, Predicted=74.330
+Actual=62.778, Predicted=81.380
+Actual=85.231, Predicted=74.357
+Actual=94.525, Predicted=85.216
+Actual=75.313, Predicted=72.645
