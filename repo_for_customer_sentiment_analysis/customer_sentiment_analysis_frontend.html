@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Customer Sentiment Analysis</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #0f172a; color: #e2e8f0; }
+    .container { max-width: 1080px; margin: 24px auto; padding: 20px; }
+    .card { background: #111827; border: 1px solid #334155; border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    label { font-size: 13px; color: #94a3b8; display: block; margin-bottom: 5px; }
+    textarea, input, button { width: 100%; border-radius: 8px; border: 1px solid #475569; padding: 10px; background: #0b1220; color: #f1f5f9; box-sizing: border-box; }
+    textarea { min-height: 90px; resize: vertical; }
+    button { background: #2563eb; border: none; font-weight: 600; cursor: pointer; }
+    .result-box { background: #052e16; border: 1px solid #16a34a; border-radius: 10px; padding: 14px; display: none; }
+    .error { color: #fca5a5; margin-top: 8px; display: none; }
+    img { width: 100%; border-radius: 10px; border: 1px solid #334155; background: #020617; }
+    .plots { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 900px) { .grid, .plots { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card" id="dashboard">
+      <h1>Customer Sentiment Analysis Dashboard</h1>
+      <p>Enter customer feedback data to predict sentiment and confidence category.</p>
+    </div>
+    <div class="card" id="input-form">
+      <h2>Feedback Input Form</h2>
+      <form onsubmit="return false;">
+        <div class="grid">
+          <div style="grid-column: span 2;">
+            <label>Feedback Text</label>
+            <textarea id="feedback_text" required>The delivery experience was poor and support response was slow.</textarea>
+          </div>
+          <div><label>Customer Segment</label><input id="customer_segment" value="Premium" required /></div>
+          <div><label>Source Channel</label><input id="source_channel" value="Email" required /></div>
+          <div><label>Confidence Score (0-1)</label><input id="confidence_score" type="number" min="0" max="1" step="0.01" value="0.82" required /></div>
+        </div>
+        <div style="margin-top: 12px;">
+          <button onclick="predictSentiment()">Analyze Sentiment</button>
+          <div id="error" class="error"></div>
+        </div>
+      </form>
+    </div>
+    <div class="card result-box" id="result-box">
+      <h2>Sentiment Analysis Result</h2>
+      <p><strong>Sentiment Prediction Result:</strong> <span id="sentiment_prediction_result"></span></p>
+      <p><strong>Sentiment Probability Score:</strong> <span id="sentiment_probability_score"></span>%</p>
+      <p><strong>Confidence Category:</strong> <span id="confidence_category"></span></p>
+      <p><strong>Model:</strong> <span id="selected_model"></span> | <strong>Accuracy:</strong> <span id="model_accuracy"></span>%</p>
+    </div>
+    <div class="card">
+      <h2>Generated Visualizations</h2>
+      <div class="plots">
+        <img src="/results/image/sentiment_distribution.png" alt="sentiment_distribution" />
+        <img src="/results/image/correlation_heatmap.png" alt="correlation_heatmap" />
+        <img src="/results/image/feature_importance.png" alt="feature_importance" />
+        <img src="/results/image/confusion_matrix.png" alt="confusion_matrix" />
+        <img src="/results/image/customer_risk_category_comparison.png" alt="customer_risk_category_comparison" />
+        <img src="/results/image/model_performance_metrics_visualization.png" alt="model_performance_metrics_visualization" />
+      </div>
+    </div>
+  </div>
+  <script>
+    async function predictSentiment() {
+      const payload = {
+        feedback_text: document.getElementById("feedback_text").value.trim(),
+        customer_segment: document.getElementById("customer_segment").value.trim(),
+        source_channel: document.getElementById("source_channel").value.trim(),
+        confidence_score: Number(document.getElementById("confidence_score").value)
+      };
+      const err = document.getElementById("error");
+      err.style.display = "none";
+      if (!payload.feedback_text || !payload.customer_segment || !payload.source_channel) {
+        err.textContent = "All fields are required."; err.style.display = "block"; return;
+      }
+      if (Number.isNaN(payload.confidence_score) || payload.confidence_score < 0 || payload.confidence_score > 1) {
+        err.textContent = "Confidence score must be between 0 and 1."; err.style.display = "block"; return;
+      }
+      try {
+        const res = await fetch(`${window.location.origin}/predict`, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify(payload) });
+        const data = await res.json();
+        if (!res.ok) { err.textContent = data.detail || "Prediction failed."; err.style.display = "block"; return; }
+        document.getElementById("sentiment_prediction_result").textContent = data.sentiment_prediction_result;
+        document.getElementById("sentiment_probability_score").textContent = data.sentiment_probability_score;
+        document.getElementById("confidence_category").textContent = data.confidence_category;
+        document.getElementById("selected_model").textContent = data.selected_model;
+        document.getElementById("model_accuracy").textContent = data.model_accuracy;
+        document.getElementById("result-box").style.display = "block";
+      } catch {
+        err.textContent = "Unable to reach backend. Start server with: python customer_sentiment_analysis.py";
+        err.style.display = "block";
+      }
+    }
+  </script>
+</body>
+</html>

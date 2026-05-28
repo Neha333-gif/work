@@ -1,0 +1,17 @@
+Customer Sentiment Analysis - Model Evaluation Report
+=================================================
+Selected Model           : Decision Tree Classifier
+Accuracy                 : 0.6667
+Precision                : 0.6667
+Recall                   : 0.6667
+F1 Score                 : 0.6637
+Dataset Path             : C:\Users\peepl\Downloads\cust_segmentation_zip\repo_for_demand_forecasting\repo_for_demand_forecasting\customet_feedback_system\sentiment-analysis.csv
+Total Samples            : 75
+Training Samples         : 60
+Testing Samples          : 15
+
+Model Comparison
+----------------
+Logistic Regression: acc=0.6000, pre=0.6222, rec=0.6000, f1=0.5600
+Decision Tree Classifier: acc=0.6667, pre=0.6667, rec=0.6667, f1=0.6637
+Random Forest Classifier: acc=0.6000, pre=0.6222, rec=0.6000, f1=0.5600

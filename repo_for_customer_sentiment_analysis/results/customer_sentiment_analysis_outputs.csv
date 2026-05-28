@@ -1,0 +1,16 @@
+text,actual_sentiment,predicted_sentiment,confidence_score
+"""Their website is so user-friendly. Love it!""",Positive,Negative,1.0
+"""The customer service at this store is exceptional. They went above and beyond.""",Negative,Positive,1.0
+"""The food at this restaurant was mediocre. Nothing special.""",Negative,Negative,1.0
+"""I love this product!""",Positive,Positive,1.0
+"""The live concert was electrifying! The band's energy was contagious.""",Positive,Positive,1.0
+"""I'm disappointed with the ending of this book. It fell flat.""",Positive,Positive,1.0
+"""The product arrived damaged. Very disappointed.""",Negative,Negative,1.0
+"""I had a frustrating experience navigating through their website.""",Positive,Positive,1.0
+"""I'm so disappointed with their customer support.""",Negative,Positive,1.0
+"""I had a great chat with their customer support. Helpful and friendly.""",Positive,Positive,1.0
+"""The hotel staff were rude and unprofessional. Terrible customer service.""",Positive,Positive,1.0
+"""The customer service at this store is outstanding. They truly care about their customers.""",Negative,Positive,1.0
+"""The product arrived damaged. Very disappointed.""",Negative,Negative,1.0
+"""I had an incredible experience at the theme park. So much fun!""",Positive,Negative,1.0
+"""The customer service at this store is exceptional. They went above and beyond.""",Negative,Negative,1.0
