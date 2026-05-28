@@ -1,0 +1,17 @@
+Employee Attrition Prediction - Model Evaluation Report
+=================================================
+Selected Model           : Random Forest Classifier
+Accuracy                 : 0.9878
+Precision                : 0.9889
+Recall                   : 0.5993
+F1 Score                 : 0.7463
+Dataset Path             : C:\Users\peepl\Downloads\cust_segmentation_zip\repo_for_demand_forecasting\repo_for_demand_forecasting\employee_attrition\MFG10YearTerminationData.csv
+Total Samples            : 49653
+Training Samples         : 39722
+Testing Samples          : 9931
+
+Model Comparison
+----------------
+Logistic Regression: acc=0.9699, pre=0.3750, rec=0.0101, f1=0.0197
+Decision Tree Classifier: acc=0.9873, pre=0.9572, rec=0.6027, f1=0.7397
+Random Forest Classifier: acc=0.9878, pre=0.9889, rec=0.5993, f1=0.7463

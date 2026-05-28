@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Employee Attrition Prediction</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #0f172a; color: #e2e8f0; }
+    .container { max-width: 1080px; margin: 24px auto; padding: 20px; }
+    .card { background: #111827; border: 1px solid #334155; border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+    h1, h2 { margin-top: 0; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    label { font-size: 13px; color: #94a3b8; display: block; margin-bottom: 5px; }
+    input, select, button { width: 100%; border-radius: 8px; border: 1px solid #475569; padding: 10px; background: #0b1220; color: #f1f5f9; box-sizing: border-box; }
+    button { background: #2563eb; border: none; font-weight: 600; cursor: pointer; }
+    button:hover { background: #1d4ed8; }
+    .result-box { background: #052e16; border: 1px solid #16a34a; border-radius: 10px; padding: 14px; display: none; }
+    .error { color: #fca5a5; margin-top: 8px; display: none; }
+    img { width: 100%; border-radius: 10px; border: 1px solid #334155; background: #020617; }
+    .plots { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 900px) { .grid, .plots { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card" id="dashboard">
+      <h1>Employee Attrition Prediction Dashboard</h1>
+      <p>Enter employee workforce data to estimate attrition risk and retention outcomes.</p>
+    </div>
+
+    <div class="card" id="input-form">
+      <h2>Employee Workforce Input Form</h2>
+      <form onsubmit="return false;">
+        <div class="grid">
+          <div><label>Employee Age</label><input id="employee_age" type="number" min="18" max="70" value="34" required /></div>
+          <div><label>Department</label><input id="department" type="text" value="Meats" required /></div>
+          <div><label>Monthly Income</label><input id="monthly_income" type="number" min="0" value="5400" required /></div>
+          <div><label>Job Role</label><input id="job_role" type="text" value="Meat Cutter" required /></div>
+          <div><label>Years at Company</label><input id="years_at_company" type="number" min="0" value="4" required /></div>
+          <div><label>Job Satisfaction (1-5)</label><input id="job_satisfaction" type="number" min="1" max="5" value="3" required /></div>
+          <div><label>Overtime Status</label><select id="overtime_status"><option>No</option><option>Yes</option></select></div>
+          <div><label>Work-Life Balance (1-5)</label><input id="work_life_balance" type="number" min="1" max="5" value="3" required /></div>
+          <div><label>Performance Rating (1-5)</label><input id="performance_rating" type="number" min="1" max="5" value="4" required /></div>
+        </div>
+        <div style="margin-top: 12px;">
+          <button onclick="predictAttrition()">Predict Employee Attrition Risk</button>
+          <div id="error" class="error"></div>
+        </div>
+      </form>
+    </div>
+
+    <div class="card result-box" id="result-box">
+      <h2>Prediction Result</h2>
+      <p><strong>Employee Attrition Prediction:</strong> <span id="employee_attrition_prediction"></span></p>
+      <p><strong>Attrition Probability Score:</strong> <span id="attrition_probability_score"></span>%</p>
+      <p><strong>Attrition Risk Category:</strong> <span id="attrition_risk_category"></span></p>
+      <p><strong>Selected Model:</strong> <span id="selected_model"></span> | <strong>Accuracy:</strong> <span id="model_accuracy"></span>%</p>
+    </div>
+
+    <div class="card">
+      <h2>Generated Visualizations</h2>
+      <div class="plots">
+        <img src="/results/image/attrition_distribution.png" alt="attrition_distribution" />
+        <img src="/results/image/correlation_heatmap.png" alt="correlation_heatmap" />
+        <img src="/results/image/feature_importance.png" alt="feature_importance" />
+        <img src="/results/image/confusion_matrix.png" alt="confusion_matrix" />
+        <img src="/results/image/roc_curve.png" alt="roc_curve" />
+        <img src="/results/image/model_performance_metrics_visualization.png" alt="model_performance_metrics_visualization" />
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = window.location.origin;
+    function showError(msg) {
+      const el = document.getElementById("error");
+      el.style.display = "block";
+      el.textContent = msg;
+    }
+
+    async function predictAttrition() {
+      const payload = {
+        employee_age: Number(document.getElementById("employee_age").value),
+        department: document.getElementById("department").value.trim(),
+        monthly_income: Number(document.getElementById("monthly_income").value),
+        job_role: document.getElementById("job_role").value.trim(),
+        years_at_company: Number(document.getElementById("years_at_company").value),
+        job_satisfaction: Number(document.getElementById("job_satisfaction").value),
+        overtime_status: document.getElementById("overtime_status").value,
+        work_life_balance: Number(document.getElementById("work_life_balance").value),
+        performance_rating: Number(document.getElementById("performance_rating").value)
+      };
+
+      document.getElementById("error").style.display = "none";
+
+      if (!payload.department || !payload.job_role) return showError("Department and job role are required.");
+      if (Number.isNaN(payload.employee_age) || payload.employee_age < 18 || payload.employee_age > 70) return showError("Employee age must be between 18 and 70.");
+      if (Number.isNaN(payload.monthly_income) || payload.monthly_income < 0) return showError("Monthly income must be a valid non-negative number.");
+      if (Number.isNaN(payload.years_at_company) || payload.years_at_company < 0) return showError("Years at company must be non-negative.");
+      if ([payload.job_satisfaction, payload.work_life_balance, payload.performance_rating].some(v => Number.isNaN(v) || v < 1 || v > 5)) return showError("Satisfaction, work-life balance, and performance rating must be in 1-5.");
+
+      try {
+        const res = await fetch(`${API}/predict`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) return showError(data.detail || "Employee attrition prediction failed.");
+
+        document.getElementById("employee_attrition_prediction").textContent = data.employee_attrition_prediction;
+        document.getElementById("attrition_probability_score").textContent = data.attrition_probability_score;
+        document.getElementById("attrition_risk_category").textContent = data.attrition_risk_category;
+        document.getElementById("selected_model").textContent = data.selected_model;
+        document.getElementById("model_accuracy").textContent = data.model_accuracy;
+        document.getElementById("result-box").style.display = "block";
+      } catch (err) {
+        showError("Unable to reach backend. Start server with: python employee_attrition_prediction.py");
+      }
+    }
+  </script>
+</body>
+</html>
