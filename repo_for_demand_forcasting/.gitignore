@@ -1,0 +1,5 @@
+﻿__pycache__/
+*.joblib
+results/*.png
+results/*.csv
+results/*.txt

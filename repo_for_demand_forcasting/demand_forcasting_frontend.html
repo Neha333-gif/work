@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Demand Forecasting System</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #0f172a; color: #e2e8f0; }
+    .container { max-width: 1080px; margin: 24px auto; padding: 20px; }
+    .card { background: #111827; border: 1px solid #334155; border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+    h1, h2 { margin-top: 0; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    label { font-size: 13px; color: #94a3b8; display: block; margin-bottom: 5px; }
+    input, button { width: 100%; border-radius: 8px; border: 1px solid #475569; padding: 10px; background: #0b1220; color: #f1f5f9; box-sizing: border-box; }
+    button { background: #2563eb; border: none; font-weight: 600; cursor: pointer; }
+    button:hover { background: #1d4ed8; }
+    .result-box { background: #052e16; border: 1px solid #16a34a; border-radius: 10px; padding: 14px; display: none; }
+    .error { color: #fca5a5; margin-top: 8px; display: none; }
+    img { width: 100%; border-radius: 10px; border: 1px solid #334155; background: #020617; }
+    .plots { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 900px) { .grid, .plots { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card" id="dashboard">
+      <h1>Demand Forecasting System Dashboard</h1>
+      <p>Enter sales and inventory demand data to generate product demand forecasts.</p>
+    </div>
+
+    <div class="card" id="input-form">
+      <h2>Sales and Inventory Demand Input Form</h2>
+      <form id="forecast-form" onsubmit="return false;">
+        <div class="grid">
+          <div><label>Product Category</label><input id="product_category" type="text" value="Essentials" required /></div>
+          <div><label>Historical Sales</label><input id="historical_sales" type="number" min="0" value="125" required /></div>
+          <div><label>Inventory Level</label><input id="inventory_level" type="number" min="0" value="100" required /></div>
+          <div><label>Seasonal Index</label><input id="seasonal_index" type="number" min="0" step="0.01" value="1.10" required /></div>
+          <div><label>Marketing Spend</label><input id="marketing_spend" type="number" min="0" value="60" required /></div>
+          <div><label>Region</label><input id="region" type="text" value="North" required /></div>
+          <div><label>Month</label><input id="month" type="number" min="1" max="12" value="7" required /></div>
+          <div><label>Promotional Offers (0 or 1)</label><input id="promotional_offers" type="number" min="0" max="1" value="1" required /></div>
+          <div><label>Customer Demand Trends</label><input id="customer_demand_trends" type="number" min="0" step="0.01" value="0.85" required /></div>
+        </div>
+        <div style="margin-top: 12px;">
+          <button onclick="forecastDemand()">Forecast Product Demand</button>
+          <div id="error" class="error"></div>
+        </div>
+      </form>
+    </div>
+
+    <div class="card result-box" id="result-box">
+      <h2>Forecasting Result</h2>
+      <p><strong>Forecasted Product Demand:</strong> <span id="forecasted_product_demand"></span></p>
+      <p><strong>Estimated Sales Range:</strong> <span id="estimated_sales_range"></span></p>
+      <p><strong>Demand Trend Indicator:</strong> <span id="demand_trend_indicator"></span></p>
+      <p><strong>Model:</strong> <span id="selected_model"></span></p>
+      <p><strong>MAE:</strong> <span id="mae"></span> | <strong>MSE:</strong> <span id="mse"></span> | <strong>RMSE:</strong> <span id="rmse"></span></p>
+    </div>
+
+    <div class="card">
+      <h2>Generated Visualizations</h2>
+      <div class="plots">
+        <img src="/results/image/demand_trend.png" alt="demand_trend" />
+        <img src="/results/image/correlation_heatmap.png" alt="correlation_heatmap" />
+        <img src="/results/image/feature_importance.png" alt="feature_importance" />
+        <img src="/results/image/actual_vs_forecasted_demand.png" alt="actual_vs_forecasted_demand" />
+        <img src="/results/image/residual_error_distribution.png" alt="residual_error_distribution" />
+        <img src="/results/image/seasonal_demand_analysis.png" alt="seasonal_demand_analysis" />
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = window.location.origin;
+
+    function showError(msg) {
+      const el = document.getElementById("error");
+      el.style.display = "block";
+      el.textContent = msg;
+    }
+
+    async function forecastDemand() {
+      const payload = {
+        product_category: document.getElementById("product_category").value.trim(),
+        historical_sales: Number(document.getElementById("historical_sales").value),
+        inventory_level: Number(document.getElementById("inventory_level").value),
+        seasonal_index: Number(document.getElementById("seasonal_index").value),
+        marketing_spend: Number(document.getElementById("marketing_spend").value),
+        region: document.getElementById("region").value.trim(),
+        month: Number(document.getElementById("month").value),
+        promotional_offers: Number(document.getElementById("promotional_offers").value),
+        customer_demand_trends: Number(document.getElementById("customer_demand_trends").value)
+      };
+      document.getElementById("error").style.display = "none";
+
+      if (!payload.product_category) return showError("Enter a valid product category.");
+      if (!payload.region) return showError("Enter a valid region.");
+      if (Number.isNaN(payload.month) || payload.month < 1 || payload.month > 12) return showError("Month must be between 1 and 12.");
+      if (Number.isNaN(payload.promotional_offers) || ![0, 1].includes(payload.promotional_offers)) return showError("Promotional offers must be 0 or 1.");
+      if ([payload.historical_sales, payload.inventory_level, payload.seasonal_index, payload.marketing_spend, payload.customer_demand_trends].some(v => Number.isNaN(v) || v < 0)) return showError("Numeric fields must be valid non-negative values.");
+
+      try {
+        const res = await fetch(`${API}/forecast`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) return showError(data.detail || "Demand forecasting failed.");
+
+        document.getElementById("forecasted_product_demand").textContent = data.forecasted_product_demand;
+        document.getElementById("estimated_sales_range").textContent = data.estimated_sales_range;
+        document.getElementById("demand_trend_indicator").textContent = data.demand_trend_indicator;
+        document.getElementById("selected_model").textContent = data.selected_model;
+        document.getElementById("mae").textContent = data.mae;
+        document.getElementById("mse").textContent = data.mse;
+        document.getElementById("rmse").textContent = data.rmse;
+        document.getElementById("result-box").style.display = "block";
+      } catch (err) {
+        showError("Unable to reach backend. Start server with: python demand_forcasting.py");
+      }
+    }
+  </script>
+</body>
+</html>
