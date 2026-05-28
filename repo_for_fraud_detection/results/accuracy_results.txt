@@ -1,0 +1,17 @@
+Fraud Detection System - Model Evaluation Report
+=================================================
+Selected Model           : Random Forest Classifier
+Accuracy                 : 0.9996
+Precision                : 0.9412
+Recall                   : 0.8163
+F1 Score                 : 0.8743
+Dataset Path             : C:\Users\peepl\Downloads\cust_segmentation_zip\repo_for_demand_forecasting\repo_for_demand_forecasting\fraud_detection_dataset\creditcard.csv
+Total Samples            : 284807
+Training Samples         : 227845
+Testing Samples          : 56962
+
+Model Comparison
+----------------
+Logistic Regression: acc=0.9992, pre=0.8312, rec=0.6531, f1=0.7314
+Decision Tree Classifier: acc=0.9994, pre=0.8902, rec=0.7449, f1=0.8111
+Random Forest Classifier: acc=0.9996, pre=0.9412, rec=0.8163, f1=0.8743

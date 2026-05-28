@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fraud Detection System</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #0f172a; color: #e2e8f0; }
+    .container { max-width: 1080px; margin: 24px auto; padding: 20px; }
+    .card { background: #111827; border: 1px solid #334155; border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+    h1, h2 { margin-top: 0; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    label { font-size: 13px; color: #94a3b8; display: block; margin-bottom: 5px; }
+    input, button { width: 100%; border-radius: 8px; border: 1px solid #475569; padding: 10px; background: #0b1220; color: #f1f5f9; box-sizing: border-box; }
+    button { background: #2563eb; border: none; font-weight: 600; cursor: pointer; }
+    .result-box { background: #052e16; border: 1px solid #16a34a; border-radius: 10px; padding: 14px; display: none; }
+    .error { color: #fca5a5; margin-top: 8px; display: none; }
+    img { width: 100%; border-radius: 10px; border: 1px solid #334155; background: #020617; }
+    .plots { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 900px) { .grid, .plots { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card" id="dashboard">
+      <h1>Fraud Detection System Dashboard</h1>
+      <p>Enter transaction monitoring data to detect suspicious and fraudulent activity.</p>
+    </div>
+    <div class="card" id="input-form">
+      <h2>Transaction Monitoring Input Form</h2>
+      <form onsubmit="return false;">
+        <div class="grid">
+          <div><label>Transaction Amount</label><input id="transaction_amount" type="number" min="0" value="2500" required /></div>
+          <div><label>Transaction Type</label><input id="transaction_type" value="Online" required /></div>
+          <div><label>Customer Age</label><input id="customer_age" type="number" min="18" max="100" value="32" required /></div>
+          <div><label>Account Balance</label><input id="account_balance" type="number" min="0" value="12000" required /></div>
+          <div><label>Device Type</label><input id="device_type" value="Mobile" required /></div>
+          <div><label>Transaction Time</label><input id="transaction_time" type="number" min="0" value="45000" required /></div>
+          <div><label>Merchant Category</label><input id="merchant_category" value="Electronics" required /></div>
+          <div><label>Location</label><input id="location" value="Urban" required /></div>
+          <div><label>Payment Method</label><input id="payment_method" value="Card" required /></div>
+        </div>
+        <div style="margin-top: 12px;">
+          <button onclick="predictFraud()">Run Fraud Detection</button>
+          <div id="error" class="error"></div>
+        </div>
+      </form>
+    </div>
+    <div class="card result-box" id="result-box">
+      <h2>Fraud Detection Result</h2>
+      <p><strong>Fraud Detection Result:</strong> <span id="fraud_detection_result"></span></p>
+      <p><strong>Fraud Probability Score:</strong> <span id="fraud_probability_score"></span>%</p>
+      <p><strong>Risk Classification:</strong> <span id="risk_classification"></span></p>
+      <p><strong>Model:</strong> <span id="selected_model"></span> | <strong>Accuracy:</strong> <span id="model_accuracy"></span>%</p>
+    </div>
+    <div class="card">
+      <h2>Generated Visualizations</h2>
+      <div class="plots">
+        <img src="/results/image/fraud_distribution.png" alt="fraud_distribution" />
+        <img src="/results/image/correlation_heatmap.png" alt="correlation_heatmap" />
+        <img src="/results/image/feature_importance.png" alt="feature_importance" />
+        <img src="/results/image/confusion_matrix.png" alt="confusion_matrix" />
+        <img src="/results/image/roc_curve.png" alt="roc_curve" />
+        <img src="/results/image/model_performance_metrics_visualization.png" alt="model_performance_metrics_visualization" />
+      </div>
+    </div>
+  </div>
+  <script>
+    async function predictFraud() {
+      const payload = {
+        transaction_amount: Number(document.getElementById("transaction_amount").value),
+        transaction_type: document.getElementById("transaction_type").value.trim(),
+        customer_age: Number(document.getElementById("customer_age").value),
+        account_balance: Number(document.getElementById("account_balance").value),
+        device_type: document.getElementById("device_type").value.trim(),
+        transaction_time: Number(document.getElementById("transaction_time").value),
+        merchant_category: document.getElementById("merchant_category").value.trim(),
+        location: document.getElementById("location").value.trim(),
+        payment_method: document.getElementById("payment_method").value.trim()
+      };
+      const err = document.getElementById("error");
+      err.style.display = "none";
+      if ([payload.transaction_amount,payload.customer_age,payload.account_balance,payload.transaction_time].some(v => Number.isNaN(v) || v < 0)) {
+        err.textContent = "Please enter valid non-negative numeric values."; err.style.display = "block"; return;
+      }
+      try {
+        const res = await fetch(`${window.location.origin}/predict`, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify(payload) });
+        const data = await res.json();
+        if (!res.ok) { err.textContent = data.detail || "Prediction failed."; err.style.display = "block"; return; }
+        document.getElementById("fraud_detection_result").textContent = data.fraud_detection_result;
+        document.getElementById("fraud_probability_score").textContent = data.fraud_probability_score;
+        document.getElementById("risk_classification").textContent = data.risk_classification;
+        document.getElementById("selected_model").textContent = data.selected_model;
+        document.getElementById("model_accuracy").textContent = data.model_accuracy;
+        document.getElementById("result-box").style.display = "block";
+      } catch {
+        err.textContent = "Unable to reach backend. Start server with: python fraud_detection.py";
+        err.style.display = "block";
+      }
+    }
+  </script>
+</body>
+</html>
