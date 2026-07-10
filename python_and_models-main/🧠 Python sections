@@ -1043,6 +1043,19 @@ print(result[1])
 
 23. Print all Armstrong numbers between 1 and 1000.
 
+num = 1234
+
+def arm_sum(num):
+    len_num = len(str(num))
+    arm_sum = 0
+    for i in str(num):
+        arm_sum += pow(int(i), len_num)
+    return arm_sum
+if arm_sum(num) == num:
+    print("Armstrong Number")
+else:
+    print("Not an Armstrong Number")
+
 
 24. Print the sum of digits of a number.
 
