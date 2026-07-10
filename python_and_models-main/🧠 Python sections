@@ -1011,7 +1011,7 @@ def find_prime(n):
     primes = []
     for num in range(2,n):
         is_prime = True
-        for i in range(2, (n//2)+1):
+        for i in range(2, int(n/2)+1):
             if num%i == 0:
                 is_prime = False
                 break 
@@ -1028,7 +1028,7 @@ def find_primes(n):
     count = 0
     for num in range(2,n):
         is_prime = True 
-        for i in range(2,(n//2)+1):
+        for i in range(2,int(n/2)+1):
             if num % i == 0:
                 is_prime = False 
                 break 
@@ -1048,7 +1048,7 @@ print(result[1])
 
 num = 2345
 sum_digit = 0
-for digit in num:
+for digit in str(num):
     sum_digit = sum_digit + digit 
 print(sum_digit)
 
