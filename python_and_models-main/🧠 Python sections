@@ -278,9 +278,9 @@ text = "pyThOn"
 app = []
 for i in text:
     if i == i.upper() :
-        app.append(i)
+        app.append(i.lower()
     else:
-        app.append(i.lower())
+        app.append(i.upper())
 print("".join(app))
 
 43. Remove all occurrences of `"a"` using replace.
