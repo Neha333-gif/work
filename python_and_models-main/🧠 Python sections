@@ -1062,7 +1062,7 @@ else:
 num = 2345
 sum_digit = 0
 for digit in str(num):
-    sum_digit = sum_digit + digit 
+    sum_digit = sum_digit + int(digit) 
 print(sum_digit)
 
 24. Print the sum of digits of a number.
