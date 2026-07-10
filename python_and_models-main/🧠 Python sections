@@ -1717,11 +1717,11 @@ print(f"lower count is : {count_down}")
 
 35. Generate sequence of powers: 2, 4, 8, 16, ...
 
-i = 0
+i = 1
 pow = 0
 num = 2
 while i >= 0:
-    pow = pow + (num**i)
+    pow = (num**i)
     print(pow)
     i = i + 1
     
